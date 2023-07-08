@@ -18220,7 +18220,7 @@ function activate(context) {
   };
   const clientOptions = {
     // Register the server for plain text documents
-    documentSelector: [{ scheme: "file", language: "plaintext" }],
+    documentSelector: [{ scheme: "file", language: "jass" }],
     synchronize: {
       // Notify the server about file changes to '.clientrc files contained in the workspace
       fileEvents: import_vscode.workspace.createFileSystemWatcher("**/.clientrc")
@@ -18232,7 +18232,7 @@ function activate(context) {
     serverOptions,
     clientOptions
   );
-  client.start();
+  client.start().then();
 }
 function deactivate() {
   if (!client) {

@@ -8997,7 +8997,7 @@ connection.onInitialize((params) => {
 });
 connection.onInitialized(() => {
   if (hasConfigurationCapability) {
-    connection.client.register(import_node.DidChangeConfigurationNotification.type, void 0);
+    connection.client.register(import_node.DidChangeConfigurationNotification.type, void 0).then();
   }
   if (hasWorkspaceFolderCapability) {
     connection.workspace.onDidChangeWorkspaceFolders((_event) => {

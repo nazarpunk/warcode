@@ -1,0 +1,127 @@
+{
+  "$schema": "https://raw.githubusercontent.com/martinring/tmlanguage/master/tmlanguage.json",
+  "name": "jass",
+  "scopeName": "source.jass",
+  "patterns": [
+    {"include": "#keywords"},
+    {"include": "#strings"},
+    {"include": "#line-comment"},
+    {"include": "#line-string"},
+    {"include": "#mul-string"},
+    {"include": "#number"},
+    {"include": "#base-type"},
+    {"include": "#keyword"},
+    {"include": "#keyword-control"},
+    {"include": "#keyword-operator"},
+    {"include": "#keyword-constant"},
+    {"include": "#function"}
+  ],
+  "repository": {
+    "keywords": {
+      "patterns": [
+        {"name": "keyword.control.jass", "match": "\\b(if|while|for|return)\\b"}
+      ]
+    },
+    "strings": {
+      "name": "string.quoted.double.jass",
+      "begin": "\"",
+      "end": "\"",
+      "patterns": [
+        {"name": "constant.character.escape.jass", "match": "\\\\."}
+      ]
+    },
+    "line-comment": {"name": "comment.line", "begin": "//", "end": "\\n"},
+    "line-string": {
+      "begin": "\"",
+      "end": "\"|\\n",
+      "beginCaptures": {
+        "0": {
+          "name": "string.quoted.double"
+        }
+      },
+      "endCaptures": {
+        "0": {
+          "name": "string.quoted.double"
+        }
+      },
+      "patterns": [
+        {
+          "name": "string.interpolated",
+          "match": "\\|[cC][\\dabcdefABCDEF]{8,8}"
+        },
+        {
+          "name": "constant.character",
+          "match": "\\|(n|r)"
+        },
+        {
+          "name": "constant.character.escape",
+          "match": "\\\\."
+        },
+        {
+          "name": "string.quoted",
+          "match": "."
+        }
+      ]
+    },
+    "mul-string": {
+      "begin": "\"",
+      "end": "\"",
+      "beginCaptures": {
+        "0": {
+          "name": "string.quoted.double"
+        }
+      },
+      "endCaptures": {
+        "0": {
+          "name": "string.quoted.double"
+        }
+      },
+      "patterns": [
+        {
+          "name": "string.interpolated",
+          "match": "\\|[cC][\\dabcdefABCDEF]{8,8}"
+        },
+        {
+          "name": "constant.character",
+          "match": "\\|(n|r)"
+        },
+        {
+          "name": "constant.character.escape",
+          "match": "\\\\."
+        },
+        {
+          "name": "string.quoted",
+          "match": "."
+        }
+      ]
+    },
+    "number": {
+      "name": "constant.numeric",
+      "match": "'[a-zA-Z0-9]{4}'|\\d+\\.\\d+|\\.\\d+|\\d+\\.|0x[\\da-fA-F]+|\\b\\d+\\b|\\$[a-fA-F0-9]+(?!\\$)"
+    },
+    "base-type": {
+      "name": "support.class",
+      "match": "\\b(integer|real|boolean|string|handle|code|nothing)\\b"
+    },
+    "keyword": {
+      "name": "keyword",
+      "match": "\\b(globals|endglobals|function|endfunction|constant|native|local|type|set|call|takes|returns|extends|array)\\b"
+    },
+    "keyword-control": {
+      "name": "keyword.control",
+      "match": "\\b(if|else|elseif|endif|then|loop|endloop|exitwhen|return)\\b"
+    },
+    "keyword-operator": {
+      "name": "keyword.operator",
+      "match": "\\b(and|or|not)\\b"
+    },
+    "keyword-constant": {
+      "name": "constant.language",
+      "match": "\\b(true|false|null)\\b"
+    },
+    "function": {
+      "name": "entity.name.function",
+      "match": "(?<=\\b(?:function|method)\\s+)[a-zA-Z][a-zA-Z0-9_]*|[a-zA-Z][a-zA-Z0-9_]*(?=\\s*\\()"
+    }
+  }
+}

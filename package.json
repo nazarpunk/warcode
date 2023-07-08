@@ -1,7 +1,5 @@
 {
-  "activationEvents": [
-    "onLanguage:plaintext"
-  ],
+  "activationEvents": [],
   "author": "nazarpunk",
   "categories": [
     "Programming Languages",
@@ -9,6 +7,26 @@
     "Formatters"
   ],
   "contributes": {
+    "languages": [
+      {
+        "id": "jass",
+        "aliases": [
+          "JASS",
+          "jass"
+        ],
+        "extensions": [
+          "j"
+        ],
+        "configuration": "./syntaxes/jass.language-configuration.json"
+      }
+    ],
+    "grammars": [
+      {
+        "language": "jass",
+        "scopeName": "source.jass",
+        "path": "./syntaxes/jass.tmLanguage.json"
+      }
+    ],
     "configuration": {
       "type": "object",
       "title": "Example configuration",
@@ -36,6 +54,7 @@
   "contributors": [],
   "description": "Vanilla JASS syntax.",
   "devDependencies": {
+    "concurrently": "^8.2.0",
     "esbuild": "^0.18.11",
     "@types/vscode": "^1.80.0",
     "@types/node": "20.2.5",
@@ -62,8 +81,7 @@
     "esbuild-client": "esbuild ./client/src/extension.ts --outfile=client/out/extension.js --bundle --external:vscode --format=cjs --platform=node --tree-shaking=true --sourcemap",
     "esbuild-server": "esbuild ./server/src/server.ts --outfile=server/out/server.js       --bundle --external:vscode --format=cjs --platform=node --tree-shaking=true --sourcemap",
     "esbuild": "npm run esbuild-client && npm run esbuild-server",
-    "esbuild-w": "npm run esbuild-client -- --watch && npm run esbuild-server -- --watch",
-    "esbuild-watch": "npm run esbuild -- --watch"
+    "esbuild-watch": "concurrently --kill-others \"npm run esbuild-client -- --watch\" \"npm run esbuild-server -- --watch\""
   },
   "version": "0.0.1"
 }
