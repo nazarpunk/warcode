@@ -13,15 +13,6 @@
     "src"
   ],
   "exclude": [
-    "node_modules",
-    ".vscode-test"
-  ],
-  "references": [
-    {
-      "path": "./client"
-    },
-    {
-      "path": "./server"
-    }
+    "node_modules"
   ]
 }

@@ -54,7 +54,6 @@
   "contributors": [],
   "description": "Vanilla JASS syntax.",
   "devDependencies": {
-    "concurrently": "^8.2.0",
     "esbuild": "^0.18.11",
     "@types/vscode": "^1.80.0",
     "@types/node": "20.2.5",
@@ -66,7 +65,7 @@
   },
   "keywords": [],
   "license": "MIT",
-  "main": "./client/out/extension",
+  "main": "./out/extension.js",
   "name": "jass-vanilla",
   "private": true,
   "publisher": "nazarpunk",
@@ -78,10 +77,9 @@
     "vscode:prepublish": "npm run esbuild-base",
     "build": "vsce package",
     "publish": "vsce publish patch",
-    "esbuild-client": "esbuild ./client/src/extension.ts --outfile=client/out/extension.js --bundle --external:vscode --format=cjs --platform=node --tree-shaking=true --sourcemap",
-    "esbuild-server": "esbuild ./server/src/server.ts --outfile=server/out/server.js       --bundle --external:vscode --format=cjs --platform=node --tree-shaking=true --sourcemap",
-    "esbuild": "npm run esbuild-client && npm run esbuild-server",
-    "esbuild-watch": "concurrently --kill-others \"npm run esbuild-client -- --watch\" \"npm run esbuild-server -- --watch\""
+    "esbuild-base": "esbuild src/extension.ts --outfile=out/extension.js --bundle --external:vscode --format=cjs --platform=node --tree-shaking=true --sourcemap",
+    "esbuild": "npm run esbuild-base",
+    "esbuild-watch": "npm run esbuild-base -- --watch"
   },
   "version": "0.0.1"
 }
