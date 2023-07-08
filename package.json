@@ -1,0 +1,41 @@
+{
+  "activationEvents": [],
+  "author": "nazarpunk",
+  "categories": [
+    "Programming Languages",
+    "Snippets",
+    "Formatters"
+  ],
+  "contributes": {
+    "commands": [
+      {
+        "command": "jass-vanilla.helloWorld",
+        "title": "Hello World"
+      }
+    ]
+  },
+  "contributors": [],
+  "description": "Vanilla JASS syntax.",
+  "devDependencies": {
+    "esbuild": "^0.18.11",
+    "@types/vscode": "^1.80.0",
+    "@types/node": "20.2.5"
+  },
+  "displayName": "jass-vanilla",
+  "engines": {
+    "vscode": "^1.80.0"
+  },
+  "keywords": [],
+  "license": "MIT",
+  "main": "./out/extension.js",
+  "name": "jass-vanilla",
+  "private": true,
+  "scripts": {
+    "build": "vsce package",
+    "publish": "vsce publish patch",
+    "esbuild-base": "esbuild ./src/extension.ts --bundle --outfile=out/extension.js --external:vscode --format=cjs --platform=node --tree-shaking=true",
+    "esbuild": "npm run esbuild-base -- --sourcemap",
+    "esbuild-watch": "npm run esbuild-base -- --sourcemap --watch"
+  },
+  "version": "0.0.1"
+}
