@@ -1,0 +1,59 @@
+library Dummy {
+    constant integer dummyId = 'dumy';
+
+    unit dummy;
+
+    public function CreateDummyOnUnit(unit target) -> unit {
+        dummy = CreateUnit(GetOwningPlayer(target), dummyId, GetUnitX(target), GetUnitY(target), 0);
+        UnitApplyTimedLife(dummy, 'BTLF', .01);
+        return dummy;
+    }
+
+    public function IsUnitDummy(unit target) -> boolean {
+        return GetUnitTypeId(target) == dummyId;
+    }
+
+    
+
+}
+
+library DarkPulse requires Dummy {
+    constant integer abilityIconId = 'SCcv'; // Пустышка
+    constant integer abilityCastId = 'CCcv'; // Настоящая способность
+
+    constant integer dummyId = 'dumy'; // Сюда впишешь равкод дамика
+
+    public constant key DarkPulseDummyKey;
+
+    unit caster, dummy;
+    real casterX, casterY, spellX, spellY;
+    integer i, level, count;
+    ability abilityCast;
+
+    function onInit() {
+        trigger t = CreateTrigger();
+        for (0 <= i < bj_MAX_PLAYER_SLOTS) TriggerRegisterPlayerUnitEvent(t, Player(i), EVENT_PLAYER_UNIT_SPELL_EFFECT, null);
+        TriggerAddAction(t, function() {
+            integer count = 20; // количество волн (стандартно 20)
+            real angle = 0, angleAdd = 2 * bj_PI / I2R(count);
+
+            caster = GetTriggerUnit();
+            casterX = GetUnitX(caster);
+            casterY = GetUnitY(caster);
+
+            ///создание Даммика и его настройка
+            dummy = CreateDummyOnUnit(caster);
+
+            UnitAddAbility(dummy, abilityCastId);
+            abilityCast = GetUnitAbility(dummy, abilityCastId);
+
+            // Цикл - формула круга
+            for (0 <= i < count) {
+                CastAbilityGround(abilityCast, casterX + Cos(angle), casterY + Sin(angle));
+                angle += angleAdd;
+            }
+        });
+    
+        t = null;
+    }
+}
