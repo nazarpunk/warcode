@@ -1,22 +1,28 @@
 {
-  "activationEvents": [],
+  "version": "0.0.1",
+  "license": "MIT",
   "author": "nazarpunk",
+  "publisher": "nazarpunk",
+  "name": "jass-vanilla",
+  "displayName": "jass-vanilla",
+  "private": false,
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/nazarpunk/vscode-jass-vanilla"
+  },
+  "keywords": ["jass"],
   "categories": [
     "Programming Languages",
     "Snippets",
     "Formatters"
   ],
+  "activationEvents": [],
   "contributes": {
     "languages": [
       {
         "id": "jass",
-        "aliases": [
-          "JASS",
-          "jass"
-        ],
-        "extensions": [
-          "j"
-        ],
+        "aliases": ["JASS", "jass"],
+        "extensions": ["j"],
         "configuration": "./syntaxes/jass.language-configuration.json"
       }
     ],
@@ -26,30 +32,7 @@
         "scopeName": "source.jass",
         "path": "./syntaxes/jass.tmLanguage.json"
       }
-    ],
-    "configuration": {
-      "type": "object",
-      "title": "Example configuration",
-      "properties": {
-        "languageServerExample.maxNumberOfProblems": {
-          "scope": "resource",
-          "type": "number",
-          "default": 100,
-          "description": "Controls the maximum number of problems produced by the server."
-        },
-        "languageServerExample.trace.server": {
-          "scope": "window",
-          "type": "string",
-          "enum": [
-            "off",
-            "messages",
-            "verbose"
-          ],
-          "default": "off",
-          "description": "Traces the communication between VS Code and the language server."
-        }
-      }
-    }
+    ]
   },
   "contributors": [],
   "description": "Vanilla JASS syntax.",
@@ -57,22 +40,13 @@
     "esbuild": "^0.18.11",
     "@types/vscode": "^1.80.0",
     "@types/node": "20.2.5",
-    "vsce": "^2.15.0"
+    "vsce": "^2.15.0",
+    "chevrotain": "^10.5.0"
   },
-  "displayName": "jass-vanilla",
   "engines": {
     "vscode": "^1.80.0"
   },
-  "keywords": [],
-  "license": "MIT",
   "main": "./out/extension.js",
-  "name": "jass-vanilla",
-  "private": true,
-  "publisher": "nazarpunk",
-  "repository": {
-    "type": "git",
-    "url": "https://github.com/Microsoft/vscode-extension-samples"
-  },
   "scripts": {
     "vscode:prepublish": "npm run esbuild-base",
     "build": "vsce package",
@@ -80,6 +54,5 @@
     "esbuild-base": "esbuild src/extension.ts --outfile=out/extension.js --bundle --external:vscode --format=cjs --platform=node --tree-shaking=true --sourcemap",
     "esbuild": "npm run esbuild-base",
     "esbuild-watch": "npm run esbuild-base -- --watch"
-  },
-  "version": "0.0.1"
+  }
 }

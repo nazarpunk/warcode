@@ -3,31 +3,31 @@ library Dummy {
 
     unit dummy;
 
-    public function CreateDummyOnUnit(unit target) -> unit {
+    public function CreateDummyOnUnit(unit target, real time) -> unit {
         dummy = CreateUnit(GetOwningPlayer(target), dummyId, GetUnitX(target), GetUnitY(target), 0);
-        UnitApplyTimedLife(dummy, 'BTLF', .01);
+        UnitApplyTimedLife(dummy, 'BTLF', time);
         return dummy;
+    }
+
+    public function GetDummyAbility(unit dummy, integer id) -> ability {
+        UnitAddAbility(dummy, id);
+        return GetUnitAbility(dummy, id);
     }
 
     public function IsUnitDummy(unit target) -> boolean {
         return GetUnitTypeId(target) == dummyId;
     }
-
-    
-
 }
 
 library DarkPulse requires Dummy {
     constant integer abilityIconId = 'SCcv'; // Пустышка
     constant integer abilityCastId = 'CCcv'; // Настоящая способность
 
-    constant integer dummyId = 'dumy'; // Сюда впишешь равкод дамика
-
     public constant key DarkPulseDummyKey;
 
     unit caster, dummy;
-    real casterX, casterY, spellX, spellY;
-    integer i, level, count;
+    real casterX, casterY;
+    integer i;
     ability abilityCast;
 
     function onInit() {
@@ -37,23 +37,97 @@ library DarkPulse requires Dummy {
             integer count = 20; // количество волн (стандартно 20)
             real angle = 0, angleAdd = 2 * bj_PI / I2R(count);
 
+            if (abilityIconId != GetSpellAbilityId()) return;
+
             caster = GetTriggerUnit();
             casterX = GetUnitX(caster);
             casterY = GetUnitY(caster);
 
-            ///создание Даммика и его настройка
-            dummy = CreateDummyOnUnit(caster);
 
-            UnitAddAbility(dummy, abilityCastId);
-            abilityCast = GetUnitAbility(dummy, abilityCastId);
+            ///создание Даммика и его настройка
+            dummy = CreateDummyOnUnit(caster, 10.);
+            SetUnitUserData(dummy, DarkPulseDummyKey);
+            abilityCast = GetDummyAbility(dummy, abilityCastId);
 
             // Цикл - формула круга
             for (0 <= i < count) {
-                CastAbilityGround(abilityCast, casterX + Cos(angle), casterY + Sin(angle));
+                CastAbilityGround(abilityCast, casterX + 100 * Cos(angle), casterY + 100 * Sin(angle));
+                DestroyEffect(AddSpecialEffect("Путь эффекта", casterX + 100 * Cos(angle), casterY + 100 * Sin(angle)));
                 angle += angleAdd;
             }
         });
     
         t = null;
     }
+}
+
+library Necrosis requires Dummy {
+    constant integer abilityIconId = 'S001'; // Пустышка
+
+    unit caster, target, dummy;
+    real casterX, casterY;
+    integer i;
+    ability abilityCast;
+
+    public constant integer NecrosisBuffId = '____'; // Вписать бафф
+    public function NecrosisOnDamage() {
+        if (!GlobalDamageIsAttack) return;
+
+        caster = GlobalDamageSource;
+        UnitRemoveAbility(caster, NecrosisBuffId);
+
+        target = GlobalDamageTarget;
+        KillUnit(target);
+    }
+
+    function onInit() {
+        trigger t = CreateTrigger();
+        for (0 <= i < bj_MAX_PLAYER_SLOTS) TriggerRegisterPlayerUnitEvent(t, Player(i), EVENT_PLAYER_UNIT_SPELL_EFFECT, null);
+        TriggerAddAction(t, function() {
+            
+            if (abilityIconId != GetSpellAbilityId()) return;
+            caster = GetTriggerUnit();
+       
+            ///создание Даммика и его настройка
+            dummy = CreateDummyOnUnit(caster, .01);
+
+
+            ///Даем и СРАЗУ получаем абилку Даммику
+            abilityCast = GetDummyAbility(dummy, 'A001'); ///Кастуем зяряженный мечь (напрямую РАВ)
+            CastAbilityTarget(abilityCast, caster);
+
+        });
+    
+        t = null;
+    }
+}
+
+
+
+library GlobalDamage requires DarkPulse, Necrosis {
+
+    public {
+        unit GlobalDamageSource;
+        unit GlobalDamageTarget;
+        boolean GlobalDamageIsAttack;
+    }
+
+    function onInit() {
+        trigger t = CreateTrigger();
+        integer i;
+        for (0 <= i < bj_MAX_PLAYER_SLOTS) TriggerRegisterPlayerUnitEvent(t, Player(i), EVENT_PLAYER_UNIT_DAMAGING, null);
+        
+        TriggerAddAction(t, function() {
+            GlobalDamageSource = GetEventDamageSource();
+            GlobalDamageTarget = GetTriggerUnit();
+            GlobalDamageIsAttack = GetEventIsAttack();
+
+            // Necrosis
+            if (GetUnitAbilityLevel(GlobalDamageSource, NecrosisBuffId) > 0) NecrosisOnDamage();
+
+            
+        }); 
+
+        t = null;
+    } 
 }
