@@ -1,0 +1,6 @@
+type destructable extends widget
+constant native ConvertRace takes integer i returns race
+
+type destructable extends widget
+
+constant native ConvertRace takes integer i, real a, real b, real c returns race

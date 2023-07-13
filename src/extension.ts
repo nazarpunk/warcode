@@ -10,8 +10,3 @@ export function activate(context: vscode.ExtensionContext) {
         new vscode.SemanticTokensLegend(TokenLegendList, [])
     ));
 }
-
-function updateDiagnostics(document: vscode.TextDocument, collection: vscode.DiagnosticCollection): void {
-
-
-}

@@ -6,10 +6,6 @@
   "name": "jass-vanilla",
   "displayName": "jass-vanilla",
   "private": false,
-  "repository": {
-    "type": "git",
-    "url": "https://github.com/nazarpunk/vscode-jass-vanilla"
-  },
   "keywords": ["jass"],
   "categories": [
     "Programming Languages",
@@ -17,6 +13,20 @@
     "Formatters"
   ],
   "activationEvents": [],
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/nazarpunk/vscode-jass-vanilla"
+  },
+  "main": "./out/extension.js",
+  "scripts": {
+    "esbuild-chevrotain": "esbuild docs/main.ts --watch --outfile=docs/dist/index.mjs --bundle --format=cjs --platform=browser --tree-shaking=true --sourcemap",
+    "vscode:prepublish": "npm run esbuild-base",
+    "build": "vsce package",
+    "publish": "vsce publish patch",
+    "esbuild-base": "esbuild src/extension.ts --outfile=out/extension.js --bundle --external:vscode --format=cjs --platform=node --tree-shaking=true --sourcemap",
+    "esbuild": "npm run esbuild-base",
+    "esbuild-watch": "npm run esbuild-base -- --watch"
+  },
   "contributes": {
     "languages": [
       {
@@ -41,18 +51,9 @@
     "@types/vscode": "^1.80.0",
     "@types/node": "20.2.5",
     "vsce": "^2.15.0",
-    "chevrotain": "^10.5.0"
+    "chevrotain": "^11.0.0"
   },
   "engines": {
     "vscode": "^1.80.0"
-  },
-  "main": "./out/extension.js",
-  "scripts": {
-    "vscode:prepublish": "npm run esbuild-base",
-    "build": "vsce package",
-    "publish": "vsce publish patch",
-    "esbuild-base": "esbuild src/extension.ts --outfile=out/extension.js --bundle --external:vscode --format=cjs --platform=node --tree-shaking=true --sourcemap",
-    "esbuild": "npm run esbuild-base",
-    "esbuild-watch": "npm run esbuild-base -- --watch"
   }
 }
