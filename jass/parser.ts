@@ -1,7 +1,17 @@
-import {CstParser} from "chevrotain";
-import {JassTokenList, JassTokenMap} from "./lexer.ts";
+import {CstNode, CstParser} from "chevrotain";
+import {JassTokenList, JassTokenMap} from "./lexer";
+import {ParserMethod} from "@chevrotain/types";
 
 export class JassParser extends CstParser {
+
+    declare jass: ParserMethod<any, any>;
+    declare typedecl: ParserMethod<any, any>;
+    declare nativedecl: ParserMethod<any, any>;
+    declare statement: ParserMethod<any, any>;
+    declare funcarg: ParserMethod<any, any>;
+    declare funcarglist: ParserMethod<any, any>;
+    declare funcreturntype: ParserMethod<any, any>;
+
     constructor() {
         super(JassTokenList, {
             recoveryEnabled: true,
@@ -17,12 +27,12 @@ export class JassParser extends CstParser {
 
         $.RULE("statement", () => {
             $.OR([
-                {ALT: () => $.SUBRULE($.typedef)},
+                {ALT: () => $.SUBRULE($.typedecl)},
                 {ALT: () => $.SUBRULE($.nativedecl)},
             ]);
         });
 
-        $.RULE('typedef', () => {
+        $.RULE('typedecl', () => {
             $.CONSUME(JassTokenMap.type);
             $.CONSUME(JassTokenMap.identifier);
             $.CONSUME(JassTokenMap.extends);

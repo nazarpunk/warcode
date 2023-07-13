@@ -1,5 +1,8 @@
-import {JassLex} from "./lexer.ts";
-import {JassParser} from "./parser.ts";
+import {JassLex} from "./lexer";
+import {SemanticTokensBuilder} from "vscode";
+import {JassParser} from "./parser";
+import {CstNodeLocation} from "@chevrotain/types";
+import {TokenLegend} from "../src/token-legend";
 
 const parser = new JassParser();
 const ParserVisitor = parser.getBaseCstVisitorConstructor();
@@ -10,49 +13,90 @@ class JassVisitor extends ParserVisitor {
         this.validateVisitor()
     }
 
+    builder?: SemanticTokensBuilder;
+
+    #mark = (location: CstNodeLocation, type: TokenLegend) => {
+        if (this.builder === null) return;
+        if (location === undefined) return;
+        this.builder?.push(
+            location.startLine - 1,
+            location.startColumn - 1,
+            location.endColumn - location.startColumn + 1,
+            type
+        );
+    }
+
     jass(ctx) {
+        return ctx.statement.map(statement => this.visit(statement));
+    }
+
+    statement(ctx) {
+        if (ctx.typedecl) return this.visit(ctx.typedecl);
+        if (ctx.nativedecl) return this.visit(ctx.nativedecl);
+        return ctx;
+    }
+
+    typedecl(ctx) {
+        this.#mark(ctx.type[0], TokenLegend.keyword);
+        this.#mark(ctx.extends[0], TokenLegend.keyword);
+        this.#mark(ctx.identifier[0], TokenLegend.type);
+        this.#mark(ctx.identifier[1], TokenLegend.type);
         return {
-            type: "statement",
-            statements: ctx.statement.map(statement => {
-                console.log(statement);
-                return statement;
-            })
-        };
-    }
-
-    statement() {
-        console.log('---statement');
-    }
-
-    typedef(ctx) {
-        console.log('---typedef');
-    }
-
-    funcarg(ctx) {
-        console.log('---funcarg');
-    }
-
-    funcarglist(ctx) {
-        console.log('---funcarglist');
-    }
-
-    funcreturntype(ctx) {
-        console.log('---funcreturntype');
+            type: 'typedecl',
+            name: ctx.identifier[0].image,
+            base: ctx.identifier[1].image,
+        }
     }
 
     nativedecl(ctx) {
-        console.log('---nativedecl');
+        this.#mark(ctx?.constant?.[0], TokenLegend.keyword);
+        this.#mark(ctx.native[0], TokenLegend.keyword);
+        this.#mark(ctx.takes[0], TokenLegend.keyword);
+        this.#mark(ctx.returns[0], TokenLegend.keyword);
+        this.#mark(ctx.identifier[0], TokenLegend.function);
+        return {
+            type: 'nativedecl',
+            arguments: this.visit(ctx.funcarglist),
+            return: this.visit(ctx.funcreturntype),
+        };
+    }
+
+    funcarg(ctx) {
+        const t = ctx.identifier[0];
+        const n = ctx.identifier[1];
+        this.#mark(t, TokenLegend.typeParameter);
+        this.#mark(n, TokenLegend.parameter);
+        return [t.image, n.image];
+    }
+
+    funcarglist(ctx) {
+        if (ctx.comma) for (const c of ctx.comma) {
+            this.#mark(c, TokenLegend.operator);
+        }
+        if (ctx.nothing) {
+            this.#mark(ctx.nothing[0], TokenLegend.type);
+            return [];
+        }
+        console.log('list');
+        return ctx.funcarg.map(funcarg => this.visit(funcarg));
+    }
+
+    funcreturntype(ctx) {
+        const r = ctx.nothing ? ctx.nothing[0] : ctx.identifier[0];
+        this.#mark(r, TokenLegend.type);
+        return r.image;
     }
 }
 
 const visitor = new JassVisitor();
 
-export function toAstVisitor(text) {
+export function JassVisit(text, builder?: SemanticTokensBuilder) {
     const result = JassLex(text);
 
     parser.input = result.tokens;
     const cst = parser.jass();
     if (parser.errors.length > 0) for (const error of parser.errors) console.error(error);
 
+    visitor.builder = builder;
     return visitor.visit(cst);
 }

@@ -9221,22 +9221,24 @@ function createSyntaxDiagramsCode(grammar, { resourceBase = `https://unpkg.com/c
 
 // jass/lexer.ts
 var JassTokenList = [];
+var identifier = createToken({ name: "identifier", pattern: /[a-zA-Z][a-zA-Z0-9_]*/ });
 var JassTokenMap = {
   whitespace: { name: "", pattern: /\s+/, group: Lexer.SKIPPED },
   comment: { name: "", pattern: /\/\/.*/, group: Lexer.SKIPPED },
   comma: { name: "", pattern: /,/, label: "," },
-  type: { name: "", pattern: /type/ },
-  extends: { name: "", pattern: /extends/ },
-  constant: { name: "", pattern: /constant/ },
-  native: { name: "", pattern: /native/ },
-  takes: { name: "", pattern: /takes/ },
-  nothing: { name: "", pattern: /nothing/ },
-  returns: { name: "", pattern: /returns/ },
-  identifier: { name: "", pattern: /[a-zA-Z][a-zA-Z0-9_]*/ }
+  type: { name: "", pattern: /type/, longer_alt: identifier },
+  extends: { name: "", pattern: /extends/, longer_alt: identifier },
+  constant: { name: "", pattern: /constant/, longer_alt: identifier },
+  native: { name: "", pattern: /native/, longer_alt: identifier },
+  takes: { name: "", pattern: /takes/, longer_alt: identifier },
+  nothing: { name: "", pattern: /nothing/, longer_alt: identifier },
+  returns: { name: "", pattern: /returns/, longer_alt: identifier },
+  identifier
 };
 for (const [k, v] of Object.entries(JassTokenMap)) {
   v.name = k;
-  JassTokenMap[k] = createToken(v);
+  if (k != identifier.name)
+    JassTokenMap[k] = createToken(v);
   JassTokenList.push(JassTokenMap[k]);
 }
 var lexer = new Lexer(JassTokenList);
@@ -9265,11 +9267,11 @@ var JassParser = class extends CstParser {
     });
     $.RULE("statement", () => {
       $.OR([
-        { ALT: () => $.SUBRULE($.typedef) },
+        { ALT: () => $.SUBRULE($.typedecl) },
         { ALT: () => $.SUBRULE($.nativedecl) }
       ]);
     });
-    $.RULE("typedef", () => {
+    $.RULE("typedecl", () => {
       $.CONSUME(JassTokenMap.type);
       $.CONSUME(JassTokenMap.identifier);
       $.CONSUME(JassTokenMap.extends);
@@ -9318,44 +9320,88 @@ var ParserVisitor = parser.getBaseCstVisitorConstructor();
 var JassVisitor = class extends ParserVisitor {
   constructor() {
     super();
+    this.#mark = (location, type) => {
+      if (this.builder === null)
+        return;
+      if (location === void 0)
+        return;
+      this.builder?.push(
+        location.startLine - 1,
+        location.startColumn - 1,
+        location.endColumn - location.startColumn + 1,
+        type
+      );
+    };
     this.validateVisitor();
   }
+  #mark;
   jass(ctx) {
+    return ctx.statement.map((statement) => this.visit(statement));
+  }
+  statement(ctx) {
+    if (ctx.typedecl)
+      return this.visit(ctx.typedecl);
+    if (ctx.nativedecl)
+      return this.visit(ctx.nativedecl);
+    return ctx;
+  }
+  typedecl(ctx) {
+    this.#mark(ctx.type[0], 2 /* keyword */);
+    this.#mark(ctx.extends[0], 2 /* keyword */);
+    this.#mark(ctx.identifier[0], 7 /* type */);
+    this.#mark(ctx.identifier[1], 7 /* type */);
     return {
-      type: "statement",
-      statements: ctx.statement.map((statement) => {
-        console.log(statement);
-        return statement;
-      })
+      type: "typedecl",
+      name: ctx.identifier[0].image,
+      base: ctx.identifier[1].image
     };
   }
-  statement() {
-    console.log("---statement");
-  }
-  typedef(ctx) {
-    console.log("---typedef");
+  nativedecl(ctx) {
+    this.#mark(ctx?.constant?.[0], 2 /* keyword */);
+    this.#mark(ctx.native[0], 2 /* keyword */);
+    this.#mark(ctx.takes[0], 2 /* keyword */);
+    this.#mark(ctx.returns[0], 2 /* keyword */);
+    this.#mark(ctx.identifier[0], 13 /* function */);
+    return {
+      type: "nativedecl",
+      arguments: this.visit(ctx.funcarglist),
+      return: this.visit(ctx.funcreturntype)
+    };
   }
   funcarg(ctx) {
-    console.log("---funcarg");
+    const t = ctx.identifier[0];
+    const n = ctx.identifier[1];
+    this.#mark(t, 12 /* typeParameter */);
+    this.#mark(n, 18 /* parameter */);
+    return [t.image, n.image];
   }
   funcarglist(ctx) {
-    console.log("---funcarglist");
+    if (ctx.comma)
+      for (const c of ctx.comma) {
+        this.#mark(c, 5 /* operator */);
+      }
+    if (ctx.nothing) {
+      this.#mark(ctx.nothing[0], 7 /* type */);
+      return [];
+    }
+    console.log("list");
+    return ctx.funcarg.map((funcarg) => this.visit(funcarg));
   }
   funcreturntype(ctx) {
-    console.log("---funcreturntype");
-  }
-  nativedecl(ctx) {
-    console.log("---nativedecl");
+    const r = ctx.nothing ? ctx.nothing[0] : ctx.identifier[0];
+    this.#mark(r, 7 /* type */);
+    return r.image;
   }
 };
 var visitor = new JassVisitor();
-function toAstVisitor(text) {
+function JassVisit(text, builder) {
   const result = JassLex(text);
   parser.input = result.tokens;
   const cst = parser.jass();
   if (parser.errors.length > 0)
     for (const error of parser.errors)
       console.error(error);
+  visitor.builder = builder;
   return visitor.visit(cst);
 }
 
@@ -9367,8 +9413,8 @@ document.body.appendChild(iframe);
 var run = async () => {
   const request = await fetch("test.txt");
   const response = await request.text();
-  let astFromVisitor = toAstVisitor(response);
-  console.log(JSON.stringify(astFromVisitor, null, "	"));
+  let astFromVisitor = JassVisit(response);
+  console.log(astFromVisitor);
 };
 run().then();
 /*! Bundled license information:

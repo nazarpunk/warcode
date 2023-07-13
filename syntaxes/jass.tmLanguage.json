@@ -2,6 +2,10 @@
   "$schema": "https://raw.githubusercontent.com/martinring/tmlanguage/master/tmlanguage.json",
   "name": "jass",
   "scopeName": "source.jass",
-  "patterns": [],
-  "repository": {}
+  "patterns": [
+    {"include": "#comment-line"}
+  ],
+  "repository": {
+    "comment-line": {"name": "comment.line", "begin": "//", "end": "\\n"}
+  }
 }

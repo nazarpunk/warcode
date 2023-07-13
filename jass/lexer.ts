@@ -1,26 +1,26 @@
-import {createToken, Lexer} from "chevrotain";
+import {createToken, ITokenConfig, Lexer, TokenType} from "chevrotain";
 
-/** @type {import("chevrotain").TokenType[]} */
-export const JassTokenList = [];
+export const JassTokenList: TokenType[] = [];
 
-/** @type {Object.<string,import("chevrotain").ITokenConfig>} */
-export const JassTokenMap = {
+const identifier = createToken({name: 'identifier', pattern: /[a-zA-Z][a-zA-Z0-9_]*/});
+
+export const JassTokenMap: { [key: string]: ITokenConfig } = {
     whitespace: {name: '', pattern: /\s+/, group: Lexer.SKIPPED},
     comment: {name: '', pattern: /\/\/.*/, group: Lexer.SKIPPED},
     comma: {name: '', pattern: /,/, label: ','},
-    type: {name: '', pattern: /type/},
-    extends: {name: '', pattern: /extends/},
-    constant: {name: '', pattern: /constant/},
-    native: {name: '', pattern: /native/},
-    takes: {name: '', pattern: /takes/},
-    nothing: {name: '', pattern: /nothing/},
-    returns: {name: '', pattern: /returns/},
-    identifier: {name: '', pattern: /[a-zA-Z][a-zA-Z0-9_]*/},
+    type: {name: '', pattern: /type/, longer_alt: identifier},
+    extends: {name: '', pattern: /extends/, longer_alt: identifier},
+    constant: {name: '', pattern: /constant/, longer_alt: identifier},
+    native: {name: '', pattern: /native/, longer_alt: identifier},
+    takes: {name: '', pattern: /takes/, longer_alt: identifier},
+    nothing: {name: '', pattern: /nothing/, longer_alt: identifier},
+    returns: {name: '', pattern: /returns/, longer_alt: identifier},
+    identifier: identifier,
 }
 
 for (const [k, v] of Object.entries(JassTokenMap)) {
     v.name = k;
-    JassTokenMap[k] = createToken(v);
+    if (k != identifier.name) JassTokenMap[k] = createToken(v);
     JassTokenList.push(JassTokenMap[k]);
 }
 
