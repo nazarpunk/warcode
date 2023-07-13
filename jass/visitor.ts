@@ -77,7 +77,6 @@ class JassVisitor extends ParserVisitor {
             this.#mark(ctx.nothing[0], TokenLegend.type);
             return [];
         }
-        console.log('list');
         return ctx.funcarg.map(funcarg => this.visit(funcarg));
     }
 
@@ -92,10 +91,8 @@ const visitor = new JassVisitor();
 
 export function JassVisit(text, builder?: SemanticTokensBuilder) {
     const result = JassLex(text);
-
     parser.input = result.tokens;
     const cst = parser.jass();
-    if (parser.errors.length > 0) for (const error of parser.errors) console.error(error);
 
     visitor.builder = builder;
     return visitor.visit(cst);

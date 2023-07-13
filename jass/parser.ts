@@ -1,6 +1,19 @@
-import {CstNode, CstParser} from "chevrotain";
+import {CstParser} from "chevrotain";
 import {JassTokenList, JassTokenMap} from "./lexer";
 import {ParserMethod} from "@chevrotain/types";
+/*
+
+import {
+    Diagnostic,
+    DiagnosticRelatedInformation,
+    DiagnosticSeverity,
+    Location,
+    Position,
+    Range,
+    TextDocument
+} from "vscode";
+
+ */
 
 export class JassParser extends CstParser {
 
@@ -12,9 +25,66 @@ export class JassParser extends CstParser {
     declare funcarglist: ParserMethod<any, any>;
     declare funcreturntype: ParserMethod<any, any>;
 
+    /*
+    diagnostic?: Diagnostic[];
+    document?: TextDocument;
+
+     */
+
     constructor() {
         super(JassTokenList, {
             recoveryEnabled: true,
+            errorMessageProvider: {
+                buildMismatchTokenMessage: options => {
+                    /*
+                    if (this.diagnostic && this.document) {
+                        console.log(options.actual);
+                        this.diagnostic.push({
+                            message: 'cannot assign twice to immutable variable `x`',
+                            range: new Range(new Position(0, 0), new Position(3, 10)),
+                            severity: DiagnosticSeverity.Error,
+                            source: '',
+                            relatedInformation: [
+                                new DiagnosticRelatedInformation(
+                                    new Location(
+                                        this.document.uri,
+                                        new Range(
+                                            new Position(1, 8),
+                                            new Position(1, 9)
+                                        )
+                                    ),
+                                    'Its WORKING!!!'
+                                )
+                            ]
+                        });
+                    } else {
+                        console.error('buildMismatchTokenMessage');
+                        console.log(options);
+                    }
+
+                     */
+                    console.error('buildMismatchTokenMessage');
+                    console.log(options);
+                    return null;
+                },
+                buildNotAllInputParsedMessage: options => {
+                    console.error('buildNotAllInputParsedMessage');
+                    console.log(options);
+                    return null;
+                },
+
+                buildNoViableAltMessage: options => {
+                    console.error('buildNoViableAltMessage');
+                    console.log(options);
+                    return null;
+                },
+
+                buildEarlyExitMessage: options => {
+                    console.error('buildEarlyExitMessag');
+                    console.log(options);
+                    return null;
+                },
+            },
         })
 
         const $ = this;

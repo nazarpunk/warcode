@@ -1,3 +1,17 @@
+var __accessCheck = (obj, member, msg) => {
+  if (!member.has(obj))
+    throw TypeError("Cannot " + msg);
+};
+var __privateGet = (obj, member, getter) => {
+  __accessCheck(obj, member, "read from private field");
+  return getter ? getter.call(obj) : member.get(obj);
+};
+var __privateAdd = (obj, member, value) => {
+  if (member.has(obj))
+    throw TypeError("Cannot add the same private member more than once");
+  member instanceof WeakSet ? member.add(obj) : member.set(obj, value);
+};
+
 // node_modules/chevrotain/lib/src/version.js
 var VERSION = "11.0.0";
 
@@ -11,8 +25,8 @@ var root = freeGlobal_default || freeSelf || Function("return this")();
 var root_default = root;
 
 // node_modules/lodash-es/_Symbol.js
-var Symbol = root_default.Symbol;
-var Symbol_default = Symbol;
+var Symbol2 = root_default.Symbol;
+var Symbol_default = Symbol2;
 
 // node_modules/lodash-es/_getRawTag.js
 var objectProto = Object.prototype;
@@ -262,8 +276,8 @@ function getNative(object, key) {
 var getNative_default = getNative;
 
 // node_modules/lodash-es/_WeakMap.js
-var WeakMap = getNative_default(root_default, "WeakMap");
-var WeakMap_default = WeakMap;
+var WeakMap2 = getNative_default(root_default, "WeakMap");
+var WeakMap_default = WeakMap2;
 
 // node_modules/lodash-es/_baseCreate.js
 var objectCreate = Object.create;
@@ -609,8 +623,8 @@ var stubFalse_default = stubFalse;
 var freeExports = typeof exports == "object" && exports && !exports.nodeType && exports;
 var freeModule = freeExports && typeof module == "object" && module && !module.nodeType && module;
 var moduleExports = freeModule && freeModule.exports === freeExports;
-var Buffer = moduleExports ? root_default.Buffer : void 0;
-var nativeIsBuffer = Buffer ? Buffer.isBuffer : void 0;
+var Buffer2 = moduleExports ? root_default.Buffer : void 0;
+var nativeIsBuffer = Buffer2 ? Buffer2.isBuffer : void 0;
 var isBuffer = nativeIsBuffer || stubFalse_default;
 var isBuffer_default = isBuffer;
 
@@ -1268,8 +1282,8 @@ var baseAssignIn_default = baseAssignIn;
 var freeExports3 = typeof exports == "object" && exports && !exports.nodeType && exports;
 var freeModule3 = freeExports3 && typeof module == "object" && module && !module.nodeType && module;
 var moduleExports3 = freeModule3 && freeModule3.exports === freeExports3;
-var Buffer2 = moduleExports3 ? root_default.Buffer : void 0;
-var allocUnsafe = Buffer2 ? Buffer2.allocUnsafe : void 0;
+var Buffer3 = moduleExports3 ? root_default.Buffer : void 0;
+var allocUnsafe = Buffer3 ? Buffer3.allocUnsafe : void 0;
 function cloneBuffer(buffer, isDeep) {
   if (isDeep) {
     return buffer.slice();
@@ -1418,8 +1432,8 @@ function initCloneArray(array) {
 var initCloneArray_default = initCloneArray;
 
 // node_modules/lodash-es/_Uint8Array.js
-var Uint8Array = root_default.Uint8Array;
-var Uint8Array_default = Uint8Array;
+var Uint8Array2 = root_default.Uint8Array;
+var Uint8Array_default = Uint8Array2;
 
 // node_modules/lodash-es/_cloneArrayBuffer.js
 function cloneArrayBuffer(arrayBuffer) {
@@ -9255,9 +9269,36 @@ function JassLex(text) {
 
 // jass/parser.ts
 var JassParser = class extends CstParser {
+  /*
+      diagnostic?: Diagnostic[];
+      document?: TextDocument;
+  
+       */
   constructor() {
     super(JassTokenList, {
-      recoveryEnabled: true
+      recoveryEnabled: true,
+      errorMessageProvider: {
+        buildMismatchTokenMessage: (options) => {
+          console.error("buildMismatchTokenMessage");
+          console.log(options);
+          return null;
+        },
+        buildNotAllInputParsedMessage: (options) => {
+          console.error("buildNotAllInputParsedMessage");
+          console.log(options);
+          return null;
+        },
+        buildNoViableAltMessage: (options) => {
+          console.error("buildNoViableAltMessage");
+          console.log(options);
+          return null;
+        },
+        buildEarlyExitMessage: (options) => {
+          console.error("buildEarlyExitMessag");
+          console.log(options);
+          return null;
+        }
+      }
     });
     const $ = this;
     $.RULE("jass", () => {
@@ -9317,10 +9358,11 @@ var JassParser = class extends CstParser {
 // jass/visitor.ts
 var parser = new JassParser();
 var ParserVisitor = parser.getBaseCstVisitorConstructor();
+var _mark;
 var JassVisitor = class extends ParserVisitor {
   constructor() {
     super();
-    this.#mark = (location, type) => {
+    __privateAdd(this, _mark, (location, type) => {
       if (this.builder === null)
         return;
       if (location === void 0)
@@ -9331,10 +9373,9 @@ var JassVisitor = class extends ParserVisitor {
         location.endColumn - location.startColumn + 1,
         type
       );
-    };
+    });
     this.validateVisitor();
   }
-  #mark;
   jass(ctx) {
     return ctx.statement.map((statement) => this.visit(statement));
   }
@@ -9346,10 +9387,10 @@ var JassVisitor = class extends ParserVisitor {
     return ctx;
   }
   typedecl(ctx) {
-    this.#mark(ctx.type[0], 2 /* keyword */);
-    this.#mark(ctx.extends[0], 2 /* keyword */);
-    this.#mark(ctx.identifier[0], 7 /* type */);
-    this.#mark(ctx.identifier[1], 7 /* type */);
+    __privateGet(this, _mark).call(this, ctx.type[0], 2 /* keyword */);
+    __privateGet(this, _mark).call(this, ctx.extends[0], 2 /* keyword */);
+    __privateGet(this, _mark).call(this, ctx.identifier[0], 7 /* type */);
+    __privateGet(this, _mark).call(this, ctx.identifier[1], 7 /* type */);
     return {
       type: "typedecl",
       name: ctx.identifier[0].image,
@@ -9357,11 +9398,11 @@ var JassVisitor = class extends ParserVisitor {
     };
   }
   nativedecl(ctx) {
-    this.#mark(ctx?.constant?.[0], 2 /* keyword */);
-    this.#mark(ctx.native[0], 2 /* keyword */);
-    this.#mark(ctx.takes[0], 2 /* keyword */);
-    this.#mark(ctx.returns[0], 2 /* keyword */);
-    this.#mark(ctx.identifier[0], 13 /* function */);
+    __privateGet(this, _mark).call(this, ctx?.constant?.[0], 2 /* keyword */);
+    __privateGet(this, _mark).call(this, ctx.native[0], 2 /* keyword */);
+    __privateGet(this, _mark).call(this, ctx.takes[0], 2 /* keyword */);
+    __privateGet(this, _mark).call(this, ctx.returns[0], 2 /* keyword */);
+    __privateGet(this, _mark).call(this, ctx.identifier[0], 13 /* function */);
     return {
       type: "nativedecl",
       arguments: this.visit(ctx.funcarglist),
@@ -9371,36 +9412,33 @@ var JassVisitor = class extends ParserVisitor {
   funcarg(ctx) {
     const t = ctx.identifier[0];
     const n = ctx.identifier[1];
-    this.#mark(t, 12 /* typeParameter */);
-    this.#mark(n, 18 /* parameter */);
+    __privateGet(this, _mark).call(this, t, 12 /* typeParameter */);
+    __privateGet(this, _mark).call(this, n, 18 /* parameter */);
     return [t.image, n.image];
   }
   funcarglist(ctx) {
     if (ctx.comma)
       for (const c of ctx.comma) {
-        this.#mark(c, 5 /* operator */);
+        __privateGet(this, _mark).call(this, c, 5 /* operator */);
       }
     if (ctx.nothing) {
-      this.#mark(ctx.nothing[0], 7 /* type */);
+      __privateGet(this, _mark).call(this, ctx.nothing[0], 7 /* type */);
       return [];
     }
-    console.log("list");
     return ctx.funcarg.map((funcarg) => this.visit(funcarg));
   }
   funcreturntype(ctx) {
     const r = ctx.nothing ? ctx.nothing[0] : ctx.identifier[0];
-    this.#mark(r, 7 /* type */);
+    __privateGet(this, _mark).call(this, r, 7 /* type */);
     return r.image;
   }
 };
+_mark = new WeakMap();
 var visitor = new JassVisitor();
 function JassVisit(text, builder) {
   const result = JassLex(text);
   parser.input = result.tokens;
   const cst = parser.jass();
-  if (parser.errors.length > 0)
-    for (const error of parser.errors)
-      console.error(error);
   visitor.builder = builder;
   return visitor.visit(cst);
 }
@@ -9410,13 +9448,12 @@ var parser2 = new JassParser();
 var iframe = document.createElement("iframe");
 iframe.src = "data:text/html;charset=utf-8," + encodeURI(createSyntaxDiagramsCode(parser2.getSerializedGastProductions()));
 document.body.appendChild(iframe);
-var run = async () => {
+(async () => {
   const request = await fetch("test.txt");
   const response = await request.text();
   let astFromVisitor = JassVisit(response);
   console.log(astFromVisitor);
-};
-run().then();
+})();
 /*! Bundled license information:
 
 lodash-es/lodash.js:
@@ -9430,4 +9467,4 @@ lodash-es/lodash.js:
    * Copyright Jeremy Ashkenas, DocumentCloud and Investigative Reporters & Editors
    *)
 */
-//# sourceMappingURL=index.mjs.map
+//# sourceMappingURL=main.mjs.map
