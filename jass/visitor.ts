@@ -51,8 +51,8 @@ export class JassVisitor extends ParserVisitor {
         this.#mark(ctx?.constant?.[0], TokenLegend.keyword);
         this.#mark(ctx.native[0], TokenLegend.keyword);
 
-        const d = ctx.native[0] as CstNodeLocation;
-        console.log(`${d.startLine}: ${d.startColumn}, ${d.endColumn}`);
+        //const d = ctx.native[0] as CstNodeLocation;
+        //console.log(`${d.startLine}: ${d.startColumn}, ${d.endColumn}`);
 
         this.#mark(ctx.takes[0], TokenLegend.keyword);
         this.#mark(ctx.returns[0], TokenLegend.keyword);

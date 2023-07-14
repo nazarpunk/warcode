@@ -1,29 +1,44 @@
-import {CancellationToken, Diagnostic, languages, SemanticTokens, SemanticTokensBuilder, TextDocument} from "vscode";
+import {
+    CancellationToken,
+    DocumentSemanticTokensProvider,
+    languages, ProviderResult,
+    SemanticTokens,
+    SemanticTokensBuilder, SemanticTokensEdits,
+    TextDocument
+} from "vscode";
 import {JassParser} from "../jass/parser";
 import {JassVisitor} from "../jass/visitor";
 
-export class DocumentSemanticTokensProvider implements DocumentSemanticTokensProvider {
+export class JassDocumentSemanticTokensProvider implements DocumentSemanticTokensProvider {
     #collection = languages.createDiagnosticCollection('jass');
     #parser = new JassParser();
     #visitor = new JassVisitor();
 
+    onDidChangeSemanticTokens = () => {
+        console.log('onDidChangeSemanticTokens');
+        return null;
+    }
+
+    provideDocumentSemanticTokensEdits?(document: TextDocument, previousResultId: string, token: CancellationToken): ProviderResult<SemanticTokens | SemanticTokensEdits> {
+        console.log('provideDocumentSemanticTokensEdits');
+        return null;
+    }
+
     // noinspection JSUnusedGlobalSymbols
     async provideDocumentSemanticTokens(document: TextDocument, token: CancellationToken): Promise<SemanticTokens> {
-        token.onCancellationRequested(() => {
-            console.error('------');
-        });
-
+        console.log('provideDocumentSemanticTokens');
         const text = document.getText();
-        const builder = new SemanticTokensBuilder();
         this.#collection.clear();
 
+        this.#visitor.builder = new SemanticTokensBuilder();
+
         this.#parser.inputText = text;
-        this.#visitor.builder = builder;
+
         this.#visitor.visit(this.#parser.jass());
         //console.log();
 
         //if (diagnostic.length > 0) this.#collection.set(document.uri, diagnostic);
-        return builder.build();
+        return this.#visitor.builder.build();
     }
 }
 

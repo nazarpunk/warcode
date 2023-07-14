@@ -44,6 +44,11 @@
       }
     ]
   },
+  "configurationDefaults": {
+    "jass": {
+      "editor.semanticHighlighting.enabled": true
+    }
+  },
   "contributors": [],
   "description": "Vanilla JASS syntax.",
   "devDependencies": {
