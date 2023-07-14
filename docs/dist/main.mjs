@@ -2793,10 +2793,10 @@ var AbstractProduction = class {
   constructor(_definition) {
     this._definition = _definition;
   }
-  accept(visitor2) {
-    visitor2.visit(this);
+  accept(visitor) {
+    visitor.visit(this);
     forEach_default(this.definition, (prod) => {
-      prod.accept(visitor2);
+      prod.accept(visitor);
     });
   }
 };
@@ -2814,8 +2814,8 @@ var NonTerminal = class extends AbstractProduction {
     }
     return [];
   }
-  accept(visitor2) {
-    visitor2.visit(this);
+  accept(visitor) {
+    visitor.visit(this);
   }
 };
 var Rule = class extends AbstractProduction {
@@ -2887,8 +2887,8 @@ var Terminal = class {
     this.idx = 1;
     assign_default(this, pickBy_default(options, (v) => v !== void 0));
   }
-  accept(visitor2) {
-    visitor2.visit(this);
+  accept(visitor) {
+    visitor.visit(this);
   }
 };
 function serializeGrammar(topRules) {
@@ -6629,9 +6629,9 @@ function lookAheadSequenceFromAlternatives(altsDefs, k) {
   return finalResult;
 }
 function getLookaheadPathsForOr(occurrence, ruleGrammar, k, orProd) {
-  const visitor2 = new InsideDefinitionFinderVisitor(occurrence, PROD_TYPE.ALTERNATION, orProd);
-  ruleGrammar.accept(visitor2);
-  return lookAheadSequenceFromAlternatives(visitor2.result, k);
+  const visitor = new InsideDefinitionFinderVisitor(occurrence, PROD_TYPE.ALTERNATION, orProd);
+  ruleGrammar.accept(visitor);
+  return lookAheadSequenceFromAlternatives(visitor.result, k);
 }
 function getLookaheadPathsForOptionalProd(occurrence, ruleGrammar, prodType, k) {
   const insideDefVisitor = new InsideDefinitionFinderVisitor(occurrence, prodType);
@@ -9237,16 +9237,74 @@ function createSyntaxDiagramsCode(grammar, { resourceBase = `https://unpkg.com/c
 var JassTokenList = [];
 var identifier = createToken({ name: "identifier", pattern: /[a-zA-Z][a-zA-Z0-9_]*/ });
 var JassTokenMap = {
-  whitespace: { name: "", pattern: /\s+/, group: Lexer.SKIPPED },
-  comment: { name: "", pattern: /\/\/.*/, group: Lexer.SKIPPED },
-  comma: { name: "", pattern: /,/, label: "," },
-  type: { name: "", pattern: /type/, longer_alt: identifier },
-  extends: { name: "", pattern: /extends/, longer_alt: identifier },
-  constant: { name: "", pattern: /constant/, longer_alt: identifier },
-  native: { name: "", pattern: /native/, longer_alt: identifier },
-  takes: { name: "", pattern: /takes/, longer_alt: identifier },
-  nothing: { name: "", pattern: /nothing/, longer_alt: identifier },
-  returns: { name: "", pattern: /returns/, longer_alt: identifier },
+  whitespace: {
+    name: "",
+    pattern: /\s+/,
+    //line_breaks: false,
+    group: Lexer.SKIPPED
+  },
+  comment: {
+    name: "",
+    pattern: /\/\/.*/,
+    line_breaks: false,
+    group: Lexer.SKIPPED
+  },
+  comma: {
+    name: "",
+    pattern: /,/,
+    start_chars_hint: [","],
+    label: ",",
+    line_breaks: false
+  },
+  type: {
+    name: "",
+    pattern: /type/,
+    start_chars_hint: ["t"],
+    line_breaks: false,
+    longer_alt: identifier
+  },
+  extends: {
+    name: "",
+    pattern: /extends/,
+    start_chars_hint: ["e"],
+    line_breaks: false,
+    longer_alt: identifier
+  },
+  constant: {
+    name: "",
+    pattern: /constant/,
+    start_chars_hint: ["c"],
+    line_breaks: false,
+    longer_alt: identifier
+  },
+  native: {
+    name: "",
+    pattern: /native/,
+    start_chars_hint: ["n"],
+    line_breaks: false,
+    longer_alt: identifier
+  },
+  takes: {
+    name: "",
+    pattern: /takes/,
+    start_chars_hint: ["t"],
+    line_breaks: false,
+    longer_alt: identifier
+  },
+  nothing: {
+    name: "",
+    pattern: /nothing/,
+    start_chars_hint: ["n"],
+    line_breaks: false,
+    longer_alt: identifier
+  },
+  returns: {
+    name: "",
+    pattern: /returns/,
+    start_chars_hint: ["r"],
+    line_breaks: false,
+    longer_alt: identifier
+  },
   identifier
 };
 for (const [k, v] of Object.entries(JassTokenMap)) {
@@ -9255,32 +9313,24 @@ for (const [k, v] of Object.entries(JassTokenMap)) {
     JassTokenMap[k] = createToken(v);
   JassTokenList.push(JassTokenMap[k]);
 }
-var lexer = new Lexer(JassTokenList);
-if (lexer.lexerDefinitionErrors.length > 0)
-  for (const error of lexer.lexerDefinitionErrors)
+var JassLexer = new Lexer(JassTokenList);
+if (JassLexer.lexerDefinitionErrors.length > 0)
+  for (const error of JassLexer.lexerDefinitionErrors)
     console.error(error);
-function JassLex(text) {
-  const result = lexer.tokenize(text);
-  if (result.errors.length > 0)
-    for (const error of result.errors)
-      console.error(error);
-  return result;
-}
 
 // jass/parser.ts
+var JassParserError = class {
+  constructor(options) {
+    this.options = options;
+  }
+};
 var JassParser = class extends CstParser {
-  /*
-      diagnostic?: Diagnostic[];
-      document?: TextDocument;
-  
-       */
   constructor() {
     super(JassTokenList, {
       recoveryEnabled: true,
       errorMessageProvider: {
         buildMismatchTokenMessage: (options) => {
-          console.error("buildMismatchTokenMessage");
-          console.log(options);
+          this.errorlist.push(new JassParserError(options));
           return null;
         },
         buildNotAllInputParsedMessage: (options) => {
@@ -9300,6 +9350,7 @@ var JassParser = class extends CstParser {
         }
       }
     });
+    this.errorlist = [];
     const $ = this;
     $.RULE("jass", () => {
       $.MANY(() => {
@@ -9353,6 +9404,10 @@ var JassParser = class extends CstParser {
     });
     this.performSelfAnalysis();
   }
+  set inputText(text) {
+    this.errorlist = [];
+    this.input = JassLexer.tokenize(text).tokens;
+  }
 };
 
 // jass/visitor.ts
@@ -9400,6 +9455,8 @@ var JassVisitor = class extends ParserVisitor {
   nativedecl(ctx) {
     __privateGet(this, _mark).call(this, ctx?.constant?.[0], 2 /* keyword */);
     __privateGet(this, _mark).call(this, ctx.native[0], 2 /* keyword */);
+    const d = ctx.native[0];
+    console.log(`${d.startLine}: ${d.startColumn}, ${d.endColumn}`);
     __privateGet(this, _mark).call(this, ctx.takes[0], 2 /* keyword */);
     __privateGet(this, _mark).call(this, ctx.returns[0], 2 /* keyword */);
     __privateGet(this, _mark).call(this, ctx.identifier[0], 13 /* function */);
@@ -9434,14 +9491,6 @@ var JassVisitor = class extends ParserVisitor {
   }
 };
 _mark = new WeakMap();
-var visitor = new JassVisitor();
-function JassVisit(text, builder) {
-  const result = JassLex(text);
-  parser.input = result.tokens;
-  const cst = parser.jass();
-  visitor.builder = builder;
-  return visitor.visit(cst);
-}
 
 // docs/main.ts
 var parser2 = new JassParser();
@@ -9449,10 +9498,11 @@ var iframe = document.createElement("iframe");
 iframe.src = "data:text/html;charset=utf-8," + encodeURI(createSyntaxDiagramsCode(parser2.getSerializedGastProductions()));
 document.body.appendChild(iframe);
 (async () => {
+  const visitor = new JassVisitor();
   const request = await fetch("test.txt");
-  const response = await request.text();
-  let astFromVisitor = JassVisit(response);
-  console.log(astFromVisitor);
+  parser2.inputText = await request.text();
+  console.log(parser2.errorlist);
+  console.log(visitor.visit(parser2.jass()));
 })();
 /*! Bundled license information:
 

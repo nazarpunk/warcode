@@ -1,19 +1,23 @@
 import {CstParser} from "chevrotain";
-import {JassTokenList, JassTokenMap} from "./lexer";
-import {ParserMethod} from "@chevrotain/types";
-/*
+import {JassLexer, JassTokenList, JassTokenMap} from "./lexer";
+import {IToken, ParserMethod, TokenType} from "@chevrotain/types";
 
-import {
-    Diagnostic,
-    DiagnosticRelatedInformation,
-    DiagnosticSeverity,
-    Location,
-    Position,
-    Range,
-    TextDocument
-} from "vscode";
 
- */
+interface JassParserMismatchToken {
+    expected: TokenType;
+    actual: IToken;
+    previous: IToken;
+    ruleName: string;
+}
+
+export class JassParserError<T> {
+    constructor(options: T) {
+        this.options = options;
+    }
+
+    options: T;
+}
+
 
 export class JassParser extends CstParser {
 
@@ -25,46 +29,19 @@ export class JassParser extends CstParser {
     declare funcarglist: ParserMethod<any, any>;
     declare funcreturntype: ParserMethod<any, any>;
 
-    /*
-    diagnostic?: Diagnostic[];
-    document?: TextDocument;
+    errorlist: JassParserError<JassParserMismatchToken>[] = [];
 
-     */
+    set inputText(text: string) {
+        this.errorlist = [];
+        this.input = JassLexer.tokenize(text).tokens;
+    }
 
     constructor() {
         super(JassTokenList, {
             recoveryEnabled: true,
             errorMessageProvider: {
                 buildMismatchTokenMessage: options => {
-                    /*
-                    if (this.diagnostic && this.document) {
-                        console.log(options.actual);
-                        this.diagnostic.push({
-                            message: 'cannot assign twice to immutable variable `x`',
-                            range: new Range(new Position(0, 0), new Position(3, 10)),
-                            severity: DiagnosticSeverity.Error,
-                            source: '',
-                            relatedInformation: [
-                                new DiagnosticRelatedInformation(
-                                    new Location(
-                                        this.document.uri,
-                                        new Range(
-                                            new Position(1, 8),
-                                            new Position(1, 9)
-                                        )
-                                    ),
-                                    'Its WORKING!!!'
-                                )
-                            ]
-                        });
-                    } else {
-                        console.error('buildMismatchTokenMessage');
-                        console.log(options);
-                    }
-
-                     */
-                    console.error('buildMismatchTokenMessage');
-                    console.log(options);
+                    this.errorlist.push(new JassParserError<JassParserMismatchToken>(options));
                     return null;
                 },
                 buildNotAllInputParsedMessage: options => {

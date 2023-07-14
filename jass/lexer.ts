@@ -5,16 +5,74 @@ export const JassTokenList: TokenType[] = [];
 const identifier = createToken({name: 'identifier', pattern: /[a-zA-Z][a-zA-Z0-9_]*/});
 
 export const JassTokenMap: { [key: string]: ITokenConfig } = {
-    whitespace: {name: '', pattern: /\s+/, group: Lexer.SKIPPED},
-    comment: {name: '', pattern: /\/\/.*/, group: Lexer.SKIPPED},
-    comma: {name: '', pattern: /,/, label: ','},
-    type: {name: '', pattern: /type/, longer_alt: identifier},
-    extends: {name: '', pattern: /extends/, longer_alt: identifier},
-    constant: {name: '', pattern: /constant/, longer_alt: identifier},
-    native: {name: '', pattern: /native/, longer_alt: identifier},
-    takes: {name: '', pattern: /takes/, longer_alt: identifier},
-    nothing: {name: '', pattern: /nothing/, longer_alt: identifier},
-    returns: {name: '', pattern: /returns/, longer_alt: identifier},
+    whitespace: {
+        name: '',
+        pattern: /\s+/,
+        //line_breaks: false,
+        group: Lexer.SKIPPED
+    },
+    comment: {
+        name: '',
+        pattern: /\/\/.*/,
+        line_breaks: false,
+        group: Lexer.SKIPPED
+    },
+    comma: {
+        name: '',
+        pattern: /,/,
+        start_chars_hint: [','],
+        label: ',',
+        line_breaks: false,
+    },
+    type: {
+        name: '',
+        pattern: /type/,
+        start_chars_hint: ['t'],
+        line_breaks: false,
+        longer_alt: identifier
+    },
+    extends: {
+        name: '',
+        pattern: /extends/,
+        start_chars_hint: ['e'],
+        line_breaks: false,
+        longer_alt: identifier
+    },
+    constant: {
+        name: '',
+        pattern: /constant/,
+        start_chars_hint: ['c'],
+        line_breaks: false,
+        longer_alt: identifier
+    },
+    native: {
+        name: '',
+        pattern: /native/,
+        start_chars_hint: ['n'],
+        line_breaks: false,
+        longer_alt: identifier
+    },
+    takes: {
+        name: '',
+        pattern: /takes/,
+        start_chars_hint: ['t'],
+        line_breaks: false,
+        longer_alt: identifier
+    },
+    nothing: {
+        name: '',
+        pattern: /nothing/,
+        start_chars_hint: ['n'],
+        line_breaks: false,
+        longer_alt: identifier
+    },
+    returns: {
+        name: '',
+        pattern: /returns/,
+        start_chars_hint: ['r'],
+        line_breaks: false,
+        longer_alt: identifier
+    },
     identifier: identifier,
 }
 
@@ -24,11 +82,5 @@ for (const [k, v] of Object.entries(JassTokenMap)) {
     JassTokenList.push(JassTokenMap[k]);
 }
 
-const lexer = new Lexer(JassTokenList);
-if (lexer.lexerDefinitionErrors.length > 0) for (const error of lexer.lexerDefinitionErrors) console.error(error);
-
-export function JassLex(text) {
-    const result = lexer.tokenize(text);
-    if (result.errors.length > 0) for (const error of result.errors) console.error(error);
-    return result;
-}
+export const JassLexer = new Lexer(JassTokenList);
+if (JassLexer.lexerDefinitionErrors.length > 0) for (const error of JassLexer.lexerDefinitionErrors) console.error(error);

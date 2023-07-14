@@ -1,4 +1,3 @@
-import {JassLex} from "./lexer";
 import {SemanticTokensBuilder} from "vscode";
 import {JassParser} from "./parser";
 import {CstNodeLocation} from "@chevrotain/types";
@@ -7,7 +6,7 @@ import {TokenLegend} from "../src/token-legend";
 const parser = new JassParser();
 const ParserVisitor = parser.getBaseCstVisitorConstructor();
 
-class JassVisitor extends ParserVisitor {
+export class JassVisitor extends ParserVisitor {
     constructor() {
         super()
         this.validateVisitor()
@@ -51,6 +50,10 @@ class JassVisitor extends ParserVisitor {
     nativedecl(ctx) {
         this.#mark(ctx?.constant?.[0], TokenLegend.keyword);
         this.#mark(ctx.native[0], TokenLegend.keyword);
+
+        const d = ctx.native[0] as CstNodeLocation;
+        console.log(`${d.startLine}: ${d.startColumn}, ${d.endColumn}`);
+
         this.#mark(ctx.takes[0], TokenLegend.keyword);
         this.#mark(ctx.returns[0], TokenLegend.keyword);
         this.#mark(ctx.identifier[0], TokenLegend.function);
@@ -85,15 +88,4 @@ class JassVisitor extends ParserVisitor {
         this.#mark(r, TokenLegend.type);
         return r.image;
     }
-}
-
-const visitor = new JassVisitor();
-
-export function JassVisit(text, builder?: SemanticTokensBuilder) {
-    const result = JassLex(text);
-    parser.input = result.tokens;
-    const cst = parser.jass();
-
-    visitor.builder = builder;
-    return visitor.visit(cst);
 }
