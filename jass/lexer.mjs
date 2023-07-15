@@ -1,8 +1,10 @@
-import {createToken, ITokenConfig, Lexer, TokenType} from "chevrotain";
+import {createToken, EOF, Lexer} from "chevrotain";
 
-export const JassTokenList: TokenType[] = [];
+/** @type {import("chevrotain").TokenType[]} */
+export const JassTokenList = [];
 
-export const JassTokenMap: { [key: string]: ITokenConfig } = {
+/** @type {Object.<string , import("chevrotain").ITokenConfig>} */
+export const JassTokenMap = {
     whitespace: {
         name: '',
         pattern: /[^\S\r\n]+/,
@@ -18,7 +20,7 @@ export const JassTokenMap: { [key: string]: ITokenConfig } = {
     linecomment: {
         name: '',
         pattern: /\/\/[^\r\n]*/,
-        label :'\\\\',
+        label: '\\\\',
         line_breaks: false,
     },
     comma: {
@@ -78,7 +80,9 @@ export const JassTokenMap: { [key: string]: ITokenConfig } = {
 
 for (const [k, v] of Object.entries(JassTokenMap)) {
     v.name = k;
+// noinspection JSValidateTypes
     JassTokenMap[k] = createToken(v);
+    // noinspection JSCheckFunctionSignatures
     JassTokenList.push(JassTokenMap[k]);
 }
 

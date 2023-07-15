@@ -1,10 +1,14 @@
-import {SemanticTokensBuilder} from "vscode";
-import {JassParser} from "./parser";
-import {CstNodeLocation} from "@chevrotain/types";
-import {TokenLegend} from "../src/token-legend";
+// noinspection JSAssignmentUsedAsCondition
+
+import {JassParser} from "./parser.mjs";
+import {TokenLegend} from "../src/token-legend.mjs";
+import ParseRule from "./parse-rule.mjs";
+import {JassTokenMap} from "./lexer.mjs";
 
 const parser = new JassParser();
 const ParserVisitor = parser.getBaseCstVisitorConstructor();
+
+const commentRegex = /^\s*\/\/\s*/g;
 
 export class JassVisitor extends ParserVisitor {
     constructor() {
@@ -12,9 +16,14 @@ export class JassVisitor extends ParserVisitor {
         this.validateVisitor()
     }
 
-    builder?: SemanticTokensBuilder;
+    /**  @type {SemanticHightlight} */ higlight;
 
-    #mark = (location: CstNodeLocation, type: TokenLegend) => {
+    /**
+     * @param {import("chevrotain").IToken} location
+     * @param  {import("vscode").TokenLegend} type
+     * @deprecated
+     */
+    #mark = (location, type) => {
         if (this.builder === null) return;
         if (location === undefined) return;
         this.builder?.push(
@@ -25,33 +34,35 @@ export class JassVisitor extends ParserVisitor {
         );
     }
 
-    jass(ctx) {
-        return ctx.statement.map(statement => this.visit(statement));
+    [ParseRule.jass](ctx) {
+        return ctx[ParseRule.rootstatement].map(statement => this.visit(statement));
     }
 
-    statement(ctx) {
-        console.log(ctx);
-
-        if (ctx.typedecl) return this.visit(ctx.typedecl);
-        if (ctx.nativedecl) return this.visit(ctx.nativedecl);
-        return ctx;
+    [ParseRule.rootstatement](context) {
+        if (context[JassTokenMap.linebreak.name]) return null;
+        let ctx;
+        if (ctx = context[ParseRule.typedecl]) return this.visit(ctx);
+        if (ctx = context[ParseRule.nativedecl]) return this.visit(ctx);
+        if (ctx = context[JassTokenMap.linecomment.name]?.[0]) {
+            this.higlight?.[JassTokenMap.linecomment.name](ctx);
+            return {
+                'type': JassTokenMap.linecomment.name,
+                'body': ctx.image.replace(commentRegex, '')
+            }
+        }
     }
 
-    commentdecl(ctx) {
-        console.log('comment', ctx);
-        return ctx;
+    [ParseRule.terminator]() {
+        return null;
     }
 
-    typedecl(ctx) {
-        console.log('typedecl', ctx);
-        this.#mark(ctx.type[0], TokenLegend.jass_type_keyword);
-        this.#mark(ctx.identifier?.[0], TokenLegend.jass_type);
-        this.#mark(ctx.extends?.[0], TokenLegend.jass_extends_keyword);
-        this.#mark(ctx.identifier?.[1], TokenLegend.jass_type);
+    [ParseRule.typedecl](ctx) {
+        this.higlight?.[ParseRule.typedecl](ctx);
         return {
-            type: 'typedecl',
-            name: ctx.identifier?.[0].image,
-            base: ctx.identifier?.[1].image,
+            type: ParseRule.typedecl,
+            name: ctx[JassTokenMap.identifier.name]?.[0].image,
+            base: ctx[JassTokenMap.identifier.name]?.[1].image,
+            comment: ctx[JassTokenMap.linecomment.name]?.[0].image.replace(commentRegex, '')
         }
     }
 

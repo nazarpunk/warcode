@@ -1,5 +1,13 @@
 type destructable extends widget // comment
 
-native aa takes nothing returns nothing
-constant native bb takes integer a, integer b, real c returns nothing
-// somecomment
+// comment 1
+
+type tA extends tB // comment
+
+
+   // comment 2
+  // comment 3
+
+
+type tC extends tD // comment
+

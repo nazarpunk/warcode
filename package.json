@@ -8,7 +8,9 @@
   "contributors": [],
   "description": "Vanilla JASS syntax.",
   "private": false,
-  "keywords": ["jass"],
+  "keywords": [
+    "jass"
+  ],
   "categories": [
     "Programming Languages",
     "Snippets",
@@ -21,31 +23,71 @@
   },
   "main": "./out/extension.js",
   "scripts": {
-    "esbuild-chevrotain": "esbuild docs/main.ts --outfile=docs/dist/main.mjs --target=es2020 --bundle --external:vscode --format=cjs --platform=browser --tree-shaking=true --sourcemap --watch",
+    "esbuild-chevrotain": "esbuild docs/main.mjs --outfile=docs/out/main.mjs --target=es2020 --bundle --external:vscode --format=cjs --platform=browser --tree-shaking=true --sourcemap --watch",
     "vscode:prepublish": "npm run esbuild-base",
     "build": "vsce package",
     "publish": "vsce publish patch",
-    "esbuild-base": "esbuild src/extension.ts --outfile=out/extension.js --target=es2020 --bundle --external:vscode --format=cjs --platform=node --tree-shaking=true --sourcemap",
+    "esbuild-base": "esbuild src/extension.mjs --outfile=out/extension.js --target=es2020 --bundle --external:vscode --format=cjs --platform=node --tree-shaking=true --sourcemap",
     "esbuild": "npm run esbuild-base",
     "esbuild-watch": "npm run esbuild-base -- --watch"
   },
   "editor.semanticHighlighting.enabled": true,
   "contributes": {
     "semanticTokenTypes": [
-      {"id": "jass_type", "description": "jass_type"},
-      {"id": "jass_type_keyword", "description": "jass_type_keyword"},
-      {"id": "jass_extends_keyword", "description": "jass_extends_keyword"},
-      {"id": "jass_constant_keyword", "description": "jass_constant_keyword"},
-      {"id": "jass_native_keyword", "description": "jass_native_keyword"},
-      {"id": "jass_function", "description": "jass_function"},
-      {"id": "jass_takes_keyword", "description": "jass_takes_keyword"},
-      {"id": "jass_argument", "description": "jass_argument"},
-      {"id": "jass_comma", "description": "jass_comma"},
-      {"id": "jass_returns_keyword", "description": "jass_returns_keyword"}
+      {
+        "id": "jass_linecomment",
+        "description": "jass_linecomment"
+      },
+      {
+        "id": "jass_typedef_comment",
+        "description": "jass_typedef_comment"
+      },
+      {
+        "id": "jass_type",
+        "description": "jass_type"
+      },
+      {
+        "id": "jass_type_keyword",
+        "description": "jass_type_keyword"
+      },
+      {
+        "id": "jass_extends_keyword",
+        "description": "jass_extends_keyword"
+      },
+      {
+        "id": "jass_constant_keyword",
+        "description": "jass_constant_keyword"
+      },
+      {
+        "id": "jass_native_keyword",
+        "description": "jass_native_keyword"
+      },
+      {
+        "id": "jass_function",
+        "description": "jass_function"
+      },
+      {
+        "id": "jass_takes_keyword",
+        "description": "jass_takes_keyword"
+      },
+      {
+        "id": "jass_argument",
+        "description": "jass_argument"
+      },
+      {
+        "id": "jass_comma",
+        "description": "jass_comma"
+      },
+      {
+        "id": "jass_returns_keyword",
+        "description": "jass_returns_keyword"
+      }
     ],
     "configurationDefaults": {
       "editor.semanticTokenColorCustomizations": {
         "rules": {
+          "jass_linecomment": "#308030",
+          "jass_typedef_comment": "#608030",
           "jass_type": "#28edcf",
           "jass_type_keyword": "#d3acf6",
           "jass_extends_keyword": "#d3acf6",
@@ -62,8 +104,13 @@
     "languages": [
       {
         "id": "jass",
-        "aliases": ["JASS", "jass"],
-        "extensions": ["j"],
+        "aliases": [
+          "JASS",
+          "jass"
+        ],
+        "extensions": [
+          "j"
+        ],
         "configuration": "./syntaxes/jass.language-configuration.json"
       }
     ],
@@ -81,11 +128,10 @@
     }
   },
   "devDependencies": {
+    "chevrotain": "^11.0.0",
     "esbuild": "^0.18.11",
-    "@types/vscode": "^1.80.0",
-    "@types/node": "20.2.5",
     "vsce": "^2.15.0",
-    "chevrotain": "^11.0.0"
+    "vscode": "^1.1.37"
   },
   "engines": {
     "vscode": "^1.80.0"
