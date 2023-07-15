@@ -13,7 +13,7 @@ document.body.appendChild(iframe);
     const request = await fetch('test.txt');
     parser.inputText = await request.text();
 
-    console.log(parser.errorlist);
+    //if (parser.errorlist.length > 0) console.log(parser.errorlist);
 
     console.log(visitor.visit(parser.jass()));
 })();

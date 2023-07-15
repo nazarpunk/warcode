@@ -2,7 +2,6 @@ import {CstParser} from "chevrotain";
 import {JassLexer, JassTokenList, JassTokenMap} from "./lexer";
 import {IToken, ParserMethod, TokenType} from "@chevrotain/types";
 
-
 interface JassParserMismatchToken {
     expected: TokenType;
     actual: IToken;
@@ -18,10 +17,10 @@ export class JassParserError<T> {
     options: T;
 }
 
-
 export class JassParser extends CstParser {
 
     declare jass: ParserMethod<any, any>;
+    declare commentdecl: ParserMethod<any, any>;
     declare typedecl: ParserMethod<any, any>;
     declare nativedecl: ParserMethod<any, any>;
     declare statement: ParserMethod<any, any>;
@@ -41,6 +40,8 @@ export class JassParser extends CstParser {
             recoveryEnabled: true,
             errorMessageProvider: {
                 buildMismatchTokenMessage: options => {
+                    console.error('buildMismatchTokenMessage');
+                    console.warn(options);
                     this.errorlist.push(new JassParserError<JassParserMismatchToken>(options));
                     return null;
                 },
@@ -72,11 +73,16 @@ export class JassParser extends CstParser {
             });
         });
 
-        $.RULE("statement", () => {
+        $.RULE('statement', () => {
             $.OR([
                 {ALT: () => $.SUBRULE($.typedecl)},
                 {ALT: () => $.SUBRULE($.nativedecl)},
+                {ALT: () => $.SUBRULE($.commentdecl)},
             ]);
+        });
+
+        $.RULE('commentdecl', () => {
+            $.CONSUME(JassTokenMap.linecomment)
         });
 
         $.RULE('typedecl', () => {
@@ -84,6 +90,8 @@ export class JassParser extends CstParser {
             $.CONSUME(JassTokenMap.identifier);
             $.CONSUME(JassTokenMap.extends);
             $.CONSUME2(JassTokenMap.identifier);
+            $.OPTION(() => $.CONSUME(JassTokenMap.linecomment))
+            $.CONSUME2(JassTokenMap.linebreak);
         });
 
         $.RULE('funcarg', () => {
@@ -121,6 +129,7 @@ export class JassParser extends CstParser {
             $.SUBRULE($.funcarglist);
             $.CONSUME4(JassTokenMap.returns);
             $.SUBRULE($.funcreturntype);
+            $.CONSUME5(JassTokenMap.linebreak);
         });
 
         this.performSelfAnalysis();

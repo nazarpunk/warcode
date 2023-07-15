@@ -9235,19 +9235,24 @@ function createSyntaxDiagramsCode(grammar, { resourceBase = `https://unpkg.com/c
 
 // jass/lexer.ts
 var JassTokenList = [];
-var identifier = createToken({ name: "identifier", pattern: /[a-zA-Z][a-zA-Z0-9_]*/ });
 var JassTokenMap = {
   whitespace: {
     name: "",
-    pattern: /\s+/,
-    //line_breaks: false,
-    group: Lexer.SKIPPED
-  },
-  comment: {
-    name: "",
-    pattern: /\/\/.*/,
+    pattern: /[^\S\r\n]+/,
     line_breaks: false,
     group: Lexer.SKIPPED
+  },
+  linebreak: {
+    name: "",
+    pattern: /\n|\r\n/,
+    label: "\\n",
+    line_breaks: true
+  },
+  linecomment: {
+    name: "",
+    pattern: /\/\/[^\r\n]*/,
+    label: "\\\\",
+    line_breaks: false
   },
   comma: {
     name: "",
@@ -9260,57 +9265,52 @@ var JassTokenMap = {
     name: "",
     pattern: /type/,
     start_chars_hint: ["t"],
-    line_breaks: false,
-    longer_alt: identifier
+    line_breaks: false
   },
   extends: {
     name: "",
     pattern: /extends/,
     start_chars_hint: ["e"],
-    line_breaks: false,
-    longer_alt: identifier
+    line_breaks: false
   },
   constant: {
     name: "",
     pattern: /constant/,
     start_chars_hint: ["c"],
-    line_breaks: false,
-    longer_alt: identifier
+    line_breaks: false
   },
   native: {
     name: "",
     pattern: /native/,
     start_chars_hint: ["n"],
-    line_breaks: false,
-    longer_alt: identifier
+    line_breaks: false
   },
   takes: {
     name: "",
     pattern: /takes/,
     start_chars_hint: ["t"],
-    line_breaks: false,
-    longer_alt: identifier
+    line_breaks: false
   },
   nothing: {
     name: "",
     pattern: /nothing/,
     start_chars_hint: ["n"],
-    line_breaks: false,
-    longer_alt: identifier
+    line_breaks: false
   },
   returns: {
     name: "",
     pattern: /returns/,
     start_chars_hint: ["r"],
-    line_breaks: false,
-    longer_alt: identifier
+    line_breaks: false
   },
-  identifier
+  identifier: {
+    name: "identifier",
+    pattern: /[a-zA-Z][a-zA-Z0-9_]*/
+  }
 };
 for (const [k, v] of Object.entries(JassTokenMap)) {
   v.name = k;
-  if (k != identifier.name)
-    JassTokenMap[k] = createToken(v);
+  JassTokenMap[k] = createToken(v);
   JassTokenList.push(JassTokenMap[k]);
 }
 var JassLexer = new Lexer(JassTokenList);
@@ -9330,6 +9330,8 @@ var JassParser = class extends CstParser {
       recoveryEnabled: true,
       errorMessageProvider: {
         buildMismatchTokenMessage: (options) => {
+          console.error("buildMismatchTokenMessage");
+          console.warn(options);
           this.errorlist.push(new JassParserError(options));
           return null;
         },
@@ -9360,14 +9362,20 @@ var JassParser = class extends CstParser {
     $.RULE("statement", () => {
       $.OR([
         { ALT: () => $.SUBRULE($.typedecl) },
-        { ALT: () => $.SUBRULE($.nativedecl) }
+        { ALT: () => $.SUBRULE($.nativedecl) },
+        { ALT: () => $.SUBRULE($.commentdecl) }
       ]);
+    });
+    $.RULE("commentdecl", () => {
+      $.CONSUME(JassTokenMap.linecomment);
     });
     $.RULE("typedecl", () => {
       $.CONSUME(JassTokenMap.type);
       $.CONSUME(JassTokenMap.identifier);
       $.CONSUME(JassTokenMap.extends);
       $.CONSUME2(JassTokenMap.identifier);
+      $.OPTION(() => $.CONSUME(JassTokenMap.linecomment));
+      $.CONSUME2(JassTokenMap.linebreak);
     });
     $.RULE("funcarg", () => {
       $.CONSUME(JassTokenMap.identifier);
@@ -9401,6 +9409,7 @@ var JassParser = class extends CstParser {
       $.SUBRULE($.funcarglist);
       $.CONSUME4(JassTokenMap.returns);
       $.SUBRULE($.funcreturntype);
+      $.CONSUME5(JassTokenMap.linebreak);
     });
     this.performSelfAnalysis();
   }
@@ -9435,31 +9444,35 @@ var JassVisitor = class extends ParserVisitor {
     return ctx.statement.map((statement) => this.visit(statement));
   }
   statement(ctx) {
+    console.log(ctx);
     if (ctx.typedecl)
       return this.visit(ctx.typedecl);
     if (ctx.nativedecl)
       return this.visit(ctx.nativedecl);
     return ctx;
   }
+  commentdecl(ctx) {
+    console.log("comment", ctx);
+    return ctx;
+  }
   typedecl(ctx) {
-    __privateGet(this, _mark).call(this, ctx.type[0], 2 /* keyword */);
-    __privateGet(this, _mark).call(this, ctx.extends[0], 2 /* keyword */);
-    __privateGet(this, _mark).call(this, ctx.identifier[0], 7 /* type */);
-    __privateGet(this, _mark).call(this, ctx.identifier[1], 7 /* type */);
+    console.log("typedecl", ctx);
+    __privateGet(this, _mark).call(this, ctx.type[0], 1 /* jass_type_keyword */);
+    __privateGet(this, _mark).call(this, ctx.identifier?.[0], 0 /* jass_type */);
+    __privateGet(this, _mark).call(this, ctx.extends?.[0], 2 /* jass_extends_keyword */);
+    __privateGet(this, _mark).call(this, ctx.identifier?.[1], 0 /* jass_type */);
     return {
       type: "typedecl",
-      name: ctx.identifier[0].image,
-      base: ctx.identifier[1].image
+      name: ctx.identifier?.[0].image,
+      base: ctx.identifier?.[1].image
     };
   }
   nativedecl(ctx) {
-    __privateGet(this, _mark).call(this, ctx?.constant?.[0], 2 /* keyword */);
-    __privateGet(this, _mark).call(this, ctx.native[0], 2 /* keyword */);
-    const d = ctx.native[0];
-    console.log(`${d.startLine}: ${d.startColumn}, ${d.endColumn}`);
-    __privateGet(this, _mark).call(this, ctx.takes[0], 2 /* keyword */);
-    __privateGet(this, _mark).call(this, ctx.returns[0], 2 /* keyword */);
-    __privateGet(this, _mark).call(this, ctx.identifier[0], 13 /* function */);
+    __privateGet(this, _mark).call(this, ctx?.constant?.[0], 3 /* jass_constant_keyword */);
+    __privateGet(this, _mark).call(this, ctx.native[0], 4 /* jass_native_keyword */);
+    __privateGet(this, _mark).call(this, ctx.identifier[0], 5 /* jass_function */);
+    __privateGet(this, _mark).call(this, ctx.takes[0], 6 /* jass_takes_keyword */);
+    __privateGet(this, _mark).call(this, ctx.returns[0], 9 /* jass_returns_keyword */);
     return {
       type: "nativedecl",
       arguments: this.visit(ctx.funcarglist),
@@ -9469,24 +9482,24 @@ var JassVisitor = class extends ParserVisitor {
   funcarg(ctx) {
     const t = ctx.identifier[0];
     const n = ctx.identifier[1];
-    __privateGet(this, _mark).call(this, t, 12 /* typeParameter */);
-    __privateGet(this, _mark).call(this, n, 18 /* parameter */);
+    __privateGet(this, _mark).call(this, t, 0 /* jass_type */);
+    __privateGet(this, _mark).call(this, n, 7 /* jass_argument */);
     return [t.image, n.image];
   }
   funcarglist(ctx) {
     if (ctx.comma)
       for (const c of ctx.comma) {
-        __privateGet(this, _mark).call(this, c, 5 /* operator */);
+        __privateGet(this, _mark).call(this, c, 8 /* jass_comma */);
       }
     if (ctx.nothing) {
-      __privateGet(this, _mark).call(this, ctx.nothing[0], 7 /* type */);
+      __privateGet(this, _mark).call(this, ctx.nothing[0], 0 /* jass_type */);
       return [];
     }
     return ctx.funcarg.map((funcarg) => this.visit(funcarg));
   }
   funcreturntype(ctx) {
     const r = ctx.nothing ? ctx.nothing[0] : ctx.identifier[0];
-    __privateGet(this, _mark).call(this, r, 7 /* type */);
+    __privateGet(this, _mark).call(this, r, 0 /* jass_type */);
     return r.image;
   }
 };
@@ -9501,7 +9514,6 @@ document.body.appendChild(iframe);
   const visitor = new JassVisitor();
   const request = await fetch("test.txt");
   parser2.inputText = await request.text();
-  console.log(parser2.errorlist);
   console.log(visitor.visit(parser2.jass()));
 })();
 /*! Bundled license information:

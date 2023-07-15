@@ -5,6 +5,8 @@
   "publisher": "nazarpunk",
   "name": "jass-vanilla",
   "displayName": "jass-vanilla",
+  "contributors": [],
+  "description": "Vanilla JASS syntax.",
   "private": false,
   "keywords": ["jass"],
   "categories": [
@@ -27,7 +29,36 @@
     "esbuild": "npm run esbuild-base",
     "esbuild-watch": "npm run esbuild-base -- --watch"
   },
+  "editor.semanticHighlighting.enabled": true,
   "contributes": {
+    "semanticTokenTypes": [
+      {"id": "jass_type", "description": "jass_type"},
+      {"id": "jass_type_keyword", "description": "jass_type_keyword"},
+      {"id": "jass_extends_keyword", "description": "jass_extends_keyword"},
+      {"id": "jass_constant_keyword", "description": "jass_constant_keyword"},
+      {"id": "jass_native_keyword", "description": "jass_native_keyword"},
+      {"id": "jass_function", "description": "jass_function"},
+      {"id": "jass_takes_keyword", "description": "jass_takes_keyword"},
+      {"id": "jass_argument", "description": "jass_argument"},
+      {"id": "jass_comma", "description": "jass_comma"},
+      {"id": "jass_returns_keyword", "description": "jass_returns_keyword"}
+    ],
+    "configurationDefaults": {
+      "editor.semanticTokenColorCustomizations": {
+        "rules": {
+          "jass_type": "#28edcf",
+          "jass_type_keyword": "#d3acf6",
+          "jass_extends_keyword": "#d3acf6",
+          "jass_constant_keyword": "#05ef09",
+          "jass_native_keyword": "#bb73ff",
+          "jass_function": "#f5ec70",
+          "jass_takes_keyword": "#8b78f8",
+          "jass_argument": "#d4dd27",
+          "jass_comma": "#868681",
+          "jass_returns_keyword": "#8e73ca"
+        }
+      }
+    },
     "languages": [
       {
         "id": "jass",
@@ -49,8 +80,6 @@
       "editor.semanticHighlighting.enabled": true
     }
   },
-  "contributors": [],
-  "description": "Vanilla JASS syntax.",
   "devDependencies": {
     "esbuild": "^0.18.11",
     "@types/vscode": "^1.80.0",

@@ -2,20 +2,24 @@ import {createToken, ITokenConfig, Lexer, TokenType} from "chevrotain";
 
 export const JassTokenList: TokenType[] = [];
 
-const identifier = createToken({name: 'identifier', pattern: /[a-zA-Z][a-zA-Z0-9_]*/});
-
 export const JassTokenMap: { [key: string]: ITokenConfig } = {
     whitespace: {
         name: '',
-        pattern: /\s+/,
-        //line_breaks: false,
-        group: Lexer.SKIPPED
-    },
-    comment: {
-        name: '',
-        pattern: /\/\/.*/,
+        pattern: /[^\S\r\n]+/,
         line_breaks: false,
         group: Lexer.SKIPPED
+    },
+    linebreak: {
+        name: '',
+        pattern: /\n|\r\n/,
+        label: '\\n',
+        line_breaks: true,
+    },
+    linecomment: {
+        name: '',
+        pattern: /\/\/[^\r\n]*/,
+        label :'\\\\',
+        line_breaks: false,
     },
     comma: {
         name: '',
@@ -29,56 +33,52 @@ export const JassTokenMap: { [key: string]: ITokenConfig } = {
         pattern: /type/,
         start_chars_hint: ['t'],
         line_breaks: false,
-        longer_alt: identifier
     },
     extends: {
         name: '',
         pattern: /extends/,
         start_chars_hint: ['e'],
         line_breaks: false,
-        longer_alt: identifier
     },
     constant: {
         name: '',
         pattern: /constant/,
         start_chars_hint: ['c'],
         line_breaks: false,
-        longer_alt: identifier
     },
     native: {
         name: '',
         pattern: /native/,
         start_chars_hint: ['n'],
         line_breaks: false,
-        longer_alt: identifier
     },
     takes: {
         name: '',
         pattern: /takes/,
         start_chars_hint: ['t'],
         line_breaks: false,
-        longer_alt: identifier
     },
     nothing: {
         name: '',
         pattern: /nothing/,
         start_chars_hint: ['n'],
         line_breaks: false,
-        longer_alt: identifier
     },
     returns: {
         name: '',
         pattern: /returns/,
         start_chars_hint: ['r'],
         line_breaks: false,
-        longer_alt: identifier
     },
-    identifier: identifier,
+    identifier: {
+        name: 'identifier',
+        pattern: /[a-zA-Z][a-zA-Z0-9_]*/
+    },
 }
 
 for (const [k, v] of Object.entries(JassTokenMap)) {
     v.name = k;
-    if (k != identifier.name) JassTokenMap[k] = createToken(v);
+    JassTokenMap[k] = createToken(v);
     JassTokenList.push(JassTokenMap[k]);
 }
 

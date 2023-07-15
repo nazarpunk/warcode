@@ -1,5 +1,5 @@
-type type destructable extends widget
-native ConvertRace takes nothing returns nothing
-constant native ConvertRace takes integer i returns race
-constant native ConvertRace takes integer i, real a, real b, real c returns race
-type destructable extends widget
+type destructable extends widget // comment
+
+native aa takes nothing returns nothing
+constant native bb takes integer a, integer b, real c returns nothing
+// somecomment

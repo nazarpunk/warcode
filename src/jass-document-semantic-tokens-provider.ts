@@ -27,15 +27,17 @@ export class JassDocumentSemanticTokensProvider implements DocumentSemanticToken
     // noinspection JSUnusedGlobalSymbols
     async provideDocumentSemanticTokens(document: TextDocument, token: CancellationToken): Promise<SemanticTokens> {
         console.log('provideDocumentSemanticTokens');
+        //return (new SemanticTokensBuilder()).build();
         const text = document.getText();
         this.#collection.clear();
 
         this.#visitor.builder = new SemanticTokensBuilder();
 
         this.#parser.inputText = text;
+        console.log(this.#visitor.visit(this.#parser.jass()));
+        console.log(this.#parser.errorlist.length);
 
-        this.#visitor.visit(this.#parser.jass());
-        //console.log();
+        //if (this.#parser.errorlist.length) return (new SemanticTokensBuilder()).build();
 
         //if (diagnostic.length > 0) this.#collection.set(document.uri, diagnostic);
         return this.#visitor.builder.build();
