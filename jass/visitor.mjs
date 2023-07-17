@@ -1,7 +1,6 @@
 // noinspection JSAssignmentUsedAsCondition
 
 import {JassParser} from "./parser.mjs";
-import {TokenLegend} from "../src/token-legend.mjs";
 import ParseRuleName from "./parse-rule-name.mjs";
 import {JassTokenMap} from "./lexer.mjs";
 
@@ -18,24 +17,8 @@ export class JassVisitor extends ParserVisitor {
 
     /**  @type {JassSemanticHightlight} */ higlight;
 
-    /**
-     * @param {import("chevrotain").IToken} location
-     * @param  {import("vscode").TokenLegend} type
-     * @deprecated
-     */
-    #mark = (location, type) => {
-        if (this.builder === null) return;
-        if (location === undefined) return;
-        this.builder?.push(
-            location.startLine - 1,
-            location.startColumn - 1,
-            location.endColumn - location.startColumn + 1,
-            type
-        );
-    }
-
     [ParseRuleName.jass](ctx) {
-        return ctx[ParseRuleName.rootstatement].map(statement => this.visit(statement));
+        return ctx[ParseRuleName.rootstatement].map(item => this.visit(item));
     }
 
     [ParseRuleName.rootstatement](context) {
@@ -70,33 +53,39 @@ export class JassVisitor extends ParserVisitor {
         this.higlight?.[ParseRuleName.nativedecl](ctx);
         return {
             type: ParseRuleName.nativedecl,
-            arguments: this.visit(ctx.funcarglist),
-            return: this.visit(ctx.funcreturntype),
+            arguments: this.visit(ctx[ParseRuleName.funcarglist]),
+            return: this.visit(ctx[ParseRuleName.funcreturntype]),
         };
     }
 
-    funcarg(ctx) {
-        const t = ctx.identifier[0];
-        const n = ctx.identifier[1];
-        this.#mark(t, TokenLegend.jass_type);
-        this.#mark(n, TokenLegend.jass_argument);
-        return [t.image, n.image];
+    [ParseRuleName.funcarg](ctx) {
+        const i = ctx[JassTokenMap.identifier.name];
+        if (i === null || i.length !== 2) return;
+        this.higlight?.[ParseRuleName.funcarg](i);
+        return [
+            i?.[0].image,
+            i?.[1].image,
+        ];
     }
 
-    funcarglist(ctx) {
-        if (ctx.comma) for (const c of ctx.comma) {
-            this.#mark(c, TokenLegend.jass_comma);
-        }
-        if (ctx.nothing) {
-            this.#mark(ctx.nothing[0], TokenLegend.jass_type);
-            return [];
-        }
-        return ctx.funcarg.map(funcarg => this.visit(funcarg));
+    [ParseRuleName.funcarglist](ctx) {
+        this.higlight?.[ParseRuleName.funcarglist](ctx);
+        if (ctx.nothing) return [];
+        return ctx?.[ParseRuleName.funcarg]?.map(item => this.visit(item));
     }
 
-    funcreturntype(ctx) {
-        const r = ctx.nothing ? ctx.nothing[0] : ctx.identifier[0];
-        this.#mark(r, TokenLegend.jass_type);
-        return r.image;
+    [ParseRuleName.funcreturntype](ctx) {
+        let token;
+        if (token = ctx[JassTokenMap.nothing.name]?.[0]) {
+            this.higlight?.[ParseRuleName.funcreturntype](token);
+            return token.image;
+        }
+
+        if (token = ctx[JassTokenMap.identifier.name]) {
+            this.higlight?.[ParseRuleName.funcreturntype](token);
+            return token.image;
+        }
+
+        return null;
     }
 }

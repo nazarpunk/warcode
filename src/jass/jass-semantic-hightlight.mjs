@@ -57,4 +57,23 @@ export default class JassSemanticHightlight {
         this.#mark(ctx[JassTokenMap.returns.name]?.[0], TokenLegend.jass_returns_keyword);
     }
 
+    /** @param {import('chevrotain').IToken[]} tokens */
+    [ParseRuleName.funcarg](tokens) {
+        this.#mark(tokens[0], TokenLegend.jass_type);
+        this.#mark(tokens[1], TokenLegend.jass_argument);
+    }
+
+    /** @param {import('chevrotain').CstNode} ctx */
+    [ParseRuleName.funcarglist](ctx) {
+        if (ctx[JassTokenMap.comma.name]) for (const comma of ctx[JassTokenMap.comma.name]) {
+            this.#mark(comma, TokenLegend.jass_comma);
+        }
+        this.#mark(ctx?.[JassTokenMap.nothing.name]?.[0], TokenLegend.jass_type);
+    }
+
+    /** @param {import('chevrotain').IToken} token */
+    [ParseRuleName.funcreturntype](token) {
+        this.#mark(token, TokenLegend.jass_type);
+    }
+
 }

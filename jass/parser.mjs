@@ -2,10 +2,11 @@ import {CstParser, EOF} from "chevrotain";
 import {JassLexer, JassTokenList, JassTokenMap} from "./lexer.mjs";
 import ParseRuleName from "./parse-rule-name.mjs";
 
-/** @typedef {('MismatchToken')} JassParserErrorType */
+/** @typedef {('MismatchToken'|'NoViableAlt')} JassParserErrorType */
 
 export const JassParserErrorType = {
     MismatchToken: 'MismatchToken',
+    NoViableAlt: 'NoViableAlt',
 }
 
 class JassParserError {
@@ -42,8 +43,7 @@ export class JassParser extends CstParser {
                     return null;
                 },
                 buildNoViableAltMessage: options => {
-                    console.error('buildNoViableAltMessage');
-                    console.log(options);
+                    this.errorlist.push(new JassParserError(JassParserErrorType.NoViableAlt, options.previous));
                     return null;
                 },
                 buildEarlyExitMessage: options => {

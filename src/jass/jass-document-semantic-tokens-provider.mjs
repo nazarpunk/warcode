@@ -47,7 +47,12 @@ export class JassDocumentSemanticTokensProvider {
         this.#visitor.builder = highlight.builder;
 
         this.#parser.inputText = text;
-        this.#visitor.visit(this.#parser.jass())
+
+        try {
+            this.#visitor.visit(this.#parser.jass());
+        } catch (e) {
+            console.error(e);
+        }
 
         this.#collection.clear();
 
@@ -55,6 +60,7 @@ export class JassDocumentSemanticTokensProvider {
 
         for (const error of this.#parser.errorlist) {
             switch (error.type) {
+                case JassParserErrorType.NoViableAlt:
                 case JassParserErrorType.MismatchToken:
                     diagnostics.push({
                         message: error.type,
