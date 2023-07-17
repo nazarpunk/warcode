@@ -13,4 +13,4 @@ export const TokenLegend = {
     jass_returns_keyword: 11,
     jass_test_keyword: 12,
 }
-export const TokenLegendList = ['jass_linecomment', 'jass_typedef_comment', 'jass_type', 'jass_type_keyword', 'jass_extends_keyword', 'jass_constant_keyword', 'jass_native_keyword', 'jass_function', 'jass_takes_keyword', 'jass_argument', 'jass_comma', 'jass_returns_keyword', 'jass_test_keyword',]
+export const TokenLegendList = ['jass_linecomment', 'jass_typedef_comment', 'jass_type', 'jass_type_keyword', 'jass_extends_keyword', 'jass_constant_keyword', 'jass_native_keyword', 'jass_function', 'jass_takes_keyword', 'jass_argument', 'jass_comma', 'jass_returns_keyword', 'jass_test_keyword']

@@ -81,6 +81,7 @@ const ruledef = [
 ];
 
 const packagePath = '../package.json';
+const tab = '    ';
 
 /** @type {{}} */
 const json = JSON.parse(fs.readFileSync(packagePath, {encoding: 'utf8'}));
@@ -100,15 +101,10 @@ for (const rule of ruledef) {
     delete rule.color;
     contributes['semanticTokenTypes'].push(rule);
 
-    fs.writeFileSync(legendPath, `\t${rule.id}: ${legendList.length},\n`, {flag: 'a+'});
+    fs.writeFileSync(legendPath, `${tab}${rule.id}: ${legendList.length},\n`, {flag: 'a+'});
     legendList.push(rule.id);
 }
 
-fs.writeFileSync(legendPath, `}\nexport const TokenLegendList = [`, {flag: 'a+'});
-
-for (const item of legendList) {
-    fs.writeFileSync(legendPath, `'${item}', `, {flag: 'a+'});
-}
-fs.writeFileSync(legendPath, ']', {flag: 'a+'});
+fs.writeFileSync(legendPath, `}\nexport const TokenLegendList = [${legendList.map(s => `'${s}'`).join(', ')}]`, {flag: 'a+'});
 
 fs.writeFileSync(packagePath, JSON.stringify(json, null, 2), {flag: 'w+'});
