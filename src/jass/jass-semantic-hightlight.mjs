@@ -57,6 +57,13 @@ export default class JassSemanticHightlight {
         this.#mark(ctx[JassTokenMap.returns.name]?.[0], TokenLegend.jass_returns_keyword);
     }
 
+    /** @param {import('chevrotain').CstNode} ctx */
+    [ParseRuleName.funcdecl](ctx) {
+        this.#mark(ctx[JassTokenMap.identifier.name]?.[0], TokenLegend.jass_function);
+        this.#mark(ctx[JassTokenMap.takes.name]?.[0], TokenLegend.jass_takes_keyword);
+        this.#mark(ctx[JassTokenMap.returns.name]?.[0], TokenLegend.jass_returns_keyword);
+    }
+
     /** @param {import('chevrotain').IToken[]} tokens */
     [ParseRuleName.funcarg](tokens) {
         this.#mark(tokens[0], TokenLegend.jass_type);

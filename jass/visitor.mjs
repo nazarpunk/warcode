@@ -18,7 +18,7 @@ export class JassVisitor extends ParserVisitor {
     /**  @type {JassSemanticHightlight} */ higlight;
 
     [ParseRuleName.jass](ctx) {
-        return ctx[ParseRuleName.rootstatement].map(item => this.visit(item));
+        return ctx[ParseRuleName.rootstatement]?.map(item => this.visit(item));
     }
 
     [ParseRuleName.rootstatement](context) {
@@ -26,6 +26,7 @@ export class JassVisitor extends ParserVisitor {
         let ctx;
         if (ctx = context[ParseRuleName.typedecl]) return this.visit(ctx);
         if (ctx = context[ParseRuleName.nativedecl]) return this.visit(ctx);
+        if (ctx = context[ParseRuleName.funcdecl]) return this.visit(ctx);
         if (ctx = context[JassTokenMap.linecomment.name]?.[0]) {
             this.higlight?.[JassTokenMap.linecomment.name](ctx);
             return {
@@ -53,14 +54,29 @@ export class JassVisitor extends ParserVisitor {
         this.higlight?.[ParseRuleName.nativedecl](ctx);
         return {
             type: ParseRuleName.nativedecl,
+            name: ctx[JassTokenMap.identifier.name]?.[0].image,
             arguments: this.visit(ctx[ParseRuleName.funcarglist]),
             return: this.visit(ctx[ParseRuleName.funcreturntype]),
         };
     }
 
+    [ParseRuleName.funcdecl](ctx) {
+        console.log('--funcdecl', ctx);
+        this.higlight?.[ParseRuleName.funcdecl](ctx);
+
+        return {
+            type: ParseRuleName.funcdecl,
+            name: ctx[JassTokenMap.identifier.name]?.[0].image,
+            statement: this.visit(ctx[ParseRuleName.statement]),
+            arguments: this.visit(ctx[ParseRuleName.funcarglist]),
+            return: this.visit(ctx[ParseRuleName.funcreturntype]),
+        };
+    }
+
+
     [ParseRuleName.funcarg](ctx) {
         const i = ctx[JassTokenMap.identifier.name];
-        if (i === null || i.length !== 2) return;
+        if (i?.length !== 2) return;
         this.higlight?.[ParseRuleName.funcarg](i);
         return [
             i?.[0].image,
@@ -87,5 +103,76 @@ export class JassVisitor extends ParserVisitor {
         }
 
         return null;
+    }
+
+    [ParseRuleName.localgroup](ctx) {
+        return ctx;
+    }
+    [ParseRuleName.localdecl](ctx) {
+        return ctx;
+    }
+
+    [ParseRuleName.vardecl](ctx) {
+        return ctx;
+    }
+
+    [ParseRuleName.expression](ctx) {
+        return ctx;
+    }
+
+    [ParseRuleName.comparator](ctx) {
+        return ctx;
+    }
+
+    [ParseRuleName.addition](ctx) {
+        return ctx;
+    }
+
+    [ParseRuleName.multiplication](ctx) {
+        return ctx;
+    }
+
+    [ParseRuleName.primary](ctx) {
+        return ctx;
+    }
+
+    [ParseRuleName.arrayaccess](ctx) {
+        return ctx;
+    }
+
+    [ParseRuleName.funccall](ctx) {
+        return ctx;
+    }
+
+    [ParseRuleName.statement](ctx) {
+        return ctx;
+    }
+
+    [ParseRuleName.callstatement](ctx) {
+        return ctx;
+    }
+
+    [ParseRuleName.setstatement](ctx) {
+        return ctx;
+    }
+
+    [ParseRuleName.loopstatement](ctx) {
+        return ctx;
+    }
+
+    [ParseRuleName.exitwhenstatement](ctx) {
+        return ctx;
+    }
+
+    [ParseRuleName.ifstatement](ctx) {
+        return ctx;
+    }
+
+    [ParseRuleName.optionalelseIf](ctx) {
+        return ctx;
+    }
+
+    [ParseRuleName.optionalelse](ctx) {
+        return ctx;
     }
 }
