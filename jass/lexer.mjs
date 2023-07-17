@@ -1,90 +1,82 @@
 import {createToken, Lexer} from 'chevrotain';
 
-/** @type {import('chevrotain').TokenType[]} */
-export const JassTokenList = [];
-
-/** @type {Object.<string , import('chevrotain').ITokenConfig>} */
+/** @type {Object.<string , import('chevrotain').TokenType>} */
 export const JassTokenMap = {
-    whitespace: {
-        name: '',
+    whitespace: createToken({
+        name: 'whitespace',
         pattern: /[^\S\r\n]+/,
         line_breaks: false,
-        group: Lexer.SKIPPED
-    },
-    linebreak: {
-        name: '',
+        group: Lexer.SKIPPED,
+    }),
+    linebreak: createToken({
+        name: 'linebreak',
         pattern: /\n|\r\n/,
-        label: '\\n',
+        label: "\\n",
         line_breaks: true,
-    },
-    linecomment: {
-        name: '',
+    }),
+    linecomment: createToken({
+        name: 'linecomment',
         pattern: /\/\/[^\r\n]*/,
-        label: '\\\\',
+        label: "\\\\",
         line_breaks: false,
-    },
-    comma: {
-        name: '',
+    }),
+    comma: createToken({
+        name: 'comma',
         pattern: /,/,
-        start_chars_hint: [','],
-        label: ',',
+        start_chars_hint: [","],
+        label: ",",
         line_breaks: false,
-    },
-    type: {
-        name: '',
+    }),
+    type: createToken({
+        name: 'type',
         pattern: /type/,
-        start_chars_hint: ['t'],
+        start_chars_hint: ["t"],
         line_breaks: false,
-    },
-    extends: {
-        name: '',
+    }),
+    extends: createToken({
+        name: 'extends',
         pattern: /extends/,
-        start_chars_hint: ['e'],
+        start_chars_hint: ["e"],
         line_breaks: false,
-    },
-    constant: {
-        name: '',
+    }),
+    constant: createToken({
+        name: 'constant',
         pattern: /constant/,
-        start_chars_hint: ['c'],
+        start_chars_hint: ["c"],
         line_breaks: false,
-    },
-    native: {
-        name: '',
+    }),
+    native: createToken({
+        name: 'native',
         pattern: /native/,
-        start_chars_hint: ['n'],
+        start_chars_hint: ["n"],
         line_breaks: false,
-    },
-    takes: {
-        name: '',
+    }),
+    takes: createToken({
+        name: 'takes',
         pattern: /takes/,
-        start_chars_hint: ['t'],
+        start_chars_hint: ["t"],
         line_breaks: false,
-    },
-    nothing: {
-        name: '',
+    }),
+    nothing: createToken({
+        name: 'nothing',
         pattern: /nothing/,
-        start_chars_hint: ['n'],
+        start_chars_hint: ["n"],
         line_breaks: false,
-    },
-    returns: {
-        name: '',
+    }),
+    returns: createToken({
+        name: 'returns',
         pattern: /returns/,
-        start_chars_hint: ['r'],
+        start_chars_hint: ["r"],
         line_breaks: false,
-    },
-    identifier: {
+    }),
+    identifier: createToken({
         name: 'identifier',
-        pattern: /[a-zA-Z][a-zA-Z0-9_]*/
-    },
+        pattern: /[a-zA-Z][a-zA-Z0-9_]*/,
+    }),
 }
 
-for (const [k, v] of Object.entries(JassTokenMap)) {
-    v.name = k;
-// noinspection JSValidateTypes
-    JassTokenMap[k] = createToken(v);
-    // noinspection JSCheckFunctionSignatures
-    JassTokenList.push(JassTokenMap[k]);
-}
+/** @type {import('chevrotain').TokenType[]} */
+export const JassTokenList = [JassTokenMap.whitespace, JassTokenMap.linebreak, JassTokenMap.linecomment, JassTokenMap.comma, JassTokenMap.type, JassTokenMap.extends, JassTokenMap.constant, JassTokenMap.native, JassTokenMap.takes, JassTokenMap.nothing, JassTokenMap.returns, JassTokenMap.identifier];
 
 export const JassLexer = new Lexer(JassTokenList);
-if (JassLexer.lexerDefinitionErrors.length > 0) for (const error of JassLexer.lexerDefinitionErrors) console.error(error);
+for (const error of JassLexer.lexerDefinitionErrors) console.error(error);

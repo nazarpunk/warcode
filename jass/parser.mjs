@@ -1,7 +1,6 @@
 import {CstParser, EOF} from "chevrotain";
 import {JassLexer, JassTokenList, JassTokenMap} from "./lexer.mjs";
-import ParseRule from "./parse-rule.mjs";
-
+import ParseRuleName from "./parse-rule-name.mjs";
 
 /** @typedef {('MismatchToken')} JassParserErrorType */
 
@@ -33,19 +32,20 @@ export class JassParser extends CstParser {
         super(JassTokenList, {
             recoveryEnabled: true,
             errorMessageProvider: {
-                buildMismatchTokenMessage: options => this.errorlist.push(new JassParserError(JassParserErrorType.MismatchToken, options.actual)),
+                buildMismatchTokenMessage: options => {
+                    this.errorlist.push(new JassParserError(JassParserErrorType.MismatchToken, options.actual));
+                    return null;
+                },
                 buildNotAllInputParsedMessage: options => {
                     console.error('buildNotAllInputParsedMessage');
                     console.log(options);
                     return null;
                 },
-
                 buildNoViableAltMessage: options => {
                     console.error('buildNoViableAltMessage');
                     console.log(options);
                     return null;
                 },
-
                 buildEarlyExitMessage: options => {
                     console.error('buildEarlyExitMessag');
                     console.log(options);
@@ -56,70 +56,70 @@ export class JassParser extends CstParser {
 
         const $ = this;
 
-        $.RULE(ParseRule.jass, () => {
+        $.RULE(ParseRuleName.jass, () => {
             $.MANY(() => {
-                $.SUBRULE($[ParseRule.rootstatement]);
+                $.SUBRULE($[ParseRuleName.rootstatement]);
             });
         });
 
-        $.RULE(ParseRule.rootstatement, () => {
+        $.RULE(ParseRuleName.rootstatement, () => {
             $.OR([
                 {ALT: () => $.CONSUME(JassTokenMap.linecomment)},
                 {ALT: () => $.CONSUME(JassTokenMap.linebreak)},
-                {ALT: () => $.SUBRULE($[ParseRule.typedecl])},
-                {ALT: () => $.SUBRULE($[ParseRule.nativedecl])},
+                {ALT: () => $.SUBRULE($[ParseRuleName.typedecl])},
+                {ALT: () => $.SUBRULE($[ParseRuleName.nativedecl])},
             ]);
         });
 
-        $.RULE(ParseRule.typedecl, () => {
+        $.RULE(ParseRuleName.typedecl, () => {
             $.CONSUME(JassTokenMap.type);
             $.CONSUME(JassTokenMap.identifier);
             $.CONSUME(JassTokenMap.extends);
             $.CONSUME2(JassTokenMap.identifier);
             $.OPTION(() => $.CONSUME(JassTokenMap.linecomment))
-            $.SUBRULE($[ParseRule.terminator]);
+            $.SUBRULE($[ParseRuleName.terminator]);
         });
 
-        $.RULE(ParseRule.terminator, () => {
+        $.RULE(ParseRuleName.terminator, () => {
             $.OR([
                 {ALT: () => $.CONSUME(EOF)},
                 {ALT: () => $.CONSUME2(JassTokenMap.linebreak)}
             ]);
         });
 
-        $.RULE(ParseRule.nativedecl, () => {
+        $.RULE(ParseRuleName.nativedecl, () => {
             $.OPTION(() => $.CONSUME(JassTokenMap.constant));
             $.CONSUME(JassTokenMap.native);
             $.CONSUME2(JassTokenMap.identifier);
             $.CONSUME3(JassTokenMap.takes);
-            $.SUBRULE($[ParseRule.funcarglist]);
+            $.SUBRULE($[ParseRuleName.funcarglist]);
             $.CONSUME4(JassTokenMap.returns);
-            $.SUBRULE($[ParseRule.funcreturntype]);
+            $.SUBRULE($[ParseRuleName.funcreturntype]);
             $.OPTION2(() => $.CONSUME(JassTokenMap.linecomment))
-            $.SUBRULE($[ParseRule.terminator]);
+            $.SUBRULE($[ParseRuleName.terminator]);
         });
 
-        $.RULE(ParseRule.funcarglist, () => {
+        $.RULE(ParseRuleName.funcarglist, () => {
             $.OR([
                 {ALT: () => $.CONSUME(JassTokenMap.nothing)},
                 {
                     ALT: () => {
-                        $.SUBRULE($[ParseRule.funcarg])
+                        $.SUBRULE($[ParseRuleName.funcarg])
                         $.MANY(() => {
                             $.CONSUME(JassTokenMap.comma)
-                            $.SUBRULE2($[ParseRule.funcarg])
+                            $.SUBRULE2($[ParseRuleName.funcarg])
                         })
                     }
                 },
             ]);
         });
 
-        $.RULE(ParseRule.funcarg, () => {
+        $.RULE(ParseRuleName.funcarg, () => {
             $.CONSUME(JassTokenMap.identifier)
             $.CONSUME2(JassTokenMap.identifier)
         });
 
-        $.RULE(ParseRule.funcreturntype, () => {
+        $.RULE(ParseRuleName.funcreturntype, () => {
             $.OR([
                 {ALT: () => $.CONSUME(JassTokenMap.nothing)},
                 {ALT: () => $.CONSUME(JassTokenMap.identifier)},

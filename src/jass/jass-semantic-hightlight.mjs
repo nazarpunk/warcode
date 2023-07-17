@@ -1,7 +1,7 @@
 import {SemanticTokensBuilder} from "vscode";
 import {JassTokenMap} from "../../jass/lexer.mjs";
 import {TokenLegend} from "../token-legend.mjs";
-import ParseRule from "../../jass/parse-rule.mjs";
+import ParseRuleName from "../../jass/parse-rule-name.mjs";
 
 export default class JassSemanticHightlight {
 
@@ -40,11 +40,21 @@ export default class JassSemanticHightlight {
     }
 
     /** @param {import('chevrotain').CstNode} ctx */
-    [ParseRule.typedecl](ctx) {
+    [ParseRuleName.typedecl](ctx) {
         this.#mark(ctx[JassTokenMap.type.name]?.[0], TokenLegend.jass_type_keyword);
         this.#mark(ctx[JassTokenMap.identifier.name]?.[0], TokenLegend.jass_type);
         this.#mark(ctx[JassTokenMap.extends.name]?.[0], TokenLegend.jass_extends_keyword);
         this.#mark(ctx[JassTokenMap.identifier.name]?.[1], TokenLegend.jass_type);
         this.#mark(ctx[JassTokenMap.linecomment.name]?.[0], TokenLegend.jass_typedef_comment);
     }
+
+    /** @param {import('chevrotain').CstNode} ctx */
+    [ParseRuleName.nativedecl](ctx) {
+        this.#mark(ctx[JassTokenMap.constant.name]?.[0], TokenLegend.jass_constant_keyword);
+        this.#mark(ctx[JassTokenMap.native.name]?.[0], TokenLegend.jass_native_keyword);
+        this.#mark(ctx[JassTokenMap.identifier.name]?.[0], TokenLegend.jass_function);
+        this.#mark(ctx[JassTokenMap.takes.name]?.[0], TokenLegend.jass_takes_keyword);
+        this.#mark(ctx[JassTokenMap.returns.name]?.[0], TokenLegend.jass_returns_keyword);
+    }
+
 }

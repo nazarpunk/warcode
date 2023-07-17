@@ -2,7 +2,7 @@
 
 import {JassParser} from "./parser.mjs";
 import {TokenLegend} from "../src/token-legend.mjs";
-import ParseRule from "./parse-rule.mjs";
+import ParseRuleName from "./parse-rule-name.mjs";
 import {JassTokenMap} from "./lexer.mjs";
 
 const parser = new JassParser();
@@ -34,15 +34,15 @@ export class JassVisitor extends ParserVisitor {
         );
     }
 
-    [ParseRule.jass](ctx) {
-        return ctx[ParseRule.rootstatement].map(statement => this.visit(statement));
+    [ParseRuleName.jass](ctx) {
+        return ctx[ParseRuleName.rootstatement].map(statement => this.visit(statement));
     }
 
-    [ParseRule.rootstatement](context) {
+    [ParseRuleName.rootstatement](context) {
         if (context[JassTokenMap.linebreak.name]) return null;
         let ctx;
-        if (ctx = context[ParseRule.typedecl]) return this.visit(ctx);
-        if (ctx = context[ParseRule.nativedecl]) return this.visit(ctx);
+        if (ctx = context[ParseRuleName.typedecl]) return this.visit(ctx);
+        if (ctx = context[ParseRuleName.nativedecl]) return this.visit(ctx);
         if (ctx = context[JassTokenMap.linecomment.name]?.[0]) {
             this.higlight?.[JassTokenMap.linecomment.name](ctx);
             return {
@@ -52,28 +52,24 @@ export class JassVisitor extends ParserVisitor {
         }
     }
 
-    [ParseRule.terminator]() {
+    [ParseRuleName.terminator]() {
         return null;
     }
 
-    [ParseRule.typedecl](ctx) {
-        this.higlight?.[ParseRule.typedecl](ctx);
+    [ParseRuleName.typedecl](ctx) {
+        this.higlight?.[ParseRuleName.typedecl](ctx);
         return {
-            type: ParseRule.typedecl,
+            type: ParseRuleName.typedecl,
             name: ctx[JassTokenMap.identifier.name]?.[0].image,
             base: ctx[JassTokenMap.identifier.name]?.[1].image,
             comment: ctx[JassTokenMap.linecomment.name]?.[0].image.replace(commentRegex, '')
         }
     }
 
-    nativedecl(ctx) {
-        this.#mark(ctx?.constant?.[0], TokenLegend.jass_constant_keyword);
-        this.#mark(ctx.native[0], TokenLegend.jass_native_keyword);
-        this.#mark(ctx.identifier[0], TokenLegend.jass_function);
-        this.#mark(ctx.takes[0], TokenLegend.jass_takes_keyword);
-        this.#mark(ctx.returns[0], TokenLegend.jass_returns_keyword);
+    [ParseRuleName.nativedecl](ctx) {
+        this.higlight?.[ParseRuleName.nativedecl](ctx);
         return {
-            type: 'nativedecl',
+            type: ParseRuleName.nativedecl,
             arguments: this.visit(ctx.funcarglist),
             return: this.visit(ctx.funcreturntype),
         };

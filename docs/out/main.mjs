@@ -5787,9 +5787,9 @@ var defaultGrammarValidatorErrorProvider = {
     msg = msg.replace(/\s\s+/g, "\n");
     return msg;
   },
-  buildNamespaceConflictError(rule2) {
+  buildNamespaceConflictError(rule) {
     const errMsg = `Namespace conflict found in grammar.
-The grammar has both a Terminal(Token) and a Non-Terminal(Rule) named: <${rule2.name}>.
+The grammar has both a Terminal(Token) and a Non-Terminal(Rule) named: <${rule.name}>.
 To resolve this make sure each Terminal and Non-Terminal names are unique
 This is easy to accomplish by using the convention that Terminal names start with an uppercase letter
 and Non-Terminal names start with a lower case letter.`;
@@ -6763,23 +6763,23 @@ var OccurrenceValidationCollector = class extends GAstVisitor {
     this.allProductions.push(terminal);
   }
 };
-function validateRuleDoesNotAlreadyExist(rule2, allRules, className, errMsgProvider) {
+function validateRuleDoesNotAlreadyExist(rule, allRules, className, errMsgProvider) {
   const errors = [];
   const occurrences = reduce_default(allRules, (result, curRule) => {
-    if (curRule.name === rule2.name) {
+    if (curRule.name === rule.name) {
       return result + 1;
     }
     return result;
   }, 0);
   if (occurrences > 1) {
     const errMsg = errMsgProvider.buildDuplicateRuleNameError({
-      topLevelRule: rule2,
+      topLevelRule: rule,
       grammarName: className
     });
     errors.push({
       message: errMsg,
       type: ParserDefinitionErrorType.DUPLICATE_RULE_NAME,
-      ruleName: rule2.name
+      ruleName: rule.name
     });
   }
   return errors;
@@ -6970,7 +6970,7 @@ function validateSomeNonEmptyLookaheadPath(topLevelRules, maxLookahead, errMsgPr
   });
   return errors;
 }
-function checkAlternativesAmbiguities(alternatives, alternation, rule2, errMsgProvider) {
+function checkAlternativesAmbiguities(alternatives, alternation, rule, errMsgProvider) {
   const foundAmbiguousPaths = [];
   const identicalAmbiguities = reduce_default(alternatives, (result, currAlt, currAltIdx) => {
     if (alternation.definition[currAltIdx].ignoreAmbiguities === true) {
@@ -6997,7 +6997,7 @@ function checkAlternativesAmbiguities(alternatives, alternation, rule2, errMsgPr
   const currErrors = map_default(identicalAmbiguities, (currAmbDescriptor) => {
     const ambgIndices = map_default(currAmbDescriptor.alts, (currAltIdx) => currAltIdx + 1);
     const currMessage = errMsgProvider.buildAlternationAmbiguityError({
-      topLevelRule: rule2,
+      topLevelRule: rule,
       alternation,
       ambiguityIndices: ambgIndices,
       prefixPath: currAmbDescriptor.path
@@ -7005,14 +7005,14 @@ function checkAlternativesAmbiguities(alternatives, alternation, rule2, errMsgPr
     return {
       message: currMessage,
       type: ParserDefinitionErrorType.AMBIGUOUS_ALTS,
-      ruleName: rule2.name,
+      ruleName: rule.name,
       occurrence: alternation.idx,
       alternatives: currAmbDescriptor.alts
     };
   });
   return currErrors;
 }
-function checkPrefixAlternativesAmbiguities(alternatives, alternation, rule2, errMsgProvider) {
+function checkPrefixAlternativesAmbiguities(alternatives, alternation, rule, errMsgProvider) {
   const pathsAndIndices = reduce_default(alternatives, (result, currAlt, idx) => {
     const currPathsAndIdx = map_default(currAlt, (currPath) => {
       return { idx, path: currPath };
@@ -7038,7 +7038,7 @@ function checkPrefixAlternativesAmbiguities(alternatives, alternation, rule2, er
       const ambgIndices = [currAmbPathAndIdx.idx + 1, targetIdx + 1];
       const occurrence = alternation.idx === 0 ? "" : alternation.idx;
       const message = errMsgProvider.buildAlternationPrefixAmbiguityError({
-        topLevelRule: rule2,
+        topLevelRule: rule,
         alternation,
         ambiguityIndices: ambgIndices,
         prefixPath: currAmbPathAndIdx.path
@@ -7046,7 +7046,7 @@ function checkPrefixAlternativesAmbiguities(alternatives, alternation, rule2, er
       return {
         message,
         type: ParserDefinitionErrorType.AMBIGUOUS_PREFIX_ALTS,
-        ruleName: rule2.name,
+        ruleName: rule.name,
         occurrence,
         alternatives: ambgIndices
       };
@@ -7078,8 +7078,8 @@ function resolveGrammar2(options) {
     errMsgProvider: defaultGrammarResolverErrorProvider
   });
   const topRulesTable = {};
-  forEach_default(options.rules, (rule2) => {
-    topRulesTable[rule2.name] = rule2;
+  forEach_default(options.rules, (rule) => {
+    topRulesTable[rule.name] = rule;
   });
   return resolveGrammar(topRulesTable, actualOptions.errMsgProvider);
 }
@@ -7486,16 +7486,16 @@ var LooksAhead = class {
       });
     });
   }
-  computeLookaheadFunc(rule2, prodOccurrence, prodKey, prodType, prodMaxLookahead, dslMethodName) {
+  computeLookaheadFunc(rule, prodOccurrence, prodKey, prodType, prodMaxLookahead, dslMethodName) {
     this.TRACE_INIT(`${dslMethodName}${prodOccurrence === 0 ? "" : prodOccurrence}`, () => {
       const laFunc = this.lookaheadStrategy.buildLookaheadForOptional({
         prodOccurrence,
-        rule: rule2,
+        rule,
         maxLookahead: prodMaxLookahead || this.maxLookahead,
         dynamicTokensEnabled: this.dynamicTokensEnabled,
         prodType
       });
-      const key = getKeyForAutomaticLookahead(this.fullRuleNameToShort[rule2.name], prodKey, prodOccurrence);
+      const key = getKeyForAutomaticLookahead(this.fullRuleNameToShort[rule.name], prodKey, prodOccurrence);
       this.setLaFuncCache(key, laFunc);
     });
   }
@@ -7554,9 +7554,9 @@ var DslMethodsCollectorVisitor = class extends GAstVisitor {
   }
 };
 var collectorVisitor = new DslMethodsCollectorVisitor();
-function collectMethods(rule2) {
+function collectMethods(rule) {
   collectorVisitor.reset();
-  rule2.accept(collectorVisitor);
+  rule.accept(collectorVisitor);
   const dslMethods = collectorVisitor.dslMethods;
   collectorVisitor.reset();
   return dslMethods;
@@ -9240,106 +9240,96 @@ function createSyntaxDiagramsCode(grammar, { resourceBase = `https://unpkg.com/c
 }
 
 // jass/lexer.mjs
-var JassTokenList = [];
 var JassTokenMap = {
-  whitespace: {
-    name: "",
+  whitespace: createToken({
+    name: "whitespace",
     pattern: /[^\S\r\n]+/,
     line_breaks: false,
     group: Lexer.SKIPPED
-  },
-  linebreak: {
-    name: "",
+  }),
+  linebreak: createToken({
+    name: "linebreak",
     pattern: /\n|\r\n/,
     label: "\\n",
     line_breaks: true
-  },
-  linecomment: {
-    name: "",
+  }),
+  linecomment: createToken({
+    name: "linecomment",
     pattern: /\/\/[^\r\n]*/,
     label: "\\\\",
     line_breaks: false
-  },
-  comma: {
-    name: "",
+  }),
+  comma: createToken({
+    name: "comma",
     pattern: /,/,
     start_chars_hint: [","],
     label: ",",
     line_breaks: false
-  },
-  type: {
-    name: "",
+  }),
+  type: createToken({
+    name: "type",
     pattern: /type/,
     start_chars_hint: ["t"],
     line_breaks: false
-  },
-  extends: {
-    name: "",
+  }),
+  extends: createToken({
+    name: "extends",
     pattern: /extends/,
     start_chars_hint: ["e"],
     line_breaks: false
-  },
-  constant: {
-    name: "",
+  }),
+  constant: createToken({
+    name: "constant",
     pattern: /constant/,
     start_chars_hint: ["c"],
     line_breaks: false
-  },
-  native: {
-    name: "",
+  }),
+  native: createToken({
+    name: "native",
     pattern: /native/,
     start_chars_hint: ["n"],
     line_breaks: false
-  },
-  takes: {
-    name: "",
+  }),
+  takes: createToken({
+    name: "takes",
     pattern: /takes/,
     start_chars_hint: ["t"],
     line_breaks: false
-  },
-  nothing: {
-    name: "",
+  }),
+  nothing: createToken({
+    name: "nothing",
     pattern: /nothing/,
     start_chars_hint: ["n"],
     line_breaks: false
-  },
-  returns: {
-    name: "",
+  }),
+  returns: createToken({
+    name: "returns",
     pattern: /returns/,
     start_chars_hint: ["r"],
     line_breaks: false
-  },
-  identifier: {
+  }),
+  identifier: createToken({
     name: "identifier",
     pattern: /[a-zA-Z][a-zA-Z0-9_]*/
-  }
+  })
 };
-for (const [k, v] of Object.entries(JassTokenMap)) {
-  v.name = k;
-  JassTokenMap[k] = createToken(v);
-  JassTokenList.push(JassTokenMap[k]);
-}
+var JassTokenList = [JassTokenMap.whitespace, JassTokenMap.linebreak, JassTokenMap.linecomment, JassTokenMap.comma, JassTokenMap.type, JassTokenMap.extends, JassTokenMap.constant, JassTokenMap.native, JassTokenMap.takes, JassTokenMap.nothing, JassTokenMap.returns, JassTokenMap.identifier];
 var JassLexer = new Lexer(JassTokenList);
-if (JassLexer.lexerDefinitionErrors.length > 0)
-  for (const error of JassLexer.lexerDefinitionErrors)
-    console.error(error);
+for (const error of JassLexer.lexerDefinitionErrors)
+  console.error(error);
 
-// jass/parse-rule.mjs
-var rule = {
-  jass: "",
-  terminator: "",
-  rootstatement: "",
-  typedecl: "",
-  nativedecl: "",
-  funcarg: "",
-  funcarglist: "",
-  funcreturntype: "",
-  linebreakdecl: ""
+// jass/parse-rule-name.mjs
+var parse_rule_name_default = {
+  jass: "jass",
+  terminator: "terminator",
+  rootstatement: "rootstatement",
+  typedecl: "typedecl",
+  nativedecl: "nativedecl",
+  funcarg: "funcarg",
+  funcarglist: "funcarglist",
+  funcreturntype: "funcreturntype",
+  linebreakdecl: "linebreakdecl"
 };
-for (const k of Object.keys(rule)) {
-  rule[k] = k;
-}
-var parse_rule_default = Object.freeze(rule);
 
 // jass/parser.mjs
 var JassParserErrorType = {
@@ -9360,7 +9350,10 @@ var JassParser = class extends CstParser {
     super(JassTokenList, {
       recoveryEnabled: true,
       errorMessageProvider: {
-        buildMismatchTokenMessage: (options) => this.errorlist.push(new JassParserError(JassParserErrorType.MismatchToken, options.actual)),
+        buildMismatchTokenMessage: (options) => {
+          this.errorlist.push(new JassParserError(JassParserErrorType.MismatchToken, options.actual));
+          return null;
+        },
         buildNotAllInputParsedMessage: (options) => {
           console.error("buildNotAllInputParsedMessage");
           console.log(options);
@@ -9381,63 +9374,63 @@ var JassParser = class extends CstParser {
     /**@type {JassParserError[]} */
     __publicField(this, "errorlist", []);
     const $ = this;
-    $.RULE(parse_rule_default.jass, () => {
+    $.RULE(parse_rule_name_default.jass, () => {
       $.MANY(() => {
-        $.SUBRULE($[parse_rule_default.rootstatement]);
+        $.SUBRULE($[parse_rule_name_default.rootstatement]);
       });
     });
-    $.RULE(parse_rule_default.rootstatement, () => {
+    $.RULE(parse_rule_name_default.rootstatement, () => {
       $.OR([
         { ALT: () => $.CONSUME(JassTokenMap.linecomment) },
         { ALT: () => $.CONSUME(JassTokenMap.linebreak) },
-        { ALT: () => $.SUBRULE($[parse_rule_default.typedecl]) },
-        { ALT: () => $.SUBRULE($[parse_rule_default.nativedecl]) }
+        { ALT: () => $.SUBRULE($[parse_rule_name_default.typedecl]) },
+        { ALT: () => $.SUBRULE($[parse_rule_name_default.nativedecl]) }
       ]);
     });
-    $.RULE(parse_rule_default.typedecl, () => {
+    $.RULE(parse_rule_name_default.typedecl, () => {
       $.CONSUME(JassTokenMap.type);
       $.CONSUME(JassTokenMap.identifier);
       $.CONSUME(JassTokenMap.extends);
       $.CONSUME2(JassTokenMap.identifier);
       $.OPTION(() => $.CONSUME(JassTokenMap.linecomment));
-      $.SUBRULE($[parse_rule_default.terminator]);
+      $.SUBRULE($[parse_rule_name_default.terminator]);
     });
-    $.RULE(parse_rule_default.terminator, () => {
+    $.RULE(parse_rule_name_default.terminator, () => {
       $.OR([
         { ALT: () => $.CONSUME(EOF) },
         { ALT: () => $.CONSUME2(JassTokenMap.linebreak) }
       ]);
     });
-    $.RULE(parse_rule_default.nativedecl, () => {
+    $.RULE(parse_rule_name_default.nativedecl, () => {
       $.OPTION(() => $.CONSUME(JassTokenMap.constant));
       $.CONSUME(JassTokenMap.native);
       $.CONSUME2(JassTokenMap.identifier);
       $.CONSUME3(JassTokenMap.takes);
-      $.SUBRULE($[parse_rule_default.funcarglist]);
+      $.SUBRULE($[parse_rule_name_default.funcarglist]);
       $.CONSUME4(JassTokenMap.returns);
-      $.SUBRULE($[parse_rule_default.funcreturntype]);
+      $.SUBRULE($[parse_rule_name_default.funcreturntype]);
       $.OPTION2(() => $.CONSUME(JassTokenMap.linecomment));
-      $.SUBRULE($[parse_rule_default.terminator]);
+      $.SUBRULE($[parse_rule_name_default.terminator]);
     });
-    $.RULE(parse_rule_default.funcarglist, () => {
+    $.RULE(parse_rule_name_default.funcarglist, () => {
       $.OR([
         { ALT: () => $.CONSUME(JassTokenMap.nothing) },
         {
           ALT: () => {
-            $.SUBRULE($[parse_rule_default.funcarg]);
+            $.SUBRULE($[parse_rule_name_default.funcarg]);
             $.MANY(() => {
               $.CONSUME(JassTokenMap.comma);
-              $.SUBRULE2($[parse_rule_default.funcarg]);
+              $.SUBRULE2($[parse_rule_name_default.funcarg]);
             });
           }
         }
       ]);
     });
-    $.RULE(parse_rule_default.funcarg, () => {
+    $.RULE(parse_rule_name_default.funcarg, () => {
       $.CONSUME(JassTokenMap.identifier);
       $.CONSUME2(JassTokenMap.identifier);
     });
-    $.RULE(parse_rule_default.funcreturntype, () => {
+    $.RULE(parse_rule_name_default.funcreturntype, () => {
       $.OR([
         { ALT: () => $.CONSUME(JassTokenMap.nothing) },
         { ALT: () => $.CONSUME(JassTokenMap.identifier) }
@@ -9451,26 +9444,22 @@ var JassParser = class extends CstParser {
   }
 };
 
-// src/jass/jass-token-legend.mjs
-var JassTokenLegend = {
+// src/token-legend.mjs
+var TokenLegend = {
   jass_linecomment: 0,
-  jass_typedef_comment: 0,
-  jass_type: 0,
-  jass_type_keyword: 0,
-  jass_extends_keyword: 0,
-  jass_constant_keyword: 0,
-  jass_native_keyword: 0,
-  jass_function: 0,
-  jass_takes_keyword: 0,
-  jass_argument: 0,
-  jass_comma: 0,
-  jass_returns_keyword: 0
+  jass_typedef_comment: 1,
+  jass_type: 2,
+  jass_type_keyword: 3,
+  jass_extends_keyword: 4,
+  jass_constant_keyword: 5,
+  jass_native_keyword: 6,
+  jass_function: 7,
+  jass_takes_keyword: 8,
+  jass_argument: 9,
+  jass_comma: 10,
+  jass_returns_keyword: 11,
+  jass_test_keyword: 12
 };
-var TokenLegendList = [];
-for (const k of Object.keys(JassTokenLegend)) {
-  JassTokenLegend[k] = TokenLegendList.length;
-  TokenLegendList.push(k);
-}
 
 // jass/visitor.mjs
 var parser = new JassParser();
@@ -9480,11 +9469,11 @@ var _mark;
 var JassVisitor = class extends ParserVisitor {
   constructor() {
     super();
-    /**  @type {SemanticHightlight} */
+    /**  @type {JassSemanticHightlight} */
     __publicField(this, "higlight");
     /**
      * @param {import("chevrotain").IToken} location
-     * @param  {import("vscode").JassTokenLegend} type
+     * @param  {import("vscode").TokenLegend} type
      * @deprecated
      */
     __privateAdd(this, _mark, (location, type) => {
@@ -9501,16 +9490,16 @@ var JassVisitor = class extends ParserVisitor {
     });
     this.validateVisitor();
   }
-  [parse_rule_default.jass](ctx) {
-    return ctx[parse_rule_default.rootstatement].map((statement) => this.visit(statement));
+  [parse_rule_name_default.jass](ctx) {
+    return ctx[parse_rule_name_default.rootstatement].map((statement) => this.visit(statement));
   }
-  [parse_rule_default.rootstatement](context) {
+  [parse_rule_name_default.rootstatement](context) {
     if (context[JassTokenMap.linebreak.name])
       return null;
     let ctx;
-    if (ctx = context[parse_rule_default.typedecl])
+    if (ctx = context[parse_rule_name_default.typedecl])
       return this.visit(ctx);
-    if (ctx = context[parse_rule_default.nativedecl])
+    if (ctx = context[parse_rule_name_default.nativedecl])
       return this.visit(ctx);
     if (ctx = context[JassTokenMap.linecomment.name]?.[0]) {
       this.higlight?.[JassTokenMap.linecomment.name](ctx);
@@ -9520,26 +9509,22 @@ var JassVisitor = class extends ParserVisitor {
       };
     }
   }
-  [parse_rule_default.terminator]() {
+  [parse_rule_name_default.terminator]() {
     return null;
   }
-  [parse_rule_default.typedecl](ctx) {
-    this.higlight?.[parse_rule_default.typedecl](ctx);
+  [parse_rule_name_default.typedecl](ctx) {
+    this.higlight?.[parse_rule_name_default.typedecl](ctx);
     return {
-      type: parse_rule_default.typedecl,
+      type: parse_rule_name_default.typedecl,
       name: ctx[JassTokenMap.identifier.name]?.[0].image,
       base: ctx[JassTokenMap.identifier.name]?.[1].image,
       comment: ctx[JassTokenMap.linecomment.name]?.[0].image.replace(commentRegex, "")
     };
   }
-  nativedecl(ctx) {
-    __privateGet(this, _mark).call(this, ctx?.constant?.[0], JassTokenLegend.jass_constant_keyword);
-    __privateGet(this, _mark).call(this, ctx.native[0], JassTokenLegend.jass_native_keyword);
-    __privateGet(this, _mark).call(this, ctx.identifier[0], JassTokenLegend.jass_function);
-    __privateGet(this, _mark).call(this, ctx.takes[0], JassTokenLegend.jass_takes_keyword);
-    __privateGet(this, _mark).call(this, ctx.returns[0], JassTokenLegend.jass_returns_keyword);
+  [parse_rule_name_default.nativedecl](ctx) {
+    this.higlight?.[parse_rule_name_default.nativedecl](ctx);
     return {
-      type: "nativedecl",
+      type: parse_rule_name_default.nativedecl,
       arguments: this.visit(ctx.funcarglist),
       return: this.visit(ctx.funcreturntype)
     };
@@ -9547,24 +9532,24 @@ var JassVisitor = class extends ParserVisitor {
   funcarg(ctx) {
     const t = ctx.identifier[0];
     const n = ctx.identifier[1];
-    __privateGet(this, _mark).call(this, t, JassTokenLegend.jass_type);
-    __privateGet(this, _mark).call(this, n, JassTokenLegend.jass_argument);
+    __privateGet(this, _mark).call(this, t, TokenLegend.jass_type);
+    __privateGet(this, _mark).call(this, n, TokenLegend.jass_argument);
     return [t.image, n.image];
   }
   funcarglist(ctx) {
     if (ctx.comma)
       for (const c of ctx.comma) {
-        __privateGet(this, _mark).call(this, c, JassTokenLegend.jass_comma);
+        __privateGet(this, _mark).call(this, c, TokenLegend.jass_comma);
       }
     if (ctx.nothing) {
-      __privateGet(this, _mark).call(this, ctx.nothing[0], JassTokenLegend.jass_type);
+      __privateGet(this, _mark).call(this, ctx.nothing[0], TokenLegend.jass_type);
       return [];
     }
     return ctx.funcarg.map((funcarg) => this.visit(funcarg));
   }
   funcreturntype(ctx) {
     const r = ctx.nothing ? ctx.nothing[0] : ctx.identifier[0];
-    __privateGet(this, _mark).call(this, r, JassTokenLegend.jass_type);
+    __privateGet(this, _mark).call(this, r, TokenLegend.jass_type);
     return r.image;
   }
 };
