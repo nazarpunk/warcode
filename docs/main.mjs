@@ -12,6 +12,9 @@ document.body.appendChild(iframe);
     const request = await fetch('test.txt');
     parser.inputText = await request.text();
 
-    if (parser.errorlist.length > 0) console.log(parser.errorlist);
-    console.log(visitor.visit(parser.jass()));
+    const result = visitor.visit(parser.jass());
+
+    for (const error of parser.errorlist) console.warn(error)
+
+    console.log(result);
 })();

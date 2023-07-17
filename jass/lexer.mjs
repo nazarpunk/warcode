@@ -1,9 +1,9 @@
-import {createToken, EOF, Lexer} from "chevrotain";
+import {createToken, Lexer} from 'chevrotain';
 
-/** @type {import("chevrotain").TokenType[]} */
+/** @type {import('chevrotain').TokenType[]} */
 export const JassTokenList = [];
 
-/** @type {Object.<string , import("chevrotain").ITokenConfig>} */
+/** @type {Object.<string , import('chevrotain').ITokenConfig>} */
 export const JassTokenMap = {
     whitespace: {
         name: '',

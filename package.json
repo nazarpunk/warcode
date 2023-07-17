@@ -81,6 +81,10 @@
       {
         "id": "jass_returns_keyword",
         "description": "jass_returns_keyword"
+      },
+      {
+        "id": "jass_test_keyword",
+        "description": "jass_test_keyword"
       }
     ],
     "configurationDefaults": {
@@ -97,7 +101,8 @@
           "jass_takes_keyword": "#8b78f8",
           "jass_argument": "#d4dd27",
           "jass_comma": "#868681",
-          "jass_returns_keyword": "#8e73ca"
+          "jass_returns_keyword": "#8e73ca",
+          "jass_test_keyword": "#8e73ca"
         }
       }
     },

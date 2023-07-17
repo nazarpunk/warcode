@@ -16,7 +16,7 @@ export class JassVisitor extends ParserVisitor {
         this.validateVisitor()
     }
 
-    /**  @type {SemanticHightlight} */ higlight;
+    /**  @type {JassSemanticHightlight} */ higlight;
 
     /**
      * @param {import("chevrotain").IToken} location

@@ -1,9 +1,9 @@
 import {SemanticTokensBuilder} from "vscode";
-import {JassTokenMap} from "../jass/lexer.mjs";
-import {TokenLegend} from "./token-legend.mjs";
-import ParseRule from "../jass/parse-rule.mjs";
+import {JassTokenMap} from "../../jass/lexer.mjs";
+import {TokenLegend} from "../token-legend.mjs";
+import ParseRule from "../../jass/parse-rule.mjs";
 
-export default class SemanticHightlight {
+export default class JassSemanticHightlight {
 
     constructor() {
         this.#builder = new SemanticTokensBuilder();

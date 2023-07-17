@@ -9342,17 +9342,25 @@ for (const k of Object.keys(rule)) {
 var parse_rule_default = Object.freeze(rule);
 
 // jass/parser.mjs
+var JassParserErrorType = {
+  MismatchToken: "MismatchToken"
+};
+var JassParserError = class {
+  /**
+   * @param {JassParserErrorType} type
+   * @param {import('chevrotain').IToken} token
+   */
+  constructor(type, token) {
+    this.type = type;
+    this.token = token;
+  }
+};
 var JassParser = class extends CstParser {
   constructor() {
     super(JassTokenList, {
       recoveryEnabled: true,
       errorMessageProvider: {
-        buildMismatchTokenMessage: (options) => {
-          console.error("buildMismatchTokenMessage");
-          console.warn(options);
-          this.errorlist.push(options);
-          return null;
-        },
+        buildMismatchTokenMessage: (options) => this.errorlist.push(new JassParserError(JassParserErrorType.MismatchToken, options.actual)),
         buildNotAllInputParsedMessage: (options) => {
           console.error("buildNotAllInputParsedMessage");
           console.log(options);
@@ -9370,6 +9378,7 @@ var JassParser = class extends CstParser {
         }
       }
     });
+    /**@type {JassParserError[]} */
     __publicField(this, "errorlist", []);
     const $ = this;
     $.RULE(parse_rule_default.jass, () => {
@@ -9442,8 +9451,8 @@ var JassParser = class extends CstParser {
   }
 };
 
-// src/token-legend.mjs
-var TokenLegend = {
+// src/jass/jass-token-legend.mjs
+var JassTokenLegend = {
   jass_linecomment: 0,
   jass_typedef_comment: 0,
   jass_type: 0,
@@ -9458,8 +9467,8 @@ var TokenLegend = {
   jass_returns_keyword: 0
 };
 var TokenLegendList = [];
-for (const k of Object.keys(TokenLegend)) {
-  TokenLegend[k] = TokenLegendList.length;
+for (const k of Object.keys(JassTokenLegend)) {
+  JassTokenLegend[k] = TokenLegendList.length;
   TokenLegendList.push(k);
 }
 
@@ -9475,7 +9484,7 @@ var JassVisitor = class extends ParserVisitor {
     __publicField(this, "higlight");
     /**
      * @param {import("chevrotain").IToken} location
-     * @param  {import("vscode").TokenLegend} type
+     * @param  {import("vscode").JassTokenLegend} type
      * @deprecated
      */
     __privateAdd(this, _mark, (location, type) => {
@@ -9524,11 +9533,11 @@ var JassVisitor = class extends ParserVisitor {
     };
   }
   nativedecl(ctx) {
-    __privateGet(this, _mark).call(this, ctx?.constant?.[0], TokenLegend.jass_constant_keyword);
-    __privateGet(this, _mark).call(this, ctx.native[0], TokenLegend.jass_native_keyword);
-    __privateGet(this, _mark).call(this, ctx.identifier[0], TokenLegend.jass_function);
-    __privateGet(this, _mark).call(this, ctx.takes[0], TokenLegend.jass_takes_keyword);
-    __privateGet(this, _mark).call(this, ctx.returns[0], TokenLegend.jass_returns_keyword);
+    __privateGet(this, _mark).call(this, ctx?.constant?.[0], JassTokenLegend.jass_constant_keyword);
+    __privateGet(this, _mark).call(this, ctx.native[0], JassTokenLegend.jass_native_keyword);
+    __privateGet(this, _mark).call(this, ctx.identifier[0], JassTokenLegend.jass_function);
+    __privateGet(this, _mark).call(this, ctx.takes[0], JassTokenLegend.jass_takes_keyword);
+    __privateGet(this, _mark).call(this, ctx.returns[0], JassTokenLegend.jass_returns_keyword);
     return {
       type: "nativedecl",
       arguments: this.visit(ctx.funcarglist),
@@ -9538,24 +9547,24 @@ var JassVisitor = class extends ParserVisitor {
   funcarg(ctx) {
     const t = ctx.identifier[0];
     const n = ctx.identifier[1];
-    __privateGet(this, _mark).call(this, t, TokenLegend.jass_type);
-    __privateGet(this, _mark).call(this, n, TokenLegend.jass_argument);
+    __privateGet(this, _mark).call(this, t, JassTokenLegend.jass_type);
+    __privateGet(this, _mark).call(this, n, JassTokenLegend.jass_argument);
     return [t.image, n.image];
   }
   funcarglist(ctx) {
     if (ctx.comma)
       for (const c of ctx.comma) {
-        __privateGet(this, _mark).call(this, c, TokenLegend.jass_comma);
+        __privateGet(this, _mark).call(this, c, JassTokenLegend.jass_comma);
       }
     if (ctx.nothing) {
-      __privateGet(this, _mark).call(this, ctx.nothing[0], TokenLegend.jass_type);
+      __privateGet(this, _mark).call(this, ctx.nothing[0], JassTokenLegend.jass_type);
       return [];
     }
     return ctx.funcarg.map((funcarg) => this.visit(funcarg));
   }
   funcreturntype(ctx) {
     const r = ctx.nothing ? ctx.nothing[0] : ctx.identifier[0];
-    __privateGet(this, _mark).call(this, r, TokenLegend.jass_type);
+    __privateGet(this, _mark).call(this, r, JassTokenLegend.jass_type);
     return r.image;
   }
 };
@@ -9570,9 +9579,10 @@ document.body.appendChild(iframe);
   const visitor = new JassVisitor();
   const request = await fetch("test.txt");
   parser2.inputText = await request.text();
-  if (parser2.errorlist.length > 0)
-    console.log(parser2.errorlist);
-  console.log(visitor.visit(parser2.jass()));
+  const result = visitor.visit(parser2.jass());
+  for (const error of parser2.errorlist)
+    console.warn(error);
+  console.log(result);
 })();
 /*! Bundled license information:
 

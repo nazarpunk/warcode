@@ -2,7 +2,26 @@ import {CstParser, EOF} from "chevrotain";
 import {JassLexer, JassTokenList, JassTokenMap} from "./lexer.mjs";
 import ParseRule from "./parse-rule.mjs";
 
+
+/** @typedef {('MismatchToken')} JassParserErrorType */
+
+export const JassParserErrorType = {
+    MismatchToken: 'MismatchToken',
+}
+
+class JassParserError {
+    /**
+     * @param {JassParserErrorType} type
+     * @param {import('chevrotain').IToken} token
+     */
+    constructor(type, token) {
+        this.type = type;
+        this.token = token;
+    }
+}
+
 export class JassParser extends CstParser {
+    /**@type {JassParserError[]} */
     errorlist = [];
 
     set inputText(text) {
@@ -14,12 +33,7 @@ export class JassParser extends CstParser {
         super(JassTokenList, {
             recoveryEnabled: true,
             errorMessageProvider: {
-                buildMismatchTokenMessage: options => {
-                    console.error('buildMismatchTokenMessage');
-                    console.warn(options);
-                    this.errorlist.push(options);
-                    return null;
-                },
+                buildMismatchTokenMessage: options => this.errorlist.push(new JassParserError(JassParserErrorType.MismatchToken, options.actual)),
                 buildNotAllInputParsedMessage: options => {
                     console.error('buildNotAllInputParsedMessage');
                     console.log(options);

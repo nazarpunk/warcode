@@ -1,5 +1,5 @@
 import {languages, SemanticTokensLegend} from "vscode";
-import {JassDocumentSemanticTokensProvider} from "./jass-document-semantic-tokens-provider.mjs";
+import {JassDocumentSemanticTokensProvider} from "./jass/jass-document-semantic-tokens-provider.mjs";
 import {TokenLegendList} from "./token-legend.mjs";
 
 // noinspection JSUnusedGlobalSymbols
