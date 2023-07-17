@@ -44,9 +44,9 @@ export class JassVisitor extends ParserVisitor {
         this.higlight?.[ParseRuleName.typedecl](ctx);
         return {
             type: ParseRuleName.typedecl,
-            name: ctx[JassTokenMap.identifier.name]?.[0].image,
-            base: ctx[JassTokenMap.identifier.name]?.[1].image,
-            comment: ctx[JassTokenMap.linecomment.name]?.[0].image.replace(commentRegex, '')
+            name: ctx[JassTokenMap.identifier.name]?.[0]?.image,
+            base: ctx[JassTokenMap.identifier.name]?.[1]?.image,
+            comment: ctx[JassTokenMap.linecomment.name]?.[0]?.image.replace(commentRegex, '')
         }
     }
 
@@ -54,7 +54,7 @@ export class JassVisitor extends ParserVisitor {
         this.higlight?.[ParseRuleName.nativedecl](ctx);
         return {
             type: ParseRuleName.nativedecl,
-            name: ctx[JassTokenMap.identifier.name]?.[0].image,
+            name: ctx[JassTokenMap.identifier.name]?.[0]?.image,
             arguments: this.visit(ctx[ParseRuleName.funcarglist]),
             return: this.visit(ctx[ParseRuleName.funcreturntype]),
         };
@@ -66,7 +66,7 @@ export class JassVisitor extends ParserVisitor {
 
         return {
             type: ParseRuleName.funcdecl,
-            name: ctx[JassTokenMap.identifier.name]?.[0].image,
+            name: ctx[JassTokenMap.identifier.name]?.[0]?.image,
             statement: this.visit(ctx[ParseRuleName.statement]),
             arguments: this.visit(ctx[ParseRuleName.funcarglist]),
             return: this.visit(ctx[ParseRuleName.funcreturntype]),
@@ -79,8 +79,8 @@ export class JassVisitor extends ParserVisitor {
         if (i?.length !== 2) return;
         this.higlight?.[ParseRuleName.funcarg](i);
         return [
-            i?.[0].image,
-            i?.[1].image,
+            i[0].image,
+            i[1].image,
         ];
     }
 
@@ -108,6 +108,7 @@ export class JassVisitor extends ParserVisitor {
     [ParseRuleName.localgroup](ctx) {
         return ctx;
     }
+
     [ParseRuleName.localdecl](ctx) {
         return ctx;
     }

@@ -72,11 +72,6 @@ const ruledef = [
         id: 'jass_returns_keyword',
         description: 'jass_returns_keyword',
         color: '#8e73ca',
-    },
-    {
-        id: 'jass_test_keyword',
-        description: 'jass_test_keyword',
-        color: '#8e73ca',
     }
 ];
 

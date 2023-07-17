@@ -1,13 +1,11 @@
-function MyFunc takes nothing returns nothing
+type d
 
-
-
-
-local integer b = 10 - 2 + 3 / 4
-
-
+function MyFunc takes integer a, real b returns nothing
+local integer           a =      1
 call Test()
 
-local integer b = 10 - 2 + 3 / 4
+
+
+local integer b = 1
 
 endfunction

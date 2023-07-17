@@ -9891,16 +9891,16 @@ var JassVisitor = class extends ParserVisitor {
     this.higlight?.[parse_rule_name_default.typedecl](ctx);
     return {
       type: parse_rule_name_default.typedecl,
-      name: ctx[JassTokenMap.identifier.name]?.[0].image,
-      base: ctx[JassTokenMap.identifier.name]?.[1].image,
-      comment: ctx[JassTokenMap.linecomment.name]?.[0].image.replace(commentRegex, "")
+      name: ctx[JassTokenMap.identifier.name]?.[0]?.image,
+      base: ctx[JassTokenMap.identifier.name]?.[1]?.image,
+      comment: ctx[JassTokenMap.linecomment.name]?.[0]?.image.replace(commentRegex, "")
     };
   }
   [parse_rule_name_default.nativedecl](ctx) {
     this.higlight?.[parse_rule_name_default.nativedecl](ctx);
     return {
       type: parse_rule_name_default.nativedecl,
-      name: ctx[JassTokenMap.identifier.name]?.[0].image,
+      name: ctx[JassTokenMap.identifier.name]?.[0]?.image,
       arguments: this.visit(ctx[parse_rule_name_default.funcarglist]),
       return: this.visit(ctx[parse_rule_name_default.funcreturntype])
     };
@@ -9910,7 +9910,7 @@ var JassVisitor = class extends ParserVisitor {
     this.higlight?.[parse_rule_name_default.funcdecl](ctx);
     return {
       type: parse_rule_name_default.funcdecl,
-      name: ctx[JassTokenMap.identifier.name]?.[0].image,
+      name: ctx[JassTokenMap.identifier.name]?.[0]?.image,
       statement: this.visit(ctx[parse_rule_name_default.statement]),
       arguments: this.visit(ctx[parse_rule_name_default.funcarglist]),
       return: this.visit(ctx[parse_rule_name_default.funcreturntype])
@@ -9922,8 +9922,8 @@ var JassVisitor = class extends ParserVisitor {
       return;
     this.higlight?.[parse_rule_name_default.funcarg](i);
     return [
-      i?.[0].image,
-      i?.[1].image
+      i[0].image,
+      i[1].image
     ];
   }
   [parse_rule_name_default.funcarglist](ctx) {
