@@ -4,6 +4,19 @@ var __publicField = (obj, key, value) => {
   __defNormalProp(obj, typeof key !== "symbol" ? key + "" : key, value);
   return value;
 };
+var __accessCheck = (obj, member, msg) => {
+  if (!member.has(obj))
+    throw TypeError("Cannot " + msg);
+};
+var __privateGet = (obj, member, getter) => {
+  __accessCheck(obj, member, "read from private field");
+  return getter ? getter.call(obj) : member.get(obj);
+};
+var __privateAdd = (obj, member, value) => {
+  if (member.has(obj))
+    throw TypeError("Cannot add the same private member more than once");
+  member instanceof WeakSet ? member.add(obj) : member.set(obj, value);
+};
 
 // node_modules/chevrotain/lib/src/version.js
 var VERSION = "11.0.1";
@@ -269,8 +282,8 @@ function getNative(object, key) {
 var getNative_default = getNative;
 
 // node_modules/lodash-es/_WeakMap.js
-var WeakMap = getNative_default(root_default, "WeakMap");
-var WeakMap_default = WeakMap;
+var WeakMap2 = getNative_default(root_default, "WeakMap");
+var WeakMap_default = WeakMap2;
 
 // node_modules/lodash-es/_baseCreate.js
 var objectCreate = Object.create;
@@ -9855,71 +9868,129 @@ var JassParser = class extends CstParser {
   }
 };
 
+// src/token-legend.mjs
+var TokenLegend = {
+  jass_comment: 0,
+  jass_type: 1,
+  jass_function: 2,
+  jass_function_native: 3,
+  jass_argument: 4,
+  jass_comma: 5,
+  jass_type_keyword: 6,
+  jass_extends_keyword: 7,
+  jass_constant_keyword: 8,
+  jass_native_keyword: 9,
+  jass_function_keyword: 10,
+  jass_endfunction_keyword: 11,
+  jass_takes_keyword: 12,
+  jass_returns_keyword: 13
+};
+
+// src/utils/i-token-to-range.mjs
+var import_vscode = require("vscode");
+var i_token_to_range_default = (token) => new import_vscode.Range(
+  new import_vscode.Position(token.startLine - 1, token.startColumn - 1),
+  new import_vscode.Position(token.endLine - 1, token.endColumn)
+);
+
 // jass/visitor.mjs
+var import_vscode2 = require("vscode");
 var parser = new JassParser();
 var ParserVisitor = parser.getBaseCstVisitorConstructor();
-var commentRegex = /^\s*\/+\s*/g;
+var _mark;
 var JassVisitor = class extends ParserVisitor {
   constructor() {
     super();
-    /**  @type {JassSemanticHightlight} */
-    __publicField(this, "higlight");
+    /** @type {import('vscode').Diagnostic[]} */
+    __publicField(this, "diagnostics");
+    /** @type {SemanticTokensBuilder} */
+    __publicField(this, "builder");
+    /**
+     * @param {import('chevrotain').IToken} location
+     * @param  {import('vscode').TokenLegend} type
+     */
+    __privateAdd(this, _mark, (location, type) => {
+      if (this.builder === null)
+        return;
+      if (location === void 0)
+        return;
+      this.builder?.push(
+        location.startLine - 1,
+        location.startColumn - 1,
+        location.endColumn - location.startColumn + 1,
+        type
+      );
+    });
     this.validateVisitor();
   }
   [parse_rule_name_default.jass](ctx) {
     return ctx[parse_rule_name_default.rootstatement]?.map((item) => this.visit(item));
   }
-  [parse_rule_name_default.rootstatement](context) {
-    if (context[JassTokenMap.linebreak.name])
+  [parse_rule_name_default.rootstatement](ctx) {
+    if (ctx[JassTokenMap.linebreak.name])
       return null;
-    let ctx;
-    if (ctx = context[parse_rule_name_default.typedecl])
-      return this.visit(ctx);
-    if (ctx = context[parse_rule_name_default.nativedecl])
-      return this.visit(ctx);
-    if (ctx = context[parse_rule_name_default.funcdecl])
-      return this.visit(ctx);
-    if (ctx = context[parse_rule_name_default.commentdecl])
-      return this.visit(ctx);
+    let node;
+    if (node = ctx[parse_rule_name_default.typedecl])
+      return this.visit(node);
+    if (node = ctx[parse_rule_name_default.nativedecl])
+      return this.visit(node);
+    if (node = ctx[parse_rule_name_default.funcdecl])
+      return this.visit(node);
+    if (node = ctx[parse_rule_name_default.commentdecl])
+      return this.visit(node);
   }
+  /** @param {import('chevrotain').CstNode} ctx */
   [parse_rule_name_default.commentdecl](ctx) {
-    this.higlight?.[parse_rule_name_default.commentdecl](ctx);
+    const comment = ctx[JassTokenMap.comment.name]?.[0];
+    __privateGet(this, _mark).call(this, comment, TokenLegend.jass_comment);
     return {
       "type": parse_rule_name_default.commentdecl,
-      "body": ctx[JassTokenMap.comment.name]?.[0]?.image.replace(commentRegex, "")
+      "body": comment?.image.replace(/^\s*\/+\s*/g, "")
     };
   }
   [parse_rule_name_default.terminator]() {
     return null;
   }
   [parse_rule_name_default.typedecl](ctx) {
-    this.higlight?.[parse_rule_name_default.typedecl](ctx);
-    if (ctx[parse_rule_name_default.commentdecl])
-      this.visit(ctx[parse_rule_name_default.commentdecl]);
+    const name = ctx[JassTokenMap.identifier.name]?.[0];
+    const base = ctx[JassTokenMap.identifier.name]?.[1];
+    __privateGet(this, _mark).call(this, name, TokenLegend.jass_type);
+    __privateGet(this, _mark).call(this, base, TokenLegend.jass_type);
+    __privateGet(this, _mark).call(this, ctx[JassTokenMap.type.name]?.[0], TokenLegend.jass_type_keyword);
+    __privateGet(this, _mark).call(this, ctx[JassTokenMap.extends.name]?.[0], TokenLegend.jass_extends_keyword);
+    this.visit(ctx[parse_rule_name_default.commentdecl]);
     return {
       type: parse_rule_name_default.typedecl,
-      name: ctx[JassTokenMap.identifier.name]?.[0]?.image,
-      base: ctx[JassTokenMap.identifier.name]?.[1]?.image
+      name: name?.image,
+      base: base?.image
     };
   }
   [parse_rule_name_default.nativedecl](ctx) {
-    this.higlight?.[parse_rule_name_default.nativedecl](ctx);
-    if (ctx[parse_rule_name_default.commentdecl])
-      this.visit(ctx[parse_rule_name_default.commentdecl]);
+    const name = ctx[JassTokenMap.identifier.name]?.[0];
+    __privateGet(this, _mark).call(this, ctx[JassTokenMap.constant.name]?.[0], TokenLegend.jass_constant_keyword);
+    __privateGet(this, _mark).call(this, name, TokenLegend.jass_function_native);
+    __privateGet(this, _mark).call(this, ctx[JassTokenMap.native.name]?.[0], TokenLegend.jass_native_keyword);
+    __privateGet(this, _mark).call(this, ctx[JassTokenMap.takes.name]?.[0], TokenLegend.jass_takes_keyword);
+    __privateGet(this, _mark).call(this, ctx[JassTokenMap.returns.name]?.[0], TokenLegend.jass_returns_keyword);
+    this.visit(ctx[parse_rule_name_default.commentdecl]);
     return {
       type: parse_rule_name_default.nativedecl,
-      name: ctx[JassTokenMap.identifier.name]?.[0]?.image,
+      name: name?.image,
       arguments: this.visit(ctx[parse_rule_name_default.funcarglist]),
       return: this.visit(ctx[parse_rule_name_default.funcreturntype])
     };
   }
   [parse_rule_name_default.funcdecl](ctx) {
-    this.higlight?.[parse_rule_name_default.funcdecl](ctx);
-    if (ctx[parse_rule_name_default.commentdecl])
-      this.visit(ctx[parse_rule_name_default.commentdecl]);
+    const name = ctx[JassTokenMap.identifier.name]?.[0];
+    __privateGet(this, _mark).call(this, ctx[JassTokenMap.function.name]?.[0], TokenLegend.jass_function_keyword);
+    __privateGet(this, _mark).call(this, name, TokenLegend.jass_function);
+    __privateGet(this, _mark).call(this, ctx[JassTokenMap.takes.name]?.[0], TokenLegend.jass_takes_keyword);
+    __privateGet(this, _mark).call(this, ctx[JassTokenMap.returns.name]?.[0], TokenLegend.jass_returns_keyword);
+    __privateGet(this, _mark).call(this, ctx[JassTokenMap.endfunction.name]?.[0], TokenLegend.jass_endfunction_keyword);
+    this.visit(ctx[parse_rule_name_default.commentdecl]);
     return {
       type: parse_rule_name_default.funcdecl,
-      name: ctx[JassTokenMap.identifier.name]?.[0]?.image,
+      name: name?.image,
       locals: ctx?.[parse_rule_name_default.localgroup]?.map((item) => this.visit(item)),
       statement: this.visit(ctx[parse_rule_name_default.statement]),
       arguments: this.visit(ctx[parse_rule_name_default.funcarglist]),
@@ -9927,35 +9998,59 @@ var JassVisitor = class extends ParserVisitor {
     };
   }
   [parse_rule_name_default.funcarg](ctx) {
-    const i = ctx[JassTokenMap.identifier.name];
-    if (i?.length !== 2)
-      return;
-    this.higlight?.[parse_rule_name_default.funcarg](i);
-    return [
-      i[0].image,
-      i[1].image
-    ];
+    const t = ctx[JassTokenMap.identifier.name];
+    if (t?.length !== 2)
+      return null;
+    __privateGet(this, _mark).call(this, t[0], TokenLegend.jass_type);
+    __privateGet(this, _mark).call(this, t[1], TokenLegend.jass_argument);
+    return t;
   }
   [parse_rule_name_default.funcarglist](ctx) {
-    this.higlight?.[parse_rule_name_default.funcarglist](ctx);
+    var _a;
     if (ctx.nothing)
       return [];
-    return ctx?.[parse_rule_name_default.funcarg]?.map((item) => this.visit(item));
+    if (ctx[JassTokenMap.comma.name])
+      for (const comma of ctx[JassTokenMap.comma.name]) {
+        __privateGet(this, _mark).call(this, comma, TokenLegend.jass_comma);
+      }
+    const args = ctx?.[parse_rule_name_default.funcarg]?.map((item) => this.visit(item));
+    if (args) {
+      const obj = {};
+      for (const arg of args) {
+        if (!arg || arg.length !== 2)
+          continue;
+        const [type, name] = arg;
+        if (type.isInsertedInRecovery || name.isInsertedInRecovery)
+          continue;
+        (obj[_a = name.image] ?? (obj[_a] = [])).push(name);
+      }
+      for (const v of Object.values(obj)) {
+        if (v.length < 2)
+          continue;
+        for (const t of v)
+          this.diagnostics?.push({
+            message: `Arguments with same name: ${t.image}`,
+            range: i_token_to_range_default(t),
+            severity: import_vscode2.DiagnosticSeverity.Warning
+          });
+      }
+    }
+    __privateGet(this, _mark).call(this, ctx?.[JassTokenMap.nothing.name]?.[0], TokenLegend.jass_type);
+    return args;
   }
   [parse_rule_name_default.funcreturntype](ctx) {
     let token;
     if (token = ctx[JassTokenMap.nothing.name]?.[0]) {
-      this.higlight?.[parse_rule_name_default.funcreturntype](token);
+      __privateGet(this, _mark).call(this, token, TokenLegend.jass_type);
       return token.image;
     }
     if (token = ctx[JassTokenMap.identifier.name]?.[0]) {
-      this.higlight?.[parse_rule_name_default.funcreturntype](token);
+      __privateGet(this, _mark).call(this, token, TokenLegend.jass_type);
       return token.image;
     }
     return null;
   }
   [parse_rule_name_default.localgroup](context) {
-    this.higlight?.[parse_rule_name_default.localgroup](context);
     if (context[JassTokenMap.linebreak.name])
       return null;
     let ctx;
@@ -10016,6 +10111,7 @@ var JassVisitor = class extends ParserVisitor {
     return ctx;
   }
 };
+_mark = new WeakMap();
 
 // docs/main.mjs
 var parser2 = new JassParser();
@@ -10029,7 +10125,6 @@ document.body.appendChild(iframe);
   const result = visitor.visit(parser2.jass());
   for (const error of parser2.errorlist)
     console.warn(error);
-  console.log(result);
 })();
 /*! Bundled license information:
 

@@ -1,8 +1,7 @@
 import {JassParser, JassParserErrorType} from "../../jass/parser.mjs";
 import {JassVisitor} from "../../jass/visitor.mjs";
 // noinspection NpmUsedModulesInstalled
-import {DiagnosticSeverity, languages} from "vscode";
-import JassSemanticHightlight from "./jass-semantic-hightlight.mjs";
+import {DiagnosticSeverity, languages, SemanticTokensBuilder} from "vscode";
 import ITokenToRange from "../utils/i-token-to-range.mjs";
 
 /** @implements {DocumentSemanticTokensProvider} */
@@ -37,9 +36,8 @@ export class JassDocumentSemanticTokensProvider {
 
         this.#collection.clear();
 
-        const highlight = new JassSemanticHightlight();
-        this.#visitor.higlight = highlight;
-        this.#visitor.builder = highlight.builder;
+        this.#visitor.builder = new SemanticTokensBuilder();
+        this.#visitor.diagnostics = [];
 
         this.#parser.inputText = text;
 
@@ -49,12 +47,11 @@ export class JassDocumentSemanticTokensProvider {
             console.error(e);
         }
 
-
         for (const error of this.#parser.errorlist) {
             switch (error.type) {
                 case JassParserErrorType.NoViableAlt:
                 case JassParserErrorType.MismatchToken:
-                    highlight.diagnostics.push({
+                    this.#visitor.diagnostics.push({
                         message: error.type,
                         range: ITokenToRange(error.token),
                         severity: DiagnosticSeverity.Error,
@@ -63,8 +60,8 @@ export class JassDocumentSemanticTokensProvider {
             }
         }
 
-        if (highlight.diagnostics.length > 0) this.#collection.set(document.uri, highlight.diagnostics);
+        if (this.#visitor.diagnostics.length > 0) this.#collection.set(document.uri, this.#visitor.diagnostics);
 
-        return highlight.build();
+        return this.#visitor.builder.build();
     }
 }

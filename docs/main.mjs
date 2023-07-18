@@ -7,6 +7,7 @@ const iframe = document.createElement('iframe');
 iframe.src = 'data:text/html;charset=utf-8,' + encodeURI(createSyntaxDiagramsCode(parser.getSerializedGastProductions()));
 document.body.appendChild(iframe);
 
+
 (async () => {
     const visitor = new JassVisitor();
     const request = await fetch('test.txt');
@@ -16,5 +17,5 @@ document.body.appendChild(iframe);
 
     for (const error of parser.errorlist) console.warn(error)
 
-    console.log(result);
+    //console.log(result);
 })();
