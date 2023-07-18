@@ -1,10 +1,3 @@
-var __defProp = Object.defineProperty;
-var __defNormalProp = (obj, key, value) => key in obj ? __defProp(obj, key, { enumerable: true, configurable: true, writable: true, value }) : obj[key] = value;
-var __publicField = (obj, key, value) => {
-  __defNormalProp(obj, typeof key !== "symbol" ? key + "" : key, value);
-  return value;
-};
-
 // node_modules/chevrotain/lib/src/version.js
 var VERSION = "11.0.1";
 
@@ -18,8 +11,8 @@ var root = freeGlobal_default || freeSelf || Function("return this")();
 var root_default = root;
 
 // node_modules/lodash-es/_Symbol.js
-var Symbol2 = root_default.Symbol;
-var Symbol_default = Symbol2;
+var Symbol = root_default.Symbol;
+var Symbol_default = Symbol;
 
 // node_modules/lodash-es/_getRawTag.js
 var objectProto = Object.prototype;
@@ -33,7 +26,7 @@ function getRawTag(value) {
     var unmasked = true;
   } catch (e) {
   }
-  var result = nativeObjectToString.call(value);
+  var result2 = nativeObjectToString.call(value);
   if (unmasked) {
     if (isOwn) {
       value[symToStringTag] = tag;
@@ -41,7 +34,7 @@ function getRawTag(value) {
       delete value[symToStringTag];
     }
   }
-  return result;
+  return result2;
 }
 var getRawTag_default = getRawTag;
 
@@ -80,11 +73,11 @@ var isSymbol_default = isSymbol;
 
 // node_modules/lodash-es/_arrayMap.js
 function arrayMap(array, iteratee) {
-  var index = -1, length = array == null ? 0 : array.length, result = Array(length);
+  var index = -1, length = array == null ? 0 : array.length, result2 = Array(length);
   while (++index < length) {
-    result[index] = iteratee(array[index], index, array);
+    result2[index] = iteratee(array[index], index, array);
   }
-  return result;
+  return result2;
 }
 var arrayMap_default = arrayMap;
 
@@ -106,8 +99,8 @@ function baseToString(value) {
   if (isSymbol_default(value)) {
     return symbolToString ? symbolToString.call(value) : "";
   }
-  var result = value + "";
-  return result == "0" && 1 / value == -INFINITY ? "-0" : result;
+  var result2 = value + "";
+  return result2 == "0" && 1 / value == -INFINITY ? "-0" : result2;
 }
 var baseToString_default = baseToString;
 
@@ -179,8 +172,8 @@ var toFinite_default = toFinite;
 
 // node_modules/lodash-es/toInteger.js
 function toInteger(value) {
-  var result = toFinite_default(value), remainder = result % 1;
-  return result === result ? remainder ? result - remainder : result : 0;
+  var result2 = toFinite_default(value), remainder = result2 % 1;
+  return result2 === result2 ? remainder ? result2 - remainder : result2 : 0;
 }
 var toInteger_default = toInteger;
 
@@ -285,9 +278,9 @@ var baseCreate = function() {
       return objectCreate(proto);
     }
     object.prototype = proto;
-    var result = new object();
+    var result2 = new object();
     object.prototype = void 0;
-    return result;
+    return result2;
   };
 }();
 var baseCreate_default = baseCreate;
@@ -580,11 +573,11 @@ var isPrototype_default = isPrototype;
 
 // node_modules/lodash-es/_baseTimes.js
 function baseTimes(n, iteratee) {
-  var index = -1, result = Array(n);
+  var index = -1, result2 = Array(n);
   while (++index < n) {
-    result[index] = iteratee(index);
+    result2[index] = iteratee(index);
   }
-  return result;
+  return result2;
 }
 var baseTimes_default = baseTimes;
 
@@ -616,8 +609,8 @@ var stubFalse_default = stubFalse;
 var freeExports = typeof exports == "object" && exports && !exports.nodeType && exports;
 var freeModule = freeExports && typeof module == "object" && module && !module.nodeType && module;
 var moduleExports = freeModule && freeModule.exports === freeExports;
-var Buffer2 = moduleExports ? root_default.Buffer : void 0;
-var nativeIsBuffer = Buffer2 ? Buffer2.isBuffer : void 0;
+var Buffer = moduleExports ? root_default.Buffer : void 0;
+var nativeIsBuffer = Buffer ? Buffer.isBuffer : void 0;
 var isBuffer = nativeIsBuffer || stubFalse_default;
 var isBuffer_default = isBuffer;
 
@@ -688,17 +681,17 @@ var isTypedArray_default = isTypedArray;
 var objectProto7 = Object.prototype;
 var hasOwnProperty5 = objectProto7.hasOwnProperty;
 function arrayLikeKeys(value, inherited) {
-  var isArr = isArray_default(value), isArg = !isArr && isArguments_default(value), isBuff = !isArr && !isArg && isBuffer_default(value), isType = !isArr && !isArg && !isBuff && isTypedArray_default(value), skipIndexes = isArr || isArg || isBuff || isType, result = skipIndexes ? baseTimes_default(value.length, String) : [], length = result.length;
+  var isArr = isArray_default(value), isArg = !isArr && isArguments_default(value), isBuff = !isArr && !isArg && isBuffer_default(value), isType = !isArr && !isArg && !isBuff && isTypedArray_default(value), skipIndexes = isArr || isArg || isBuff || isType, result2 = skipIndexes ? baseTimes_default(value.length, String) : [], length = result2.length;
   for (var key in value) {
     if ((inherited || hasOwnProperty5.call(value, key)) && !(skipIndexes && // Safari 9 has enumerable `arguments.length` in strict mode.
     (key == "length" || // Node.js 0.10 has enumerable non-index properties on buffers.
     isBuff && (key == "offset" || key == "parent") || // PhantomJS 2 has enumerable non-index properties on typed arrays.
     isType && (key == "buffer" || key == "byteLength" || key == "byteOffset") || // Skip index properties.
     isIndex_default(key, length)))) {
-      result.push(key);
+      result2.push(key);
     }
   }
-  return result;
+  return result2;
 }
 var arrayLikeKeys_default = arrayLikeKeys;
 
@@ -721,13 +714,13 @@ function baseKeys(object) {
   if (!isPrototype_default(object)) {
     return nativeKeys_default(object);
   }
-  var result = [];
+  var result2 = [];
   for (var key in Object(object)) {
     if (hasOwnProperty6.call(object, key) && key != "constructor") {
-      result.push(key);
+      result2.push(key);
     }
   }
-  return result;
+  return result2;
 }
 var baseKeys_default = baseKeys;
 
@@ -755,13 +748,13 @@ var assign_default = assign;
 
 // node_modules/lodash-es/_nativeKeysIn.js
 function nativeKeysIn(object) {
-  var result = [];
+  var result2 = [];
   if (object != null) {
     for (var key in Object(object)) {
-      result.push(key);
+      result2.push(key);
     }
   }
-  return result;
+  return result2;
 }
 var nativeKeysIn_default = nativeKeysIn;
 
@@ -772,13 +765,13 @@ function baseKeysIn(object) {
   if (!isObject_default(object)) {
     return nativeKeysIn_default(object);
   }
-  var isProto = isPrototype_default(object), result = [];
+  var isProto = isPrototype_default(object), result2 = [];
   for (var key in object) {
     if (!(key == "constructor" && (isProto || !hasOwnProperty8.call(object, key)))) {
-      result.push(key);
+      result2.push(key);
     }
   }
-  return result;
+  return result2;
 }
 var baseKeysIn_default = baseKeysIn;
 
@@ -816,9 +809,9 @@ var hashClear_default = hashClear;
 
 // node_modules/lodash-es/_hashDelete.js
 function hashDelete(key) {
-  var result = this.has(key) && delete this.__data__[key];
-  this.size -= result ? 1 : 0;
-  return result;
+  var result2 = this.has(key) && delete this.__data__[key];
+  this.size -= result2 ? 1 : 0;
+  return result2;
 }
 var hashDelete_default = hashDelete;
 
@@ -829,8 +822,8 @@ var hasOwnProperty9 = objectProto11.hasOwnProperty;
 function hashGet(key) {
   var data = this.__data__;
   if (nativeCreate_default) {
-    var result = data[key];
-    return result === HASH_UNDEFINED ? void 0 : result;
+    var result2 = data[key];
+    return result2 === HASH_UNDEFINED ? void 0 : result2;
   }
   return hasOwnProperty9.call(data, key) ? data[key] : void 0;
 }
@@ -982,9 +975,9 @@ var getMapData_default = getMapData;
 
 // node_modules/lodash-es/_mapCacheDelete.js
 function mapCacheDelete(key) {
-  var result = getMapData_default(this, key)["delete"](key);
-  this.size -= result ? 1 : 0;
-  return result;
+  var result2 = getMapData_default(this, key)["delete"](key);
+  this.size -= result2 ? 1 : 0;
+  return result2;
 }
 var mapCacheDelete_default = mapCacheDelete;
 
@@ -1036,9 +1029,9 @@ function memoize(func, resolver) {
     if (cache.has(key)) {
       return cache.get(key);
     }
-    var result = func.apply(this, args);
-    memoized.cache = cache.set(key, result) || cache;
-    return result;
+    var result2 = func.apply(this, args);
+    memoized.cache = cache.set(key, result2) || cache;
+    return result2;
   };
   memoized.cache = new (memoize.Cache || MapCache_default)();
   return memoized;
@@ -1049,14 +1042,14 @@ var memoize_default = memoize;
 // node_modules/lodash-es/_memoizeCapped.js
 var MAX_MEMOIZE_SIZE = 500;
 function memoizeCapped(func) {
-  var result = memoize_default(func, function(key) {
+  var result2 = memoize_default(func, function(key) {
     if (cache.size === MAX_MEMOIZE_SIZE) {
       cache.clear();
     }
     return key;
   });
-  var cache = result.cache;
-  return result;
+  var cache = result2.cache;
+  return result2;
 }
 var memoizeCapped_default = memoizeCapped;
 
@@ -1064,14 +1057,14 @@ var memoizeCapped_default = memoizeCapped;
 var rePropName = /[^.[\]]+|\[(?:(-?\d+(?:\.\d+)?)|(["'])((?:(?!\2)[^\\]|\\.)*?)\2)\]|(?=(?:\.|\[\])(?:\.|\[\]|$))/g;
 var reEscapeChar = /\\(\\)?/g;
 var stringToPath = memoizeCapped_default(function(string) {
-  var result = [];
+  var result2 = [];
   if (string.charCodeAt(0) === 46) {
-    result.push("");
+    result2.push("");
   }
   string.replace(rePropName, function(match, number, quote, subString) {
-    result.push(quote ? subString.replace(reEscapeChar, "$1") : number || match);
+    result2.push(quote ? subString.replace(reEscapeChar, "$1") : number || match);
   });
-  return result;
+  return result2;
 });
 var stringToPath_default = stringToPath;
 
@@ -1096,8 +1089,8 @@ function toKey(value) {
   if (typeof value == "string" || isSymbol_default(value)) {
     return value;
   }
-  var result = value + "";
-  return result == "0" && 1 / value == -INFINITY3 ? "-0" : result;
+  var result2 = value + "";
+  return result2 == "0" && 1 / value == -INFINITY3 ? "-0" : result2;
 }
 var toKey_default = toKey;
 
@@ -1114,8 +1107,8 @@ var baseGet_default = baseGet;
 
 // node_modules/lodash-es/get.js
 function get(object, path, defaultValue) {
-  var result = object == null ? void 0 : baseGet_default(object, path);
-  return result === void 0 ? defaultValue : result;
+  var result2 = object == null ? void 0 : baseGet_default(object, path);
+  return result2 === void 0 ? defaultValue : result2;
 }
 var get_default = get;
 
@@ -1137,23 +1130,23 @@ function isFlattenable(value) {
 var isFlattenable_default = isFlattenable;
 
 // node_modules/lodash-es/_baseFlatten.js
-function baseFlatten(array, depth, predicate, isStrict, result) {
+function baseFlatten(array, depth, predicate, isStrict, result2) {
   var index = -1, length = array.length;
   predicate || (predicate = isFlattenable_default);
-  result || (result = []);
+  result2 || (result2 = []);
   while (++index < length) {
     var value = array[index];
     if (depth > 0 && predicate(value)) {
       if (depth > 1) {
-        baseFlatten(value, depth - 1, predicate, isStrict, result);
+        baseFlatten(value, depth - 1, predicate, isStrict, result2);
       } else {
-        arrayPush_default(result, value);
+        arrayPush_default(result2, value);
       }
     } else if (!isStrict) {
-      result[result.length] = value;
+      result2[result2.length] = value;
     }
   }
-  return result;
+  return result2;
 }
 var baseFlatten_default = baseFlatten;
 
@@ -1180,11 +1173,11 @@ function baseSlice(array, start, end) {
   }
   length = start > end ? 0 : end - start >>> 0;
   start >>>= 0;
-  var result = Array(length);
+  var result2 = Array(length);
   while (++index < length) {
-    result[index] = array[index + start];
+    result2[index] = array[index + start];
   }
-  return result;
+  return result2;
 }
 var baseSlice_default = baseSlice;
 
@@ -1210,9 +1203,9 @@ var stackClear_default = stackClear;
 
 // node_modules/lodash-es/_stackDelete.js
 function stackDelete(key) {
-  var data = this.__data__, result = data["delete"](key);
+  var data = this.__data__, result2 = data["delete"](key);
   this.size = data.size;
-  return result;
+  return result2;
 }
 var stackDelete_default = stackDelete;
 
@@ -1275,28 +1268,28 @@ var baseAssignIn_default = baseAssignIn;
 var freeExports3 = typeof exports == "object" && exports && !exports.nodeType && exports;
 var freeModule3 = freeExports3 && typeof module == "object" && module && !module.nodeType && module;
 var moduleExports3 = freeModule3 && freeModule3.exports === freeExports3;
-var Buffer3 = moduleExports3 ? root_default.Buffer : void 0;
-var allocUnsafe = Buffer3 ? Buffer3.allocUnsafe : void 0;
+var Buffer2 = moduleExports3 ? root_default.Buffer : void 0;
+var allocUnsafe = Buffer2 ? Buffer2.allocUnsafe : void 0;
 function cloneBuffer(buffer, isDeep) {
   if (isDeep) {
     return buffer.slice();
   }
-  var length = buffer.length, result = allocUnsafe ? allocUnsafe(length) : new buffer.constructor(length);
-  buffer.copy(result);
-  return result;
+  var length = buffer.length, result2 = allocUnsafe ? allocUnsafe(length) : new buffer.constructor(length);
+  buffer.copy(result2);
+  return result2;
 }
 var cloneBuffer_default = cloneBuffer;
 
 // node_modules/lodash-es/_arrayFilter.js
 function arrayFilter(array, predicate) {
-  var index = -1, length = array == null ? 0 : array.length, resIndex = 0, result = [];
+  var index = -1, length = array == null ? 0 : array.length, resIndex = 0, result2 = [];
   while (++index < length) {
     var value = array[index];
     if (predicate(value, index, array)) {
-      result[resIndex++] = value;
+      result2[resIndex++] = value;
     }
   }
-  return result;
+  return result2;
 }
 var arrayFilter_default = arrayFilter;
 
@@ -1330,12 +1323,12 @@ var copySymbols_default = copySymbols;
 // node_modules/lodash-es/_getSymbolsIn.js
 var nativeGetSymbols2 = Object.getOwnPropertySymbols;
 var getSymbolsIn = !nativeGetSymbols2 ? stubArray_default : function(object) {
-  var result = [];
+  var result2 = [];
   while (object) {
-    arrayPush_default(result, getSymbols_default(object));
+    arrayPush_default(result2, getSymbols_default(object));
     object = getPrototype_default(object);
   }
-  return result;
+  return result2;
 };
 var getSymbolsIn_default = getSymbolsIn;
 
@@ -1347,8 +1340,8 @@ var copySymbolsIn_default = copySymbolsIn;
 
 // node_modules/lodash-es/_baseGetAllKeys.js
 function baseGetAllKeys(object, keysFunc, symbolsFunc) {
-  var result = keysFunc(object);
-  return isArray_default(object) ? result : arrayPush_default(result, symbolsFunc(object));
+  var result2 = keysFunc(object);
+  return isArray_default(object) ? result2 : arrayPush_default(result2, symbolsFunc(object));
 }
 var baseGetAllKeys_default = baseGetAllKeys;
 
@@ -1391,7 +1384,7 @@ var weakMapCtorString = toSource_default(WeakMap_default);
 var getTag = baseGetTag_default;
 if (DataView_default && getTag(new DataView_default(new ArrayBuffer(1))) != dataViewTag2 || Map_default && getTag(new Map_default()) != mapTag2 || Promise_default && getTag(Promise_default.resolve()) != promiseTag || Set_default && getTag(new Set_default()) != setTag2 || WeakMap_default && getTag(new WeakMap_default()) != weakMapTag2) {
   getTag = function(value) {
-    var result = baseGetTag_default(value), Ctor = result == objectTag2 ? value.constructor : void 0, ctorString = Ctor ? toSource_default(Ctor) : "";
+    var result2 = baseGetTag_default(value), Ctor = result2 == objectTag2 ? value.constructor : void 0, ctorString = Ctor ? toSource_default(Ctor) : "";
     if (ctorString) {
       switch (ctorString) {
         case dataViewCtorString:
@@ -1406,7 +1399,7 @@ if (DataView_default && getTag(new DataView_default(new ArrayBuffer(1))) != data
           return weakMapTag2;
       }
     }
-    return result;
+    return result2;
   };
 }
 var getTag_default = getTag;
@@ -1415,24 +1408,24 @@ var getTag_default = getTag;
 var objectProto14 = Object.prototype;
 var hasOwnProperty11 = objectProto14.hasOwnProperty;
 function initCloneArray(array) {
-  var length = array.length, result = new array.constructor(length);
+  var length = array.length, result2 = new array.constructor(length);
   if (length && typeof array[0] == "string" && hasOwnProperty11.call(array, "index")) {
-    result.index = array.index;
-    result.input = array.input;
+    result2.index = array.index;
+    result2.input = array.input;
   }
-  return result;
+  return result2;
 }
 var initCloneArray_default = initCloneArray;
 
 // node_modules/lodash-es/_Uint8Array.js
-var Uint8Array2 = root_default.Uint8Array;
-var Uint8Array_default = Uint8Array2;
+var Uint8Array = root_default.Uint8Array;
+var Uint8Array_default = Uint8Array;
 
 // node_modules/lodash-es/_cloneArrayBuffer.js
 function cloneArrayBuffer(arrayBuffer) {
-  var result = new arrayBuffer.constructor(arrayBuffer.byteLength);
-  new Uint8Array_default(result).set(new Uint8Array_default(arrayBuffer));
-  return result;
+  var result2 = new arrayBuffer.constructor(arrayBuffer.byteLength);
+  new Uint8Array_default(result2).set(new Uint8Array_default(arrayBuffer));
+  return result2;
 }
 var cloneArrayBuffer_default = cloneArrayBuffer;
 
@@ -1446,9 +1439,9 @@ var cloneDataView_default = cloneDataView;
 // node_modules/lodash-es/_cloneRegExp.js
 var reFlags = /\w*$/;
 function cloneRegExp(regexp) {
-  var result = new regexp.constructor(regexp.source, reFlags.exec(regexp));
-  result.lastIndex = regexp.lastIndex;
-  return result;
+  var result2 = new regexp.constructor(regexp.source, reFlags.exec(regexp));
+  result2.lastIndex = regexp.lastIndex;
+  return result2;
 }
 var cloneRegExp_default = cloneRegExp;
 
@@ -1586,21 +1579,21 @@ var cloneableTags = {};
 cloneableTags[argsTag3] = cloneableTags[arrayTag2] = cloneableTags[arrayBufferTag3] = cloneableTags[dataViewTag4] = cloneableTags[boolTag3] = cloneableTags[dateTag3] = cloneableTags[float32Tag3] = cloneableTags[float64Tag3] = cloneableTags[int8Tag3] = cloneableTags[int16Tag3] = cloneableTags[int32Tag3] = cloneableTags[mapTag5] = cloneableTags[numberTag3] = cloneableTags[objectTag3] = cloneableTags[regexpTag3] = cloneableTags[setTag5] = cloneableTags[stringTag3] = cloneableTags[symbolTag3] = cloneableTags[uint8Tag3] = cloneableTags[uint8ClampedTag3] = cloneableTags[uint16Tag3] = cloneableTags[uint32Tag3] = true;
 cloneableTags[errorTag2] = cloneableTags[funcTag3] = cloneableTags[weakMapTag3] = false;
 function baseClone(value, bitmask, customizer, key, object, stack) {
-  var result, isDeep = bitmask & CLONE_DEEP_FLAG, isFlat = bitmask & CLONE_FLAT_FLAG, isFull = bitmask & CLONE_SYMBOLS_FLAG;
+  var result2, isDeep = bitmask & CLONE_DEEP_FLAG, isFlat = bitmask & CLONE_FLAT_FLAG, isFull = bitmask & CLONE_SYMBOLS_FLAG;
   if (customizer) {
-    result = object ? customizer(value, key, object, stack) : customizer(value);
+    result2 = object ? customizer(value, key, object, stack) : customizer(value);
   }
-  if (result !== void 0) {
-    return result;
+  if (result2 !== void 0) {
+    return result2;
   }
   if (!isObject_default(value)) {
     return value;
   }
   var isArr = isArray_default(value);
   if (isArr) {
-    result = initCloneArray_default(value);
+    result2 = initCloneArray_default(value);
     if (!isDeep) {
-      return copyArray_default(value, result);
+      return copyArray_default(value, result2);
     }
   } else {
     var tag = getTag_default(value), isFunc = tag == funcTag3 || tag == genTag2;
@@ -1608,15 +1601,15 @@ function baseClone(value, bitmask, customizer, key, object, stack) {
       return cloneBuffer_default(value, isDeep);
     }
     if (tag == objectTag3 || tag == argsTag3 || isFunc && !object) {
-      result = isFlat || isFunc ? {} : initCloneObject_default(value);
+      result2 = isFlat || isFunc ? {} : initCloneObject_default(value);
       if (!isDeep) {
-        return isFlat ? copySymbolsIn_default(value, baseAssignIn_default(result, value)) : copySymbols_default(value, baseAssign_default(result, value));
+        return isFlat ? copySymbolsIn_default(value, baseAssignIn_default(result2, value)) : copySymbols_default(value, baseAssign_default(result2, value));
       }
     } else {
       if (!cloneableTags[tag]) {
         return object ? value : {};
       }
-      result = initCloneByTag_default(value, tag, isDeep);
+      result2 = initCloneByTag_default(value, tag, isDeep);
     }
   }
   stack || (stack = new Stack_default());
@@ -1624,14 +1617,14 @@ function baseClone(value, bitmask, customizer, key, object, stack) {
   if (stacked) {
     return stacked;
   }
-  stack.set(value, result);
+  stack.set(value, result2);
   if (isSet_default(value)) {
     value.forEach(function(subValue) {
-      result.add(baseClone(subValue, bitmask, customizer, subValue, value, stack));
+      result2.add(baseClone(subValue, bitmask, customizer, subValue, value, stack));
     });
   } else if (isMap_default(value)) {
     value.forEach(function(subValue, key2) {
-      result.set(key2, baseClone(subValue, bitmask, customizer, key2, value, stack));
+      result2.set(key2, baseClone(subValue, bitmask, customizer, key2, value, stack));
     });
   }
   var keysFunc = isFull ? isFlat ? getAllKeysIn_default : getAllKeys_default : isFlat ? keysIn_default : keys_default;
@@ -1641,9 +1634,9 @@ function baseClone(value, bitmask, customizer, key, object, stack) {
       key2 = subValue;
       subValue = value[key2];
     }
-    assignValue_default(result, key2, baseClone(subValue, bitmask, customizer, key2, value, stack));
+    assignValue_default(result2, key2, baseClone(subValue, bitmask, customizer, key2, value, stack));
   });
-  return result;
+  return result2;
 }
 var baseClone_default = baseClone;
 
@@ -1656,14 +1649,14 @@ var clone_default = clone;
 
 // node_modules/lodash-es/compact.js
 function compact(array) {
-  var index = -1, length = array == null ? 0 : array.length, resIndex = 0, result = [];
+  var index = -1, length = array == null ? 0 : array.length, resIndex = 0, result2 = [];
   while (++index < length) {
     var value = array[index];
     if (value) {
-      result[resIndex++] = value;
+      result2[resIndex++] = value;
     }
   }
-  return result;
+  return result2;
 }
 var compact_default = compact;
 
@@ -1724,7 +1717,7 @@ function equalArrays(array, other, bitmask, customizer, equalFunc, stack) {
   if (arrStacked && othStacked) {
     return arrStacked == other && othStacked == array;
   }
-  var index = -1, result = true, seen = bitmask & COMPARE_UNORDERED_FLAG ? new SetCache_default() : void 0;
+  var index = -1, result2 = true, seen = bitmask & COMPARE_UNORDERED_FLAG ? new SetCache_default() : void 0;
   stack.set(array, other);
   stack.set(other, array);
   while (++index < arrLength) {
@@ -1736,7 +1729,7 @@ function equalArrays(array, other, bitmask, customizer, equalFunc, stack) {
       if (compared) {
         continue;
       }
-      result = false;
+      result2 = false;
       break;
     }
     if (seen) {
@@ -1745,37 +1738,37 @@ function equalArrays(array, other, bitmask, customizer, equalFunc, stack) {
           return seen.push(othIndex);
         }
       })) {
-        result = false;
+        result2 = false;
         break;
       }
     } else if (!(arrValue === othValue || equalFunc(arrValue, othValue, bitmask, customizer, stack))) {
-      result = false;
+      result2 = false;
       break;
     }
   }
   stack["delete"](array);
   stack["delete"](other);
-  return result;
+  return result2;
 }
 var equalArrays_default = equalArrays;
 
 // node_modules/lodash-es/_mapToArray.js
 function mapToArray(map2) {
-  var index = -1, result = Array(map2.size);
+  var index = -1, result2 = Array(map2.size);
   map2.forEach(function(value, key) {
-    result[++index] = [key, value];
+    result2[++index] = [key, value];
   });
-  return result;
+  return result2;
 }
 var mapToArray_default = mapToArray;
 
 // node_modules/lodash-es/_setToArray.js
 function setToArray(set) {
-  var index = -1, result = Array(set.size);
+  var index = -1, result2 = Array(set.size);
   set.forEach(function(value) {
-    result[++index] = value;
+    result2[++index] = value;
   });
-  return result;
+  return result2;
 }
 var setToArray_default = setToArray;
 
@@ -1831,9 +1824,9 @@ function equalByTag(object, other, tag, bitmask, customizer, equalFunc, stack) {
       }
       bitmask |= COMPARE_UNORDERED_FLAG2;
       stack.set(object, other);
-      var result = equalArrays_default(convert(object), convert(other), bitmask, customizer, equalFunc, stack);
+      var result2 = equalArrays_default(convert(object), convert(other), bitmask, customizer, equalFunc, stack);
       stack["delete"](object);
-      return result;
+      return result2;
     case symbolTag4:
       if (symbolValueOf2) {
         return symbolValueOf2.call(object) == symbolValueOf2.call(other);
@@ -1864,7 +1857,7 @@ function equalObjects(object, other, bitmask, customizer, equalFunc, stack) {
   if (objStacked && othStacked) {
     return objStacked == other && othStacked == object;
   }
-  var result = true;
+  var result2 = true;
   stack.set(object, other);
   stack.set(other, object);
   var skipCtor = isPartial;
@@ -1875,20 +1868,20 @@ function equalObjects(object, other, bitmask, customizer, equalFunc, stack) {
       var compared = isPartial ? customizer(othValue, objValue, key, other, object, stack) : customizer(objValue, othValue, key, object, other, stack);
     }
     if (!(compared === void 0 ? objValue === othValue || equalFunc(objValue, othValue, bitmask, customizer, stack) : compared)) {
-      result = false;
+      result2 = false;
       break;
     }
     skipCtor || (skipCtor = key == "constructor");
   }
-  if (result && !skipCtor) {
+  if (result2 && !skipCtor) {
     var objCtor = object.constructor, othCtor = other.constructor;
     if (objCtor != othCtor && ("constructor" in object && "constructor" in other) && !(typeof objCtor == "function" && objCtor instanceof objCtor && typeof othCtor == "function" && othCtor instanceof othCtor)) {
-      result = false;
+      result2 = false;
     }
   }
   stack["delete"](object);
   stack["delete"](other);
-  return result;
+  return result2;
 }
 var equalObjects_default = equalObjects;
 
@@ -1968,9 +1961,9 @@ function baseIsMatch(object, source, matchData, customizer) {
     } else {
       var stack = new Stack_default();
       if (customizer) {
-        var result = customizer(objValue, srcValue, key, object, source, stack);
+        var result2 = customizer(objValue, srcValue, key, object, source, stack);
       }
-      if (!(result === void 0 ? baseIsEqual_default(srcValue, objValue, COMPARE_PARTIAL_FLAG5 | COMPARE_UNORDERED_FLAG3, customizer, stack) : result)) {
+      if (!(result2 === void 0 ? baseIsEqual_default(srcValue, objValue, COMPARE_PARTIAL_FLAG5 | COMPARE_UNORDERED_FLAG3, customizer, stack) : result2)) {
         return false;
       }
     }
@@ -1987,12 +1980,12 @@ var isStrictComparable_default = isStrictComparable;
 
 // node_modules/lodash-es/_getMatchData.js
 function getMatchData(object) {
-  var result = keys_default(object), length = result.length;
+  var result2 = keys_default(object), length = result2.length;
   while (length--) {
-    var key = result[length], value = object[key];
-    result[length] = [key, value, isStrictComparable_default(value)];
+    var key = result2[length], value = object[key];
+    result2[length] = [key, value, isStrictComparable_default(value)];
   }
-  return result;
+  return result2;
 }
 var getMatchData_default = getMatchData;
 
@@ -2028,16 +2021,16 @@ var baseHasIn_default = baseHasIn;
 // node_modules/lodash-es/_hasPath.js
 function hasPath(object, path, hasFunc) {
   path = castPath_default(path, object);
-  var index = -1, length = path.length, result = false;
+  var index = -1, length = path.length, result2 = false;
   while (++index < length) {
     var key = toKey_default(path[index]);
-    if (!(result = object != null && hasFunc(object, key))) {
+    if (!(result2 = object != null && hasFunc(object, key))) {
       break;
     }
     object = object[key];
   }
-  if (result || ++index != length) {
-    return result;
+  if (result2 || ++index != length) {
+    return result2;
   }
   length = object == null ? 0 : object.length;
   return !!length && isLength_default(length) && isIndex_default(key, length) && (isArray_default(object) || isArguments_default(object));
@@ -2228,9 +2221,9 @@ var arrayIncludesWith_default = arrayIncludesWith;
 // node_modules/lodash-es/_baseDifference.js
 var LARGE_ARRAY_SIZE2 = 200;
 function baseDifference(array, values2, iteratee, comparator) {
-  var index = -1, includes2 = arrayIncludes_default, isCommon = true, length = array.length, result = [], valuesLength = values2.length;
+  var index = -1, includes2 = arrayIncludes_default, isCommon = true, length = array.length, result2 = [], valuesLength = values2.length;
   if (!length) {
-    return result;
+    return result2;
   }
   if (iteratee) {
     values2 = arrayMap_default(values2, baseUnary_default(iteratee));
@@ -2254,12 +2247,12 @@ function baseDifference(array, values2, iteratee, comparator) {
             continue outer;
           }
         }
-        result.push(value);
+        result2.push(value);
       } else if (!includes2(values2, computed, comparator)) {
-        result.push(value);
+        result2.push(value);
       }
     }
-  return result;
+  return result2;
 }
 var baseDifference_default = baseDifference;
 
@@ -2326,12 +2319,12 @@ var arrayEvery_default = arrayEvery;
 
 // node_modules/lodash-es/_baseEvery.js
 function baseEvery(collection, predicate) {
-  var result = true;
+  var result2 = true;
   baseEach_default(collection, function(value, index, collection2) {
-    result = !!predicate(value, index, collection2);
-    return result;
+    result2 = !!predicate(value, index, collection2);
+    return result2;
   });
-  return result;
+  return result2;
 }
 var baseEvery_default = baseEvery;
 
@@ -2347,13 +2340,13 @@ var every_default = every;
 
 // node_modules/lodash-es/_baseFilter.js
 function baseFilter(collection, predicate) {
-  var result = [];
+  var result2 = [];
   baseEach_default(collection, function(value, index, collection2) {
     if (predicate(value, index, collection2)) {
-      result.push(value);
+      result2.push(value);
     }
   });
-  return result;
+  return result2;
 }
 var baseFilter_default = baseFilter;
 
@@ -2408,11 +2401,11 @@ var head_default = head;
 
 // node_modules/lodash-es/_baseMap.js
 function baseMap(collection, iteratee) {
-  var index = -1, result = isArrayLike_default(collection) ? Array(collection.length) : [];
+  var index = -1, result2 = isArrayLike_default(collection) ? Array(collection.length) : [];
   baseEach_default(collection, function(value, key, collection2) {
-    result[++index] = iteratee(value, key, collection2);
+    result2[++index] = iteratee(value, key, collection2);
   });
-  return result;
+  return result2;
 }
 var baseMap_default = baseMap;
 
@@ -2432,11 +2425,11 @@ var flatMap_default = flatMap;
 // node_modules/lodash-es/groupBy.js
 var objectProto18 = Object.prototype;
 var hasOwnProperty15 = objectProto18.hasOwnProperty;
-var groupBy = createAggregator_default(function(result, value, key) {
-  if (hasOwnProperty15.call(result, key)) {
-    result[key].push(value);
+var groupBy = createAggregator_default(function(result2, value, key) {
+  if (hasOwnProperty15.call(result2, key)) {
+    result2[key].push(value);
   } else {
-    baseAssignValue_default(result, key, [value]);
+    baseAssignValue_default(result2, key, [value]);
   }
 });
 var groupBy_default = groupBy;
@@ -2601,14 +2594,14 @@ var baseSet_default = baseSet;
 
 // node_modules/lodash-es/_basePickBy.js
 function basePickBy(object, paths, predicate) {
-  var index = -1, length = paths.length, result = {};
+  var index = -1, length = paths.length, result2 = {};
   while (++index < length) {
     var path = paths[index], value = baseGet_default(object, path);
     if (predicate(value, path)) {
-      baseSet_default(result, castPath_default(path, object), value);
+      baseSet_default(result2, castPath_default(path, object), value);
     }
   }
-  return result;
+  return result2;
 }
 var basePickBy_default = basePickBy;
 
@@ -2652,12 +2645,12 @@ var reject_default = reject;
 
 // node_modules/lodash-es/_baseSome.js
 function baseSome(collection, predicate) {
-  var result;
+  var result2;
   baseEach_default(collection, function(value, index, collection2) {
-    result = predicate(value, index, collection2);
-    return !result;
+    result2 = predicate(value, index, collection2);
+    return !result2;
   });
-  return !!result;
+  return !!result2;
 }
 var baseSome_default = baseSome;
 
@@ -2681,7 +2674,7 @@ var createSet_default = createSet;
 // node_modules/lodash-es/_baseUniq.js
 var LARGE_ARRAY_SIZE3 = 200;
 function baseUniq(array, iteratee, comparator) {
-  var index = -1, includes2 = arrayIncludes_default, length = array.length, isCommon = true, result = [], seen = result;
+  var index = -1, includes2 = arrayIncludes_default, length = array.length, isCommon = true, result2 = [], seen = result2;
   if (comparator) {
     isCommon = false;
     includes2 = arrayIncludesWith_default;
@@ -2694,7 +2687,7 @@ function baseUniq(array, iteratee, comparator) {
     includes2 = cacheHas_default;
     seen = new SetCache_default();
   } else {
-    seen = iteratee ? [] : result;
+    seen = iteratee ? [] : result2;
   }
   outer:
     while (++index < length) {
@@ -2710,15 +2703,15 @@ function baseUniq(array, iteratee, comparator) {
         if (iteratee) {
           seen.push(computed);
         }
-        result.push(value);
+        result2.push(value);
       } else if (!includes2(seen, computed, comparator)) {
-        if (seen !== result) {
+        if (seen !== result2) {
           seen.push(computed);
         }
-        result.push(value);
+        result2.push(value);
       }
     }
-  return result;
+  return result2;
 }
 var baseUniq_default = baseUniq;
 
@@ -2786,10 +2779,10 @@ var AbstractProduction = class {
   constructor(_definition) {
     this._definition = _definition;
   }
-  accept(visitor) {
-    visitor.visit(this);
+  accept(visitor2) {
+    visitor2.visit(this);
     forEach_default(this.definition, (prod) => {
-      prod.accept(visitor);
+      prod.accept(visitor2);
     });
   }
 };
@@ -2807,8 +2800,8 @@ var NonTerminal = class extends AbstractProduction {
     }
     return [];
   }
-  accept(visitor) {
-    visitor.visit(this);
+  accept(visitor2) {
+    visitor2.visit(this);
   }
 };
 var Rule = class extends AbstractProduction {
@@ -2880,8 +2873,8 @@ var Terminal = class {
     this.idx = 1;
     assign_default(this, pickBy_default(options, (v) => v !== void 0));
   }
-  accept(visitor) {
-    visitor.visit(this);
+  accept(visitor2) {
+    visitor2.visit(this);
   }
 };
 function serializeGrammar(topRules) {
@@ -4117,11 +4110,11 @@ function getOptimizedStartCodesIndices(regExp, ensureOptimizations = false) {
   }
   return [];
 }
-function firstCharOptimizedIndices(ast, result, ignoreCase) {
+function firstCharOptimizedIndices(ast, result2, ignoreCase) {
   switch (ast.type) {
     case "Disjunction":
       for (let i = 0; i < ast.value.length; i++) {
-        firstCharOptimizedIndices(ast.value[i], result, ignoreCase);
+        firstCharOptimizedIndices(ast.value[i], result2, ignoreCase);
       }
       break;
     case "Alternative":
@@ -4141,7 +4134,7 @@ function firstCharOptimizedIndices(ast, result, ignoreCase) {
         const atom = term;
         switch (atom.type) {
           case "Character":
-            addOptimizedIdxToResult(atom.value, result, ignoreCase);
+            addOptimizedIdxToResult(atom.value, result2, ignoreCase);
             break;
           case "Set":
             if (atom.complement === true) {
@@ -4149,16 +4142,16 @@ function firstCharOptimizedIndices(ast, result, ignoreCase) {
             }
             forEach_default(atom.value, (code) => {
               if (typeof code === "number") {
-                addOptimizedIdxToResult(code, result, ignoreCase);
+                addOptimizedIdxToResult(code, result2, ignoreCase);
               } else {
                 const range = code;
                 if (ignoreCase === true) {
                   for (let rangeCode = range.from; rangeCode <= range.to; rangeCode++) {
-                    addOptimizedIdxToResult(rangeCode, result, ignoreCase);
+                    addOptimizedIdxToResult(rangeCode, result2, ignoreCase);
                   }
                 } else {
                   for (let rangeCode = range.from; rangeCode <= range.to && rangeCode < minOptimizationVal; rangeCode++) {
-                    addOptimizedIdxToResult(rangeCode, result, ignoreCase);
+                    addOptimizedIdxToResult(rangeCode, result2, ignoreCase);
                   }
                   if (range.to >= minOptimizationVal) {
                     const minUnOptVal = range.from >= minOptimizationVal ? range.from : minOptimizationVal;
@@ -4166,7 +4159,7 @@ function firstCharOptimizedIndices(ast, result, ignoreCase) {
                     const minOptIdx = charCodeToOptimizedIndex(minUnOptVal);
                     const maxOptIdx = charCodeToOptimizedIndex(maxUnOptVal);
                     for (let currOptIdx = minOptIdx; currOptIdx <= maxOptIdx; currOptIdx++) {
-                      result[currOptIdx] = currOptIdx;
+                      result2[currOptIdx] = currOptIdx;
                     }
                   }
                 }
@@ -4174,7 +4167,7 @@ function firstCharOptimizedIndices(ast, result, ignoreCase) {
             });
             break;
           case "Group":
-            firstCharOptimizedIndices(atom.value, result, ignoreCase);
+            firstCharOptimizedIndices(atom.value, result2, ignoreCase);
             break;
           default:
             throw Error("Non Exhaustive Match");
@@ -4193,26 +4186,26 @@ function firstCharOptimizedIndices(ast, result, ignoreCase) {
     default:
       throw Error("non exhaustive match!");
   }
-  return values_default(result);
+  return values_default(result2);
 }
-function addOptimizedIdxToResult(code, result, ignoreCase) {
+function addOptimizedIdxToResult(code, result2, ignoreCase) {
   const optimizedCharIdx = charCodeToOptimizedIndex(code);
-  result[optimizedCharIdx] = optimizedCharIdx;
+  result2[optimizedCharIdx] = optimizedCharIdx;
   if (ignoreCase === true) {
-    handleIgnoreCase(code, result);
+    handleIgnoreCase(code, result2);
   }
 }
-function handleIgnoreCase(code, result) {
+function handleIgnoreCase(code, result2) {
   const char = String.fromCharCode(code);
   const upperChar = char.toUpperCase();
   if (upperChar !== char) {
     const optimizedCharIdx = charCodeToOptimizedIndex(upperChar.charCodeAt(0));
-    result[optimizedCharIdx] = optimizedCharIdx;
+    result2[optimizedCharIdx] = optimizedCharIdx;
   } else {
     const lowerChar = char.toLowerCase();
     if (lowerChar !== char) {
       const optimizedCharIdx = charCodeToOptimizedIndex(lowerChar.charCodeAt(0));
-      result[optimizedCharIdx] = optimizedCharIdx;
+      result2[optimizedCharIdx] = optimizedCharIdx;
     }
   }
 }
@@ -4439,11 +4432,11 @@ function analyzeTokenTypes(tokenTypes, options) {
   let charCodeToPatternIdxToConfig = [];
   if (!options.safeMode) {
     tracer("First Char Optimization", () => {
-      charCodeToPatternIdxToConfig = reduce_default(onlyRelevantTypes, (result, currTokType, idx) => {
+      charCodeToPatternIdxToConfig = reduce_default(onlyRelevantTypes, (result2, currTokType, idx) => {
         if (typeof currTokType.PATTERN === "string") {
           const charCode = currTokType.PATTERN.charCodeAt(0);
           const optimizedIdx = charCodeToOptimizedIndex(charCode);
-          addToMapOfArrays(result, optimizedIdx, patternIdxToConfig[idx]);
+          addToMapOfArrays(result2, optimizedIdx, patternIdxToConfig[idx]);
         } else if (isArray_default(currTokType.START_CHARS_HINT)) {
           let lastOptimizedIdx;
           forEach_default(currTokType.START_CHARS_HINT, (charOrInt) => {
@@ -4451,7 +4444,7 @@ function analyzeTokenTypes(tokenTypes, options) {
             const currOptimizedIdx = charCodeToOptimizedIndex(charCode);
             if (lastOptimizedIdx !== currOptimizedIdx) {
               lastOptimizedIdx = currOptimizedIdx;
-              addToMapOfArrays(result, currOptimizedIdx, patternIdxToConfig[idx]);
+              addToMapOfArrays(result2, currOptimizedIdx, patternIdxToConfig[idx]);
             }
           });
         } else if (isRegExp_default(currTokType.PATTERN)) {
@@ -4469,7 +4462,7 @@ function analyzeTokenTypes(tokenTypes, options) {
               canBeOptimized = false;
             }
             forEach_default(optimizedCodes, (code) => {
-              addToMapOfArrays(result, code, patternIdxToConfig[idx]);
+              addToMapOfArrays(result2, code, patternIdxToConfig[idx]);
             });
           }
         } else {
@@ -4480,7 +4473,7 @@ function analyzeTokenTypes(tokenTypes, options) {
           }
           canBeOptimized = false;
         }
-        return result;
+        return result2;
       }, []);
     });
   }
@@ -4637,13 +4630,13 @@ function findUnsupportedFlags(tokenTypes) {
 function findDuplicatePatterns(tokenTypes) {
   const found = [];
   let identicalPatterns = map_default(tokenTypes, (outerType) => {
-    return reduce_default(tokenTypes, (result, innerType) => {
+    return reduce_default(tokenTypes, (result2, innerType) => {
       if (outerType.PATTERN.source === innerType.PATTERN.source && !includes_default(found, innerType) && innerType.PATTERN !== Lexer.NA) {
         found.push(innerType);
-        result.push(innerType);
-        return result;
+        result2.push(innerType);
+        return result2;
       }
-      return result;
+      return result2;
     }, []);
   });
   identicalPatterns = compact_default(identicalPatterns);
@@ -4696,17 +4689,17 @@ function findModesThatDoNotExist(tokenTypes, validModes) {
 }
 function findUnreachablePatterns(tokenTypes) {
   const errors = [];
-  const canBeTested = reduce_default(tokenTypes, (result, tokType, idx) => {
+  const canBeTested = reduce_default(tokenTypes, (result2, tokType, idx) => {
     const pattern = tokType.PATTERN;
     if (pattern === Lexer.NA) {
-      return result;
+      return result2;
     }
     if (isString_default(pattern)) {
-      result.push({ str: pattern, idx, tokenType: tokType });
+      result2.push({ str: pattern, idx, tokenType: tokType });
     } else if (isRegExp_default(pattern) && noMetaChar(pattern)) {
-      result.push({ str: pattern.source, idx, tokenType: tokType });
+      result2.push({ str: pattern.source, idx, tokenType: tokType });
     }
-    return result;
+    return result2;
   }, []);
   forEach_default(tokenTypes, (tokType, testIdx) => {
     forEach_default(canBeTested, ({ str, idx, tokenType }) => {
@@ -4885,15 +4878,15 @@ function isShortPattern(pattern) {
 }
 var LineTerminatorOptimizedTester = {
   // implements /\n|\r\n?/g.test
-  test: function(text) {
-    const len = text.length;
+  test: function(text2) {
+    const len = text2.length;
     for (let i = this.lastIndex; i < len; i++) {
-      const c = text.charCodeAt(i);
+      const c = text2.charCodeAt(i);
       if (c === 10) {
         this.lastIndex = i + 1;
         return true;
       } else if (c === 13) {
-        if (text.charCodeAt(i + 1) === 10) {
+        if (text2.charCodeAt(i + 1) === 10) {
           this.lastIndex = i + 2;
         } else {
           this.lastIndex = i + 1;
@@ -4997,20 +4990,20 @@ function augmentTokenTypes(tokenTypes) {
   });
 }
 function expandCategories(tokenTypes) {
-  let result = clone_default(tokenTypes);
+  let result2 = clone_default(tokenTypes);
   let categories = tokenTypes;
   let searching = true;
   while (searching) {
     categories = compact_default(flatten_default(map_default(categories, (currTokType) => currTokType.CATEGORIES)));
-    const newCategories = difference_default(categories, result);
-    result = result.concat(newCategories);
+    const newCategories = difference_default(categories, result2);
+    result2 = result2.concat(newCategories);
     if (isEmpty_default(newCategories)) {
       searching = false;
     } else {
       categories = newCategories;
     }
   }
-  return result;
+  return result2;
 }
 function assignTokenDefaultProps(tokenTypes) {
   forEach_default(tokenTypes, (currTokType) => {
@@ -5294,7 +5287,7 @@ var Lexer = class {
       });
     });
   }
-  tokenize(text, initialMode = this.defaultMode) {
+  tokenize(text2, initialMode = this.defaultMode) {
     if (!isEmpty_default(this.lexerDefinitionErrors)) {
       const allErrMessages = map_default(this.lexerDefinitionErrors, (error) => {
         return error.message;
@@ -5302,19 +5295,19 @@ var Lexer = class {
       const allErrMessagesString = allErrMessages.join("-----------------------\n");
       throw new Error("Unable to Tokenize because Errors detected in definition of Lexer:\n" + allErrMessagesString);
     }
-    return this.tokenizeInternal(text, initialMode);
+    return this.tokenizeInternal(text2, initialMode);
   }
   // There is quite a bit of duplication between this and "tokenizeInternalLazy"
   // This is intentional due to performance considerations.
   // this method also used quite a bit of `!` none null assertions because it is too optimized
   // for `tsc` to always understand it is "safe"
-  tokenizeInternal(text, initialMode) {
+  tokenizeInternal(text2, initialMode) {
     let i, j, k, matchAltImage, longerAlt, matchedImage, payload, altPayload, imageLength, group, tokType, newToken, errLength, droppedChar, msg, match;
-    const orgText = text;
+    const orgText = text2;
     const orgLength = orgText.length;
     let offset = 0;
     let matchedTokensIndex = 0;
-    const guessedNumberOfTokens = this.hasCustom ? 0 : Math.floor(text.length / 10);
+    const guessedNumberOfTokens = this.hasCustom ? 0 : Math.floor(text2.length / 10);
     const matchedTokens = new Array(guessedNumberOfTokens);
     const errors = [];
     let line = this.trackStartLines ? 1 : void 0;
@@ -5409,7 +5402,7 @@ var Lexer = class {
           }
         } else {
           this.updateLastIndex(currPattern, offset);
-          matchedImage = this.match(currPattern, text, offset);
+          matchedImage = this.match(currPattern, text2, offset);
         }
         if (matchedImage !== null) {
           longerAlt = currConfig.longerAlt;
@@ -5431,7 +5424,7 @@ var Lexer = class {
                 }
               } else {
                 this.updateLastIndex(longerAltPattern, offset);
-                matchAltImage = this.match(longerAltPattern, text, offset);
+                matchAltImage = this.match(longerAltPattern, text2, offset);
               }
               if (matchAltImage && matchAltImage.length > matchedImage.length) {
                 matchedImage = matchAltImage;
@@ -5457,7 +5450,7 @@ var Lexer = class {
             groups[group].push(newToken);
           }
         }
-        text = this.chopInput(text, imageLength);
+        text2 = this.chopInput(text2, imageLength);
         offset = offset + imageLength;
         column = this.computeNewColumn(column, imageLength);
         if (trackLines === true && currConfig.canLineTerminator === true) {
@@ -5485,7 +5478,7 @@ var Lexer = class {
         const errorColumn = column;
         let foundResyncPoint = recoveryEnabled === false;
         while (foundResyncPoint === false && offset < orgLength) {
-          text = this.chopInput(text, 1);
+          text2 = this.chopInput(text2, 1);
           offset++;
           for (j = 0; j < currModePatternsLength; j++) {
             const currConfig2 = patternIdxToConfig[j];
@@ -5499,7 +5492,7 @@ var Lexer = class {
               foundResyncPoint = currPattern.exec(orgText, offset, matchedTokens, groups) !== null;
             } else {
               this.updateLastIndex(currPattern, offset);
-              foundResyncPoint = currPattern.exec(text) !== null;
+              foundResyncPoint = currPattern.exec(text2) !== null;
             }
             if (foundResyncPoint === true) {
               break;
@@ -5540,8 +5533,8 @@ var Lexer = class {
       push_mode.call(this, config.push);
     }
   }
-  chopInput(text, length) {
-    return text.substring(length);
+  chopInput(text2, length) {
+    return text2.substring(length);
   }
   updateLastIndex(regExp, newLastIndex) {
     regExp.lastIndex = newLastIndex;
@@ -5608,15 +5601,15 @@ var Lexer = class {
       token.payload = payload;
     }
   }
-  matchWithTest(pattern, text, offset) {
-    const found = pattern.test(text);
+  matchWithTest(pattern, text2, offset) {
+    const found = pattern.test(text2);
     if (found === true) {
-      return text.substring(offset, pattern.lastIndex);
+      return text2.substring(offset, pattern.lastIndex);
     }
     return null;
   }
-  matchWithExec(pattern, text) {
-    const regExpArray = pattern.exec(text);
+  matchWithExec(pattern, text2) {
+    const regExpArray = pattern.exec(text2);
     return regExpArray !== null ? regExpArray[0] : null;
   }
 };
@@ -5720,7 +5713,7 @@ var defaultParserErrorProvider = {
     if (customUserDescription) {
       return errPrefix + customUserDescription + errSuffix;
     } else {
-      const allLookAheadPaths = reduce_default(expectedPathsPerAlt, (result, currAltPaths) => result.concat(currAltPaths), []);
+      const allLookAheadPaths = reduce_default(expectedPathsPerAlt, (result2, currAltPaths) => result2.concat(currAltPaths), []);
       const nextValidTokenSequences = map_default(allLookAheadPaths, (currPath) => `[${map_default(currPath, (currTokenType) => tokenLabel2(currTokenType)).join(", ")}]`);
       const nextValidSequenceItems = map_default(nextValidTokenSequences, (itemMsg, idx) => `  ${idx + 1}. ${itemMsg}`);
       const calculatedDescription = `one of these possible Token sequences:
@@ -6031,14 +6024,14 @@ var NextTerminalAfterAtLeastOneSepWalker = class extends AbstractNextTerminalAft
 };
 function possiblePathsFrom(targetDef, maxLength, currPath = []) {
   currPath = clone_default(currPath);
-  let result = [];
+  let result2 = [];
   let i = 0;
   function remainingPathWith(nextDef) {
     return nextDef.concat(drop_default(targetDef, i + 1));
   }
   function getAlternativesForProd(definition) {
     const alternatives = possiblePathsFrom(remainingPathWith(definition), maxLength, currPath);
-    return result.concat(alternatives);
+    return result2.concat(alternatives);
   }
   while (currPath.length < maxLength && i < targetDef.length) {
     const prod = targetDef[i];
@@ -6047,7 +6040,7 @@ function possiblePathsFrom(targetDef, maxLength, currPath = []) {
     } else if (prod instanceof NonTerminal) {
       return getAlternativesForProd(prod.definition);
     } else if (prod instanceof Option) {
-      result = getAlternativesForProd(prod.definition);
+      result2 = getAlternativesForProd(prod.definition);
     } else if (prod instanceof RepetitionMandatory) {
       const newDef = prod.definition.concat([
         new Repetition({
@@ -6069,21 +6062,21 @@ function possiblePathsFrom(targetDef, maxLength, currPath = []) {
           definition: [new Terminal({ terminalType: prod.separator })].concat(prod.definition)
         })
       ]);
-      result = getAlternativesForProd(newDef);
+      result2 = getAlternativesForProd(newDef);
     } else if (prod instanceof Repetition) {
       const newDef = prod.definition.concat([
         new Repetition({
           definition: prod.definition
         })
       ]);
-      result = getAlternativesForProd(newDef);
+      result2 = getAlternativesForProd(newDef);
     } else if (prod instanceof Alternation) {
       forEach_default(prod.definition, (currAlt) => {
         if (isEmpty_default(currAlt.definition) === false) {
-          result = getAlternativesForProd(currAlt.definition);
+          result2 = getAlternativesForProd(currAlt.definition);
         }
       });
-      return result;
+      return result2;
     } else if (prod instanceof Terminal) {
       currPath.push(prod.terminalType);
     } else {
@@ -6091,11 +6084,11 @@ function possiblePathsFrom(targetDef, maxLength, currPath = []) {
     }
     i++;
   }
-  result.push({
+  result2.push({
     partialPath: currPath,
     suffixDef: drop_default(targetDef, i)
   });
-  return result;
+  return result2;
 }
 function nextPossibleTokensAfter(initialDef, tokenVector, tokMatcher, maxLookAhead) {
   const EXIT_NON_TERMINAL = "EXIT_NONE_TERMINAL";
@@ -6104,7 +6097,7 @@ function nextPossibleTokensAfter(initialDef, tokenVector, tokMatcher, maxLookAhe
   let foundCompletePath = false;
   const tokenVectorLength = tokenVector.length;
   const minimalAlternativesIndex = tokenVectorLength - maxLookAhead - 1;
-  const result = [];
+  const result2 = [];
   const possiblePaths = [];
   possiblePaths.push({
     idx: -1,
@@ -6150,7 +6143,7 @@ function nextPossibleTokensAfter(initialDef, tokenVector, tokMatcher, maxLookAhe
           possiblePaths.push(nextPath);
         }
       } else if (currIdx === tokenVectorLength - 1) {
-        result.push({
+        result2.push({
           nextTokenType: prod.terminalType,
           nextTokenOccurrence: prod.idx,
           ruleStack: currRuleStack,
@@ -6287,7 +6280,7 @@ function nextPossibleTokensAfter(initialDef, tokenVector, tokMatcher, maxLookAhe
       throw Error("non exhaustive match");
     }
   }
-  return result;
+  return result2;
 }
 function expandTopLevelRule(topRule, currIdx, currRuleStack, currOccurrenceStack) {
   const newRuleStack = clone_default(currRuleStack);
@@ -6375,18 +6368,18 @@ function buildAlternativesLookAheadFunc(alts, hasPredicates, tokenMatcher2, dyna
     const singleTokenAlts = map_default(alts, (currAlt) => {
       return flatten_default(currAlt);
     });
-    const choiceToAlt = reduce_default(singleTokenAlts, (result, currAlt, idx) => {
+    const choiceToAlt = reduce_default(singleTokenAlts, (result2, currAlt, idx) => {
       forEach_default(currAlt, (currTokType) => {
-        if (!has_default(result, currTokType.tokenTypeIdx)) {
-          result[currTokType.tokenTypeIdx] = idx;
+        if (!has_default(result2, currTokType.tokenTypeIdx)) {
+          result2[currTokType.tokenTypeIdx] = idx;
         }
         forEach_default(currTokType.categoryMatches, (currExtendingType) => {
-          if (!has_default(result, currExtendingType)) {
-            result[currExtendingType] = idx;
+          if (!has_default(result2, currExtendingType)) {
+            result2[currExtendingType] = idx;
           }
         });
       });
-      return result;
+      return result2;
     }, {});
     return function() {
       const nextToken = this.LA(1);
@@ -6428,12 +6421,12 @@ function buildSingleAlternativeLookaheadFunction(alt, tokenMatcher2, dynamicToke
         return this.LA(1).tokenTypeIdx === expectedTokenUniqueKey;
       };
     } else {
-      const choiceToAlt = reduce_default(singleTokensTypes, (result, currTokType, idx) => {
-        result[currTokType.tokenTypeIdx] = true;
+      const choiceToAlt = reduce_default(singleTokensTypes, (result2, currTokType, idx) => {
+        result2[currTokType.tokenTypeIdx] = true;
         forEach_default(currTokType.categoryMatches, (currExtendingType) => {
-          result[currExtendingType] = true;
+          result2[currExtendingType] = true;
         });
-        return result;
+        return result2;
       }, []);
       return function() {
         const nextToken = this.LA(1);
@@ -6535,11 +6528,11 @@ var InsideDefinitionFinderVisitor = class extends GAstVisitor {
   }
 };
 function initializeArrayOfArrays(size) {
-  const result = new Array(size);
+  const result2 = new Array(size);
   for (let i = 0; i < size; i++) {
-    result[i] = [];
+    result2[i] = [];
   }
-  return result;
+  return result2;
 }
 function pathToHashKeys(path) {
   let keys2 = [""];
@@ -6622,9 +6615,9 @@ function lookAheadSequenceFromAlternatives(altsDefs, k) {
   return finalResult;
 }
 function getLookaheadPathsForOr(occurrence, ruleGrammar, k, orProd) {
-  const visitor = new InsideDefinitionFinderVisitor(occurrence, PROD_TYPE.ALTERNATION, orProd);
-  ruleGrammar.accept(visitor);
-  return lookAheadSequenceFromAlternatives(visitor.result, k);
+  const visitor2 = new InsideDefinitionFinderVisitor(occurrence, PROD_TYPE.ALTERNATION, orProd);
+  ruleGrammar.accept(visitor2);
+  return lookAheadSequenceFromAlternatives(visitor2.result, k);
 }
 function getLookaheadPathsForOptionalProd(occurrence, ruleGrammar, prodType, k) {
   const insideDefVisitor = new InsideDefinitionFinderVisitor(occurrence, prodType);
@@ -6752,11 +6745,11 @@ var OccurrenceValidationCollector = class extends GAstVisitor {
 };
 function validateRuleDoesNotAlreadyExist(rule, allRules, className, errMsgProvider) {
   const errors = [];
-  const occurrences = reduce_default(allRules, (result, curRule) => {
+  const occurrences = reduce_default(allRules, (result2, curRule) => {
     if (curRule.name === rule.name) {
-      return result + 1;
+      return result2 + 1;
     }
-    return result;
+    return result2;
   }, 0);
   if (occurrences > 1) {
     const errMsg = errMsgProvider.buildDuplicateRuleNameError({
@@ -6812,17 +6805,17 @@ function validateNoLeftRecursion(topRule, currRule, errMsgProvider, path = []) {
   }
 }
 function getFirstNoneTerminal(definition) {
-  let result = [];
+  let result2 = [];
   if (isEmpty_default(definition)) {
-    return result;
+    return result2;
   }
   const firstProd = head_default(definition);
   if (firstProd instanceof NonTerminal) {
-    result.push(firstProd.referencedRule);
+    result2.push(firstProd.referencedRule);
   } else if (firstProd instanceof Alternative || firstProd instanceof Option || firstProd instanceof RepetitionMandatory || firstProd instanceof RepetitionMandatoryWithSeparator || firstProd instanceof RepetitionWithSeparator || firstProd instanceof Repetition) {
-    result = result.concat(getFirstNoneTerminal(firstProd.definition));
+    result2 = result2.concat(getFirstNoneTerminal(firstProd.definition));
   } else if (firstProd instanceof Alternation) {
-    result = flatten_default(map_default(firstProd.definition, (currSubDef) => getFirstNoneTerminal(currSubDef.definition)));
+    result2 = flatten_default(map_default(firstProd.definition, (currSubDef) => getFirstNoneTerminal(currSubDef.definition)));
   } else if (firstProd instanceof Terminal) {
   } else {
     throw Error("non exhaustive match");
@@ -6831,9 +6824,9 @@ function getFirstNoneTerminal(definition) {
   const hasMore = definition.length > 1;
   if (isFirstOptional && hasMore) {
     const rest = drop_default(definition);
-    return result.concat(getFirstNoneTerminal(rest));
+    return result2.concat(getFirstNoneTerminal(rest));
   } else {
-    return result;
+    return result2;
   }
 }
 var OrCollector = class extends GAstVisitor {
@@ -6959,9 +6952,9 @@ function validateSomeNonEmptyLookaheadPath(topLevelRules, maxLookahead, errMsgPr
 }
 function checkAlternativesAmbiguities(alternatives, alternation, rule, errMsgProvider) {
   const foundAmbiguousPaths = [];
-  const identicalAmbiguities = reduce_default(alternatives, (result, currAlt, currAltIdx) => {
+  const identicalAmbiguities = reduce_default(alternatives, (result2, currAlt, currAltIdx) => {
     if (alternation.definition[currAltIdx].ignoreAmbiguities === true) {
-      return result;
+      return result2;
     }
     forEach_default(currAlt, (currPath) => {
       const altsCurrPathAppearsIn = [currAltIdx];
@@ -6973,13 +6966,13 @@ function checkAlternativesAmbiguities(alternatives, alternation, rule, errMsgPro
       });
       if (altsCurrPathAppearsIn.length > 1 && !containsPath(foundAmbiguousPaths, currPath)) {
         foundAmbiguousPaths.push(currPath);
-        result.push({
+        result2.push({
           alts: altsCurrPathAppearsIn,
           path: currPath
         });
       }
     });
-    return result;
+    return result2;
   }, []);
   const currErrors = map_default(identicalAmbiguities, (currAmbDescriptor) => {
     const ambgIndices = map_default(currAmbDescriptor.alts, (currAltIdx) => currAltIdx + 1);
@@ -7000,11 +6993,11 @@ function checkAlternativesAmbiguities(alternatives, alternation, rule, errMsgPro
   return currErrors;
 }
 function checkPrefixAlternativesAmbiguities(alternatives, alternation, rule, errMsgProvider) {
-  const pathsAndIndices = reduce_default(alternatives, (result, currAlt, idx) => {
+  const pathsAndIndices = reduce_default(alternatives, (result2, currAlt, idx) => {
     const currPathsAndIdx = map_default(currAlt, (currPath) => {
       return { idx, path: currPath };
     });
-    return result.concat(currPathsAndIdx);
+    return result2.concat(currPathsAndIdx);
   }, []);
   const errors = compact_default(flatMap_default(pathsAndIndices, (currPathAndIdx) => {
     const alternativeGast = alternation.definition[currPathAndIdx.idx];
@@ -9226,811 +9219,179 @@ function createSyntaxDiagramsCode(grammar, { resourceBase = `https://unpkg.com/c
   return header + cssHtml + scripts + diagramsDiv + serializedGrammar + initLogic;
 }
 
-// jass/lexer.mjs
-var JassTokenMap = {
-  whitespace: createToken({
-    name: "whitespace",
-    pattern: /[^\S\r\n]+/,
-    line_breaks: false,
-    group: Lexer.SKIPPED
-  }),
-  comment: createToken({
-    name: "comment",
-    pattern: /\/\/[^\r\n]*/,
-    line_breaks: false
-  }),
-  type: createToken({
-    name: "type",
-    pattern: /\btype\b/,
-    start_chars_hint: ["t"],
-    line_breaks: false
-  }),
-  extends: createToken({
-    name: "extends",
-    pattern: /\bextends\b/,
-    start_chars_hint: ["e"],
-    line_breaks: false
-  }),
-  constant: createToken({
-    name: "constant",
-    pattern: /\bconstant\b/,
-    start_chars_hint: ["c"],
-    line_breaks: false
-  }),
-  native: createToken({
-    name: "native",
-    pattern: /\bnative\b/,
-    start_chars_hint: ["n"],
-    line_breaks: false
-  }),
-  function: createToken({
-    name: "function",
-    pattern: /\bfunction\b/,
-    start_chars_hint: ["f"],
-    line_breaks: false
-  }),
-  takes: createToken({
-    name: "takes",
-    pattern: /\btakes\b/,
-    start_chars_hint: ["t"],
-    line_breaks: false
-  }),
-  nothing: createToken({
-    name: "nothing",
-    pattern: /\bnothing\b/,
-    start_chars_hint: ["n"],
-    line_breaks: false
-  }),
-  returns: createToken({
-    name: "returns",
-    pattern: /\breturns\b/,
-    start_chars_hint: ["r"],
-    line_breaks: false
-  }),
-  local: createToken({
-    name: "local",
-    pattern: /\blocal\b/,
-    start_chars_hint: ["l"],
-    line_breaks: false
-  }),
-  and: createToken({
-    name: "and",
-    pattern: /\band\b/,
-    start_chars_hint: ["a"],
-    line_breaks: false
-  }),
-  or: createToken({
-    name: "or",
-    pattern: /\bor\b/,
-    start_chars_hint: ["o"],
-    line_breaks: false
-  }),
-  call: createToken({
-    name: "call",
-    pattern: /\bcall\b/,
-    start_chars_hint: ["c"],
-    line_breaks: false
-  }),
-  not: createToken({
-    name: "not",
-    pattern: /\bnot\b/,
-    start_chars_hint: ["n"],
-    line_breaks: false
-  }),
-  set: createToken({
-    name: "set",
-    pattern: /\bset\b/,
-    start_chars_hint: ["s"],
-    line_breaks: false
-  }),
-  loop: createToken({
-    name: "loop",
-    pattern: /\bloop\b/,
-    start_chars_hint: ["l"],
-    line_breaks: false
-  }),
-  then: createToken({
-    name: "then",
-    pattern: /\bthen\b/,
-    start_chars_hint: ["t"],
-    line_breaks: false
-  }),
-  exitwhen: createToken({
-    name: "exitwhen",
-    pattern: /\bexitwhen\b/,
-    start_chars_hint: ["e"],
-    line_breaks: false
-  }),
-  endloop: createToken({
-    name: "endloop",
-    pattern: /\bendloop\b/,
-    start_chars_hint: ["e"],
-    line_breaks: false
-  }),
-  elseif: createToken({
-    name: "elseif",
-    pattern: /\belseif\b/,
-    start_chars_hint: ["e"],
-    line_breaks: false
-  }),
-  else: createToken({
-    name: "else",
-    pattern: /\belse\b/,
-    start_chars_hint: ["e"],
-    line_breaks: false
-  }),
-  endif: createToken({
-    name: "endif",
-    pattern: /\bendif\b/,
-    start_chars_hint: ["e"],
-    line_breaks: false
-  }),
-  endfunction: createToken({
-    name: "endfunction",
-    pattern: /\bendfunction\b/,
-    start_chars_hint: ["e"],
-    line_breaks: false
-  }),
-  comma: createToken({
-    name: "comma",
-    pattern: /,/,
-    start_chars_hint: [","],
-    label: ",",
-    line_breaks: false
-  }),
-  equalsequals: createToken({
-    name: "equalsequals",
-    pattern: /==/,
-    start_chars_hint: ["="],
-    line_breaks: false,
-    label: "=="
-  }),
-  equals: createToken({
-    name: "equals",
-    pattern: /=/,
-    start_chars_hint: ["="],
-    line_breaks: false,
-    label: "="
-  }),
-  notequals: createToken({
-    name: "notequals",
-    pattern: /!=/,
-    start_chars_hint: ["!"],
-    line_breaks: false,
-    label: "!="
-  }),
-  add: createToken({
-    name: "add",
-    pattern: /\+/,
-    start_chars_hint: ["+"],
-    line_breaks: false,
-    label: "+"
-  }),
-  sub: createToken({
-    name: "sub",
-    pattern: /-/,
-    start_chars_hint: ["-"],
-    line_breaks: false,
-    label: "-"
-  }),
-  mult: createToken({
-    name: "mult",
-    pattern: /\*/,
-    start_chars_hint: ["*"],
-    line_breaks: false,
-    label: "*"
-  }),
-  div: createToken({
-    name: "div",
-    pattern: /\//,
-    start_chars_hint: ["/"],
-    line_breaks: false,
-    label: "/"
-  }),
-  if: createToken({
-    name: "if",
-    pattern: /if/,
-    start_chars_hint: ["i"],
-    line_breaks: false
-  }),
-  stringliteral: createToken({
-    name: "stringliteral",
-    pattern: /".*"/,
-    start_chars_hint: ['"'],
-    line_breaks: false
-  }),
-  lparen: createToken({
-    name: "lparen",
-    pattern: /\(/,
-    start_chars_hint: ["("],
-    line_breaks: false,
-    label: "("
-  }),
-  rparen: createToken({
-    name: "rparen",
-    pattern: /\)/,
-    start_chars_hint: [")"],
-    line_breaks: false,
-    label: ")"
-  }),
-  lsquareparen: createToken({
-    name: "lsquareparen",
-    pattern: /\[/,
-    start_chars_hint: ["["],
-    line_breaks: false,
-    label: "["
-  }),
-  rsquareparen: createToken({
-    name: "rsquareparen",
-    pattern: /]/,
-    start_chars_hint: ["]"],
-    line_breaks: false,
-    label: "]"
-  }),
-  idliteral: createToken({
-    name: "idliteral",
-    pattern: /'.*'/,
-    line_breaks: false
-  }),
-  integer: createToken({
-    name: "integer",
-    pattern: /[0-9]+/,
-    line_breaks: false
-  }),
-  real: createToken({
-    name: "real",
-    pattern: /[0-9]+\.[0-9]+/,
-    line_breaks: false
-  }),
-  linebreak: createToken({
-    name: "linebreak",
-    pattern: /\n|\r\n/,
-    label: "\\n",
-    line_breaks: true
-  }),
-  identifier: createToken({
-    name: "identifier",
-    pattern: /[a-zA-Z][a-zA-Z0-9_]*/,
-    line_breaks: false
-  })
-};
-var JassTokenList = [JassTokenMap.whitespace, JassTokenMap.comment, JassTokenMap.type, JassTokenMap.extends, JassTokenMap.constant, JassTokenMap.native, JassTokenMap.function, JassTokenMap.takes, JassTokenMap.nothing, JassTokenMap.returns, JassTokenMap.local, JassTokenMap.and, JassTokenMap.or, JassTokenMap.call, JassTokenMap.not, JassTokenMap.set, JassTokenMap.loop, JassTokenMap.then, JassTokenMap.exitwhen, JassTokenMap.endloop, JassTokenMap.elseif, JassTokenMap.else, JassTokenMap.endif, JassTokenMap.endfunction, JassTokenMap.comma, JassTokenMap.equalsequals, JassTokenMap.equals, JassTokenMap.notequals, JassTokenMap.add, JassTokenMap.sub, JassTokenMap.mult, JassTokenMap.div, JassTokenMap.if, JassTokenMap.stringliteral, JassTokenMap.lparen, JassTokenMap.rparen, JassTokenMap.lsquareparen, JassTokenMap.rsquareparen, JassTokenMap.idliteral, JassTokenMap.integer, JassTokenMap.real, JassTokenMap.linebreak, JassTokenMap.identifier];
-var JassLexer = new Lexer(JassTokenList);
-for (const error of JassLexer.lexerDefinitionErrors)
-  console.error(error);
-
-// jass/parse-rule-name.mjs
-var parse_rule_name_default = {
-  addition: "addition",
-  arrayaccess: "arrayaccess",
-  callstatement: "callstatement",
-  comparator: "comparator",
-  exitwhenstatement: "exitwhenstatement",
-  expression: "expression",
-  funcarg: "funcarg",
-  funcarglist: "funcarglist",
-  funcdecl: "funcdecl",
-  funcreturntype: "funcreturntype",
-  funccall: "funccall",
-  ifstatement: "ifstatement",
-  jass: "jass",
-  linebreakdecl: "linebreakdecl",
-  localgroup: "localgroup",
-  localdecl: "localdecl",
-  loopstatement: "loopstatement",
-  multiplication: "multiplication",
-  nativedecl: "nativedecl",
-  optionalelse: "optionalelse",
-  optionalelseIf: "optionalelseIf",
-  primary: "primary",
-  rootstatement: "rootstatement",
-  setstatement: "setstatement",
-  statement: "statement",
-  terminator: "terminator",
-  typedecl: "typedecl",
-  vardecl: "vardecl",
-  commentdecl: "commentdecl"
-};
-
-// jass/parser.mjs
-var JassParserErrorType = {
-  MismatchToken: "MismatchToken",
-  NoViableAlt: "NoViableAlt"
-};
-var JassParserError = class {
-  /**
-   * @param {JassParserErrorType} type
-   * @param {import('chevrotain').IToken} token
-   */
-  constructor(type, token) {
-    this.type = type;
-    this.token = token;
-  }
-};
-var JassParser = class extends CstParser {
+// docs/calculator/main.mjs
+var AdditionOperator = createToken({
+  name: "AdditionOperator",
+  pattern: Lexer.NA
+});
+var Plus = createToken({
+  name: "Plus",
+  pattern: /\+/,
+  categories: AdditionOperator
+});
+var Minus = createToken({
+  name: "Minus",
+  pattern: /-/,
+  categories: AdditionOperator
+});
+var MultiplicationOperator = createToken({
+  name: "MultiplicationOperator",
+  pattern: Lexer.NA
+});
+var Multi = createToken({
+  name: "Multi",
+  pattern: /\*/,
+  categories: MultiplicationOperator
+});
+var Div = createToken({
+  name: "Div",
+  pattern: /\//,
+  categories: MultiplicationOperator
+});
+var LParen = createToken({ name: "LParen", pattern: /\(/ });
+var RParen = createToken({ name: "RParen", pattern: /\)/ });
+var NumberLiteral = createToken({
+  name: "NumberLiteral",
+  pattern: /[1-9]\d*/
+});
+var PowerFunc = createToken({ name: "PowerFunc", pattern: /power/ });
+var Comma = createToken({ name: "Comma", pattern: /,/ });
+var WhiteSpace = createToken({
+  name: "WhiteSpace",
+  pattern: /\s+/,
+  group: Lexer.SKIPPED
+});
+var allTokens = [
+  WhiteSpace,
+  // whitespace is normally very common so it should be placed first to speed up the lexer's performance
+  Plus,
+  Minus,
+  Multi,
+  Div,
+  LParen,
+  RParen,
+  NumberLiteral,
+  AdditionOperator,
+  MultiplicationOperator,
+  PowerFunc,
+  Comma
+];
+var CalculatorLexer = new Lexer(allTokens);
+var CalculatorPure = class extends CstParser {
   constructor() {
-    super(JassTokenList, {
-      recoveryEnabled: true,
-      errorMessageProvider: {
-        buildMismatchTokenMessage: (options) => {
-          this.errorlist.push(new JassParserError(JassParserErrorType.MismatchToken, options.actual));
-          return null;
-        },
-        buildNotAllInputParsedMessage: (options) => {
-          console.error("buildNotAllInputParsedMessage");
-          console.log(options);
-          return null;
-        },
-        buildNoViableAltMessage: (options) => {
-          this.errorlist.push(new JassParserError(JassParserErrorType.NoViableAlt, options.previous));
-          return null;
-        },
-        buildEarlyExitMessage: (options) => {
-          console.error("buildEarlyExitMessag");
-          console.log(options);
-          return null;
-        }
-      }
-    });
-    /**@type {JassParserError[]} */
-    __publicField(this, "errorlist", []);
+    super(allTokens);
     const $ = this;
-    $.RULE(parse_rule_name_default.jass, () => $.MANY(() => $.SUBRULE($[parse_rule_name_default.rootstatement])));
-    $.RULE(parse_rule_name_default.rootstatement, () => {
-      $.OR([
-        { ALT: () => $.SUBRULE($[parse_rule_name_default.commentdecl]) },
-        { ALT: () => $.CONSUME(JassTokenMap.linebreak) },
-        { ALT: () => $.SUBRULE($[parse_rule_name_default.typedecl]) },
-        { ALT: () => $.SUBRULE($[parse_rule_name_default.nativedecl]) },
-        { ALT: () => $.SUBRULE($[parse_rule_name_default.funcdecl]) }
-      ]);
+    $.RULE("expression", () => {
+      $.SUBRULE($.additionExpression);
     });
-    $.RULE(parse_rule_name_default.commentdecl, () => $.CONSUME(JassTokenMap.comment));
-    $.RULE(parse_rule_name_default.typedecl, () => {
-      $.CONSUME(JassTokenMap.type);
-      $.CONSUME(JassTokenMap.identifier);
-      $.CONSUME(JassTokenMap.extends);
-      $.CONSUME2(JassTokenMap.identifier);
-      $.OPTION(() => $.SUBRULE($[parse_rule_name_default.commentdecl]));
-      $.SUBRULE($[parse_rule_name_default.terminator]);
-    });
-    $.RULE(parse_rule_name_default.terminator, () => {
-      $.OR([
-        { ALT: () => $.CONSUME(EOF) },
-        { ALT: () => $.CONSUME2(JassTokenMap.linebreak) }
-      ]);
-    });
-    $.RULE(parse_rule_name_default.nativedecl, () => {
-      $.OPTION(() => $.CONSUME(JassTokenMap.constant));
-      $.CONSUME(JassTokenMap.native);
-      $.CONSUME2(JassTokenMap.identifier);
-      $.CONSUME3(JassTokenMap.takes);
-      $.SUBRULE($[parse_rule_name_default.funcarglist]);
-      $.CONSUME4(JassTokenMap.returns);
-      $.SUBRULE($[parse_rule_name_default.funcreturntype]);
-      $.OPTION2(() => $.SUBRULE($[parse_rule_name_default.commentdecl]));
-      $.SUBRULE($[parse_rule_name_default.terminator]);
-    });
-    $.RULE(parse_rule_name_default.funcarglist, () => {
-      $.OR([
-        { ALT: () => $.CONSUME(JassTokenMap.nothing) },
-        {
-          ALT: () => {
-            $.SUBRULE($[parse_rule_name_default.funcarg]);
-            $.MANY(() => {
-              $.CONSUME(JassTokenMap.comma);
-              $.SUBRULE2($[parse_rule_name_default.funcarg]);
-            });
-          }
-        }
-      ]);
-    });
-    $.RULE(parse_rule_name_default.funcarg, () => {
-      $.CONSUME(JassTokenMap.identifier);
-      $.CONSUME2(JassTokenMap.identifier);
-    });
-    $.RULE(parse_rule_name_default.funcreturntype, () => {
-      $.OR([
-        { ALT: () => $.CONSUME(JassTokenMap.nothing) },
-        { ALT: () => $.CONSUME(JassTokenMap.identifier) }
-      ]);
-    });
-    $.RULE(parse_rule_name_default.funcdecl, () => {
-      $.CONSUME(JassTokenMap.function);
-      $.CONSUME2(JassTokenMap.identifier);
-      $.CONSUME3(JassTokenMap.takes);
-      $.SUBRULE($[parse_rule_name_default.funcarglist]);
-      $.CONSUME4(JassTokenMap.returns);
-      $.SUBRULE($[parse_rule_name_default.funcreturntype]);
-      $.OPTION(() => $.SUBRULE($[parse_rule_name_default.commentdecl]));
-      $.CONSUME5(JassTokenMap.linebreak);
-      $.MANY1(() => $.SUBRULE($[parse_rule_name_default.localgroup]));
-      $.MANY2(() => $.SUBRULE($[parse_rule_name_default.statement]));
-      $.CONSUME8(JassTokenMap.endfunction);
-      $.OPTION2(() => $.SUBRULE2($[parse_rule_name_default.commentdecl]));
-      $.SUBRULE($[parse_rule_name_default.terminator]);
-    });
-    $.RULE(parse_rule_name_default.localgroup, () => {
-      $.OR([
-        { ALT: () => $.SUBRULE($[parse_rule_name_default.commentdecl]) },
-        { ALT: () => $.CONSUME(JassTokenMap.linebreak) },
-        { ALT: () => $.SUBRULE($[parse_rule_name_default.localdecl]) }
-      ]);
-    });
-    $.RULE(parse_rule_name_default.localdecl, () => {
-      $.CONSUME(JassTokenMap.local);
-      $.SUBRULE($[parse_rule_name_default.vardecl]);
-    });
-    $.RULE(parse_rule_name_default.vardecl, () => {
-      $.CONSUME(JassTokenMap.identifier);
-      $.CONSUME2(JassTokenMap.identifier);
-      $.OPTION(() => {
-        $.CONSUME3(JassTokenMap.equals);
-        $.SUBRULE($[parse_rule_name_default.expression]);
+    $.RULE("additionExpression", () => {
+      $.SUBRULE($.multiplicationExpression, { LABEL: "lhs" });
+      $.MANY(() => {
+        $.CONSUME(AdditionOperator);
+        $.SUBRULE2($.multiplicationExpression, { LABEL: "rhs" });
       });
-      $.OPTION2(() => $.SUBRULE($[parse_rule_name_default.commentdecl]));
-      $.CONSUME3(JassTokenMap.linebreak);
     });
-    $.RULE(parse_rule_name_default.expression, () => {
-      $.OR([{
-        ALT: () => $.SUBRULE($[parse_rule_name_default.comparator])
-      }]);
-    });
-    $.RULE(parse_rule_name_default.comparator, () => {
-      $.OR([
-        {
-          ALT: () => {
-            $.SUBRULE($[parse_rule_name_default.addition]);
-            $.MANY(() => {
-              $.OR2([
-                { ALT: () => $.CONSUME2(JassTokenMap.equalsequals) },
-                { ALT: () => $.CONSUME2(JassTokenMap.and) },
-                { ALT: () => $.CONSUME2(JassTokenMap.or) },
-                { ALT: () => $.CONSUME3(JassTokenMap.notequals) }
-              ]);
-              $.SUBRULE2($[parse_rule_name_default.addition]);
-            });
-          }
-        }
-      ]);
-    });
-    $.RULE(parse_rule_name_default.addition, () => {
-      $.OR([
-        {
-          ALT: () => {
-            $.SUBRULE($[parse_rule_name_default.multiplication]);
-            $.MANY(() => {
-              $.OR2([
-                { ALT: () => $.CONSUME2(JassTokenMap.add) },
-                { ALT: () => $.CONSUME3(JassTokenMap.sub) }
-              ]);
-              $.SUBRULE2($[parse_rule_name_default.multiplication]);
-            });
-          }
-        }
-      ]);
-    });
-    $.RULE(parse_rule_name_default.multiplication, () => {
-      $.OR([
-        {
-          ALT: () => {
-            $.SUBRULE($[parse_rule_name_default.primary]);
-            $.MANY(() => {
-              $.OR2([
-                { ALT: () => $.CONSUME2(JassTokenMap.mult) },
-                { ALT: () => $.CONSUME3(JassTokenMap.div) }
-              ]);
-              $.SUBRULE2($[parse_rule_name_default.primary]);
-            });
-          }
-        }
-      ]);
-    });
-    $.RULE(parse_rule_name_default.primary, () => {
-      $.OR([
-        {
-          ALT: () => {
-            $.OPTION(() => $.CONSUME(JassTokenMap.sub));
-            $.CONSUME(JassTokenMap.integer);
-          }
-        },
-        {
-          ALT: () => {
-            $.CONSUME(JassTokenMap.not);
-            $.SUBRULE($[parse_rule_name_default.primary]);
-          }
-        },
-        {
-          ALT: () => $.SUBRULE($[parse_rule_name_default.funccall])
-        },
-        {
-          ALT: () => {
-            $.CONSUME(JassTokenMap.lparen);
-            $.SUBRULE2($[parse_rule_name_default.expression]);
-            $.CONSUME(JassTokenMap.rparen);
-          }
-        },
-        {
-          ALT: () => {
-            $.CONSUME3(JassTokenMap.identifier);
-            $.OPTION3(() => $.SUBRULE($[parse_rule_name_default.arrayaccess]));
-          }
-        },
-        {
-          ALT: () => {
-            $.CONSUME(JassTokenMap.function);
-            $.CONSUME4(JassTokenMap.identifier);
-          }
-        },
-        {
-          ALT: () => {
-            $.OPTION2(() => $.CONSUME2(JassTokenMap.sub));
-            $.CONSUME3(JassTokenMap.real);
-          }
-        },
-        {
-          ALT: () => $.CONSUME3(JassTokenMap.idliteral)
-        },
-        {
-          ALT: () => $.CONSUME3(JassTokenMap.stringliteral)
-        }
-      ]);
-    });
-    $.RULE(parse_rule_name_default.arrayaccess, () => {
-      $.CONSUME(JassTokenMap.lsquareparen);
-      $.SUBRULE3($[parse_rule_name_default.expression]);
-      $.CONSUME(JassTokenMap.rsquareparen);
-    });
-    $.RULE(parse_rule_name_default.funccall, () => {
-      $.CONSUME(JassTokenMap.identifier);
-      $.CONSUME2(JassTokenMap.lparen);
-      $.OPTION(() => {
-        $.SUBRULE4($[parse_rule_name_default.expression]);
-        $.MANY(() => {
-          $.CONSUME(JassTokenMap.comma);
-          $.SUBRULE($[parse_rule_name_default.expression]);
-        });
+    $.RULE("multiplicationExpression", () => {
+      $.SUBRULE($.atomicExpression, { LABEL: "lhs" });
+      $.MANY(() => {
+        $.CONSUME(MultiplicationOperator);
+        $.SUBRULE2($.atomicExpression, { LABEL: "rhs" });
       });
-      $.CONSUME3(JassTokenMap.rparen);
     });
-    $.RULE(parse_rule_name_default.statement, () => {
-      $.OR4([
-        { ALT: () => $.SUBRULE($[parse_rule_name_default.commentdecl]) },
-        { ALT: () => $.CONSUME(JassTokenMap.linebreak) },
-        { ALT: () => $.SUBRULE($[parse_rule_name_default.callstatement]) },
-        { ALT: () => $.SUBRULE($[parse_rule_name_default.setstatement]) },
-        { ALT: () => $.SUBRULE($[parse_rule_name_default.loopstatement]) },
-        { ALT: () => $.SUBRULE($[parse_rule_name_default.exitwhenstatement]) },
-        { ALT: () => $.SUBRULE($[parse_rule_name_default.ifstatement]) }
-      ]);
-    });
-    $.RULE(parse_rule_name_default.callstatement, () => {
-      $.CONSUME(JassTokenMap.call);
-      $.SUBRULE($[parse_rule_name_default.funccall]);
-    });
-    $.RULE(parse_rule_name_default.setstatement, () => {
-      $.CONSUME(JassTokenMap.set);
-      $.CONSUME(JassTokenMap.identifier);
-      $.OPTION3(() => $.SUBRULE($[parse_rule_name_default.arrayaccess]));
-      $.CONSUME(JassTokenMap.equals);
+    $.RULE(
+      "atomicExpression",
+      () => $.OR([
+        // parenthesisExpression has the highest precedence and thus it appears
+        // in the "lowest" leaf in the expression ParseTree.
+        { ALT: () => $.SUBRULE($.parenthesisExpression) },
+        { ALT: () => $.CONSUME(NumberLiteral) },
+        { ALT: () => $.SUBRULE($.powerFunction) }
+      ])
+    );
+    $.RULE("parenthesisExpression", () => {
+      $.CONSUME(LParen);
       $.SUBRULE($.expression);
+      $.CONSUME(RParen);
     });
-    $.RULE(parse_rule_name_default.loopstatement, () => {
-      $.CONSUME(JassTokenMap.loop);
-      $.MANY(() => $.SUBRULE($[parse_rule_name_default.statement]));
-      $.CONSUME(JassTokenMap.endloop);
-    });
-    $.RULE(parse_rule_name_default.exitwhenstatement, () => {
-      $.CONSUME(JassTokenMap.exitwhen);
-      $.SUBRULE($[parse_rule_name_default.expression]);
-    });
-    $.RULE(parse_rule_name_default.ifstatement, () => {
-      $.CONSUME(JassTokenMap.if);
-      $.CONSUME(JassTokenMap.lparen);
-      $.SUBRULE9($[parse_rule_name_default.expression]);
-      $.CONSUME(JassTokenMap.rparen);
-      $.CONSUME(JassTokenMap.then);
-      $.MANY(() => $.SUBRULE($[parse_rule_name_default.statement]));
-      $.MANY2(() => $.SUBRULE($[parse_rule_name_default.optionalelseIf]));
-      $.OPTION(() => $.SUBRULE($[parse_rule_name_default.optionalelse]));
-      $.CONSUME(JassTokenMap.endif);
-    });
-    $.RULE(parse_rule_name_default.optionalelseIf, () => {
-      $.CONSUME(JassTokenMap.elseif);
-      $.CONSUME2(JassTokenMap.lparen);
-      $.SUBRULE3($[parse_rule_name_default.expression]);
-      $.CONSUME3(JassTokenMap.rparen);
-      $.CONSUME4(JassTokenMap.then);
-      $.MANY4(() => $.SUBRULE($[parse_rule_name_default.statement]));
-    });
-    $.RULE(parse_rule_name_default.optionalelse, () => {
-      $.CONSUME(JassTokenMap.else);
-      $.MANY(() => $.SUBRULE($[parse_rule_name_default.statement]));
+    $.RULE("powerFunction", () => {
+      $.CONSUME(PowerFunc);
+      $.CONSUME(LParen);
+      $.SUBRULE($.expression, { LABEL: "base" });
+      $.CONSUME(Comma);
+      $.SUBRULE2($.expression, { LABEL: "exponent" });
+      $.CONSUME(RParen);
     });
     this.performSelfAnalysis();
   }
-  set inputText(text) {
-    this.errorlist = [];
-    this.input = JassLexer.tokenize(text).tokens;
-  }
 };
-
-// jass/visitor.mjs
-var parser = new JassParser();
-var ParserVisitor = parser.getBaseCstVisitorConstructor();
-var commentRegex = /^\s*\/+\s*/g;
-var JassVisitor = class extends ParserVisitor {
+var parser = new CalculatorPure([]);
+var BaseCstVisitor = parser.getBaseCstVisitorConstructor();
+var CalculatorInterpreter = class extends BaseCstVisitor {
   constructor() {
     super();
-    /**  @type {JassSemanticHightlight} */
-    __publicField(this, "higlight");
     this.validateVisitor();
   }
-  [parse_rule_name_default.jass](ctx) {
-    return ctx[parse_rule_name_default.rootstatement]?.map((item) => this.visit(item));
+  expression(ctx) {
+    return this.visit(ctx.additionExpression);
   }
-  [parse_rule_name_default.rootstatement](context) {
-    if (context[JassTokenMap.linebreak.name])
-      return null;
-    let ctx;
-    if (ctx = context[parse_rule_name_default.typedecl])
-      return this.visit(ctx);
-    if (ctx = context[parse_rule_name_default.nativedecl])
-      return this.visit(ctx);
-    if (ctx = context[parse_rule_name_default.funcdecl])
-      return this.visit(ctx);
-    if (ctx = context[parse_rule_name_default.commentdecl])
-      return this.visit(ctx);
-  }
-  [parse_rule_name_default.commentdecl](ctx) {
-    this.higlight?.[parse_rule_name_default.commentdecl](ctx);
-    return {
-      "type": parse_rule_name_default.commentdecl,
-      "body": ctx[JassTokenMap.comment.name]?.[0]?.image.replace(commentRegex, "")
-    };
-  }
-  [parse_rule_name_default.terminator]() {
-    return null;
-  }
-  [parse_rule_name_default.typedecl](ctx) {
-    this.higlight?.[parse_rule_name_default.typedecl](ctx);
-    if (ctx[parse_rule_name_default.commentdecl])
-      this.visit(ctx[parse_rule_name_default.commentdecl]);
-    return {
-      type: parse_rule_name_default.typedecl,
-      name: ctx[JassTokenMap.identifier.name]?.[0]?.image,
-      base: ctx[JassTokenMap.identifier.name]?.[1]?.image
-    };
-  }
-  [parse_rule_name_default.nativedecl](ctx) {
-    this.higlight?.[parse_rule_name_default.nativedecl](ctx);
-    if (ctx[parse_rule_name_default.commentdecl])
-      this.visit(ctx[parse_rule_name_default.commentdecl]);
-    return {
-      type: parse_rule_name_default.nativedecl,
-      name: ctx[JassTokenMap.identifier.name]?.[0]?.image,
-      arguments: this.visit(ctx[parse_rule_name_default.funcarglist]),
-      return: this.visit(ctx[parse_rule_name_default.funcreturntype])
-    };
-  }
-  [parse_rule_name_default.funcdecl](ctx) {
-    this.higlight?.[parse_rule_name_default.funcdecl](ctx);
-    if (ctx[parse_rule_name_default.commentdecl])
-      this.visit(ctx[parse_rule_name_default.commentdecl]);
-    return {
-      type: parse_rule_name_default.funcdecl,
-      name: ctx[JassTokenMap.identifier.name]?.[0]?.image,
-      locals: ctx?.[parse_rule_name_default.localgroup]?.map((item) => this.visit(item)),
-      statement: this.visit(ctx[parse_rule_name_default.statement]),
-      arguments: this.visit(ctx[parse_rule_name_default.funcarglist]),
-      return: this.visit(ctx[parse_rule_name_default.funcreturntype])
-    };
-  }
-  [parse_rule_name_default.funcarg](ctx) {
-    const i = ctx[JassTokenMap.identifier.name];
-    if (i?.length !== 2)
-      return;
-    this.higlight?.[parse_rule_name_default.funcarg](i);
-    return [
-      i[0].image,
-      i[1].image
-    ];
-  }
-  [parse_rule_name_default.funcarglist](ctx) {
-    this.higlight?.[parse_rule_name_default.funcarglist](ctx);
-    if (ctx.nothing)
-      return [];
-    return ctx?.[parse_rule_name_default.funcarg]?.map((item) => this.visit(item));
-  }
-  [parse_rule_name_default.funcreturntype](ctx) {
-    let token;
-    if (token = ctx[JassTokenMap.nothing.name]?.[0]) {
-      this.higlight?.[parse_rule_name_default.funcreturntype](token);
-      return token.image;
+  additionExpression(ctx) {
+    let result2 = this.visit(ctx.lhs);
+    if (ctx.rhs) {
+      ctx.rhs.forEach((rhsOperand, idx) => {
+        let rhsValue = this.visit(rhsOperand);
+        let operator = ctx.AdditionOperator[idx];
+        if (tokenMatcher(operator, Plus)) {
+          result2 += rhsValue;
+        } else {
+          result2 -= rhsValue;
+        }
+      });
     }
-    if (token = ctx[JassTokenMap.identifier.name]?.[0]) {
-      this.higlight?.[parse_rule_name_default.funcreturntype](token);
-      return token.image;
+    return result2;
+  }
+  multiplicationExpression(ctx) {
+    let result2 = this.visit(ctx.lhs);
+    if (ctx.rhs) {
+      for (const rhsOperand of ctx.rhs) {
+        const idx = ctx.rhs.indexOf(rhsOperand);
+        let rhsValue = this.visit(rhsOperand);
+        let operator = ctx.MultiplicationOperator[idx];
+        if (tokenMatcher(operator, Multi)) {
+          result2 *= rhsValue;
+        } else {
+          result2 /= rhsValue;
+        }
+      }
     }
-    return null;
+    return result2;
   }
-  [parse_rule_name_default.localgroup](context) {
-    this.higlight?.[parse_rule_name_default.localgroup](context);
-    if (context[JassTokenMap.linebreak.name])
-      return null;
-    let ctx;
-    if (ctx = context[parse_rule_name_default.localdecl])
-      return this.visit(ctx);
-    if (ctx = context[parse_rule_name_default.commentdecl])
-      return this.visit(ctx);
+  atomicExpression(ctx) {
+    if (ctx.parenthesisExpression) {
+      return this.visit(ctx.parenthesisExpression);
+    } else if (ctx.NumberLiteral) {
+      return parseInt(ctx.NumberLiteral[0].image, 10);
+    } else if (ctx.powerFunction) {
+      return this.visit(ctx.powerFunction);
+    }
   }
-  [parse_rule_name_default.localdecl](ctx) {
-    return ctx;
+  parenthesisExpression(ctx) {
+    return this.visit(ctx.expression);
   }
-  [parse_rule_name_default.vardecl](ctx) {
-    return ctx;
-  }
-  [parse_rule_name_default.expression](ctx) {
-    return ctx;
-  }
-  [parse_rule_name_default.comparator](ctx) {
-    return ctx;
-  }
-  [parse_rule_name_default.addition](ctx) {
-    return ctx;
-  }
-  [parse_rule_name_default.multiplication](ctx) {
-    return ctx;
-  }
-  [parse_rule_name_default.primary](ctx) {
-    return ctx;
-  }
-  [parse_rule_name_default.arrayaccess](ctx) {
-    return ctx;
-  }
-  [parse_rule_name_default.funccall](ctx) {
-    return ctx;
-  }
-  [parse_rule_name_default.statement](ctx) {
-    return ctx[parse_rule_name_default.localdecl]?.map((item) => this.visit(item));
-  }
-  [parse_rule_name_default.callstatement](ctx) {
-    return ctx;
-  }
-  [parse_rule_name_default.setstatement](ctx) {
-    return ctx;
-  }
-  [parse_rule_name_default.loopstatement](ctx) {
-    return ctx;
-  }
-  [parse_rule_name_default.exitwhenstatement](ctx) {
-    return ctx;
-  }
-  [parse_rule_name_default.ifstatement](ctx) {
-    return ctx;
-  }
-  [parse_rule_name_default.optionalelseIf](ctx) {
-    return ctx;
-  }
-  [parse_rule_name_default.optionalelse](ctx) {
-    return ctx;
+  powerFunction(ctx) {
+    const base = this.visit(ctx.base);
+    const exponent = this.visit(ctx.exponent);
+    return Math.pow(base, exponent);
   }
 };
-
-// docs/main.mjs
-var parser2 = new JassParser();
 var iframe = document.createElement("iframe");
-iframe.src = "data:text/html;charset=utf-8," + encodeURI(createSyntaxDiagramsCode(parser2.getSerializedGastProductions()));
+iframe.src = "data:text/html;charset=utf-8," + encodeURI(createSyntaxDiagramsCode(parser.getSerializedGastProductions()));
 document.body.appendChild(iframe);
-(async () => {
-  const visitor = new JassVisitor();
-  const request = await fetch("test.txt");
-  parser2.inputText = await request.text();
-  const result = visitor.visit(parser2.jass());
-  for (const error of parser2.errorlist)
-    console.warn(error);
-  console.log(result);
-})();
+var visitor = new CalculatorInterpreter();
+var text = "2 + 3 * 4";
+parser.input = CalculatorLexer.tokenize(text).tokens;
+console.log(parser.errors);
+var result = visitor.visit(parser.expression());
+console.log(result);
 /*! Bundled license information:
 
 lodash-es/lodash.js:

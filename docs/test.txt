@@ -1,11 +1,15 @@
-type d
 
-function MyFunc takes integer a, real b returns nothing
-local integer           a =      1
-call Test()
+function MyFunc takes real a, real w, real real returns nothing
 
+    local unit a = 23333
 
+    // ddwdwdwdwd
 
-local integer b = 1
+    // 2eee
+
+    local unit d = 4444 + -2222+3444-1/(2+34 - test(a(b+d())))/22
+
 
 endfunction
+
+

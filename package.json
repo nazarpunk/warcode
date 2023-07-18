@@ -23,6 +23,7 @@
   },
   "main": "./out/extension.js",
   "scripts": {
+    "esbuild-chevrotain-calculator": "esbuild docs/calculator/main.mjs --outfile=docs/calculator/out/main.mjs --target=es2020 --bundle --external:vscode --format=cjs --platform=browser --tree-shaking=true --sourcemap --watch",
     "esbuild-chevrotain": "esbuild docs/main.mjs --outfile=docs/out/main.mjs --target=es2020 --bundle --external:vscode --format=cjs --platform=browser --tree-shaking=true --sourcemap --watch",
     "vscode:prepublish": "npm run esbuild-base",
     "build": "vsce package",
@@ -35,16 +36,28 @@
   "contributes": {
     "semanticTokenTypes": [
       {
-        "id": "jass_linecomment",
-        "description": "jass_linecomment"
-      },
-      {
-        "id": "jass_typedef_comment",
-        "description": "jass_typedef_comment"
+        "id": "jass_comment",
+        "description": "jass_comment"
       },
       {
         "id": "jass_type",
         "description": "jass_type"
+      },
+      {
+        "id": "jass_function",
+        "description": "jass_function"
+      },
+      {
+        "id": "jass_function_native",
+        "description": "jass_function_native"
+      },
+      {
+        "id": "jass_argument",
+        "description": "jass_argument"
+      },
+      {
+        "id": "jass_comma",
+        "description": "jass_comma"
       },
       {
         "id": "jass_type_keyword",
@@ -63,46 +76,39 @@
         "description": "jass_native_keyword"
       },
       {
-        "id": "jass_function",
-        "description": "jass_function"
+        "id": "jass_function_keyword",
+        "description": "jass_function_keyword"
+      },
+      {
+        "id": "jass_endfunction_keyword",
+        "description": "jass_endfunction_keyword"
       },
       {
         "id": "jass_takes_keyword",
         "description": "jass_takes_keyword"
       },
       {
-        "id": "jass_argument",
-        "description": "jass_argument"
-      },
-      {
-        "id": "jass_comma",
-        "description": "jass_comma"
-      },
-      {
         "id": "jass_returns_keyword",
         "description": "jass_returns_keyword"
-      },
-      {
-        "id": "jass_test_keyword",
-        "description": "jass_test_keyword"
       }
     ],
     "configurationDefaults": {
       "editor.semanticTokenColorCustomizations": {
         "rules": {
-          "jass_linecomment": "#308030",
-          "jass_typedef_comment": "#608030",
-          "jass_type": "#28edcf",
-          "jass_type_keyword": "#d3acf6",
-          "jass_extends_keyword": "#d3acf6",
-          "jass_constant_keyword": "#05ef09",
-          "jass_native_keyword": "#bb73ff",
-          "jass_function": "#f5ec70",
-          "jass_takes_keyword": "#8b78f8",
-          "jass_argument": "#d4dd27",
-          "jass_comma": "#868681",
-          "jass_returns_keyword": "#8e73ca",
-          "jass_test_keyword": "#8e73ca"
+          "jass_comment": "#308030",
+          "jass_type": "#4EC9B0",
+          "jass_function": "#DCDCAA",
+          "jass_function_native": "#C586C0",
+          "jass_argument": "#9CDCDA",
+          "jass_comma": "#FFFFFF",
+          "jass_type_keyword": "#2C7AD6",
+          "jass_extends_keyword": "#2C7AD6",
+          "jass_constant_keyword": "#2C7AD6",
+          "jass_native_keyword": "#2C7AD6",
+          "jass_function_keyword": "#2C7AD6",
+          "jass_endfunction_keyword": "#2C7AD6",
+          "jass_takes_keyword": "#2C7AD6",
+          "jass_returns_keyword": "#2C7AD6"
         }
       }
     },
@@ -133,10 +139,10 @@
     }
   },
   "devDependencies": {
-    "chevrotain": "^11.0.0",
-    "esbuild": "^0.18.11",
-    "vsce": "^2.15.0",
-    "vscode": "^1.1.37"
+    "chevrotain": "^11.0.1",
+    "esbuild": "^0.18.14",
+    "@vscode/vsce": "^2.15.0",
+    "@types/vscode": "^1.80.0"
   },
   "engines": {
     "vscode": "^1.80.0"

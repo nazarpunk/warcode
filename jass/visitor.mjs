@@ -7,7 +7,7 @@ import {JassTokenMap} from "./lexer.mjs";
 const parser = new JassParser();
 const ParserVisitor = parser.getBaseCstVisitorConstructor();
 
-const commentRegex = /^\s*\/\/\s*/g;
+const commentRegex = /^\s*\/+\s*/g;
 
 export class JassVisitor extends ParserVisitor {
     constructor() {
@@ -27,12 +27,14 @@ export class JassVisitor extends ParserVisitor {
         if (ctx = context[ParseRuleName.typedecl]) return this.visit(ctx);
         if (ctx = context[ParseRuleName.nativedecl]) return this.visit(ctx);
         if (ctx = context[ParseRuleName.funcdecl]) return this.visit(ctx);
-        if (ctx = context[JassTokenMap.linecomment.name]?.[0]) {
-            this.higlight?.[JassTokenMap.linecomment.name](ctx);
-            return {
-                'type': JassTokenMap.linecomment.name,
-                'body': ctx.image.replace(commentRegex, '')
-            }
+        if (ctx = context[ParseRuleName.commentdecl]) return this.visit(ctx);
+    }
+
+    [ParseRuleName.commentdecl](ctx) {
+        this.higlight?.[ParseRuleName.commentdecl](ctx);
+        return {
+            'type': ParseRuleName.commentdecl,
+            'body': ctx[JassTokenMap.comment.name]?.[0]?.image.replace(commentRegex, '')
         }
     }
 
@@ -42,16 +44,17 @@ export class JassVisitor extends ParserVisitor {
 
     [ParseRuleName.typedecl](ctx) {
         this.higlight?.[ParseRuleName.typedecl](ctx);
+        if (ctx[ParseRuleName.commentdecl]) this.visit(ctx[ParseRuleName.commentdecl]);
         return {
             type: ParseRuleName.typedecl,
             name: ctx[JassTokenMap.identifier.name]?.[0]?.image,
             base: ctx[JassTokenMap.identifier.name]?.[1]?.image,
-            comment: ctx[JassTokenMap.linecomment.name]?.[0]?.image.replace(commentRegex, '')
         }
     }
 
     [ParseRuleName.nativedecl](ctx) {
         this.higlight?.[ParseRuleName.nativedecl](ctx);
+        if (ctx[ParseRuleName.commentdecl]) this.visit(ctx[ParseRuleName.commentdecl]);
         return {
             type: ParseRuleName.nativedecl,
             name: ctx[JassTokenMap.identifier.name]?.[0]?.image,
@@ -61,12 +64,12 @@ export class JassVisitor extends ParserVisitor {
     }
 
     [ParseRuleName.funcdecl](ctx) {
-        console.log('--funcdecl', ctx);
         this.higlight?.[ParseRuleName.funcdecl](ctx);
-
+        if (ctx[ParseRuleName.commentdecl]) this.visit(ctx[ParseRuleName.commentdecl]);
         return {
             type: ParseRuleName.funcdecl,
             name: ctx[JassTokenMap.identifier.name]?.[0]?.image,
+            locals: ctx?.[ParseRuleName.localgroup]?.map(item => this.visit(item)),
             statement: this.visit(ctx[ParseRuleName.statement]),
             arguments: this.visit(ctx[ParseRuleName.funcarglist]),
             return: this.visit(ctx[ParseRuleName.funcreturntype]),
@@ -92,12 +95,13 @@ export class JassVisitor extends ParserVisitor {
 
     [ParseRuleName.funcreturntype](ctx) {
         let token;
+
         if (token = ctx[JassTokenMap.nothing.name]?.[0]) {
             this.higlight?.[ParseRuleName.funcreturntype](token);
             return token.image;
         }
 
-        if (token = ctx[JassTokenMap.identifier.name]) {
+        if (token = ctx[JassTokenMap.identifier.name]?.[0]) {
             this.higlight?.[ParseRuleName.funcreturntype](token);
             return token.image;
         }
@@ -105,8 +109,12 @@ export class JassVisitor extends ParserVisitor {
         return null;
     }
 
-    [ParseRuleName.localgroup](ctx) {
-        return ctx;
+    [ParseRuleName.localgroup](context) {
+        this.higlight?.[ParseRuleName.localgroup](context);
+        if (context[JassTokenMap.linebreak.name]) return null;
+        let ctx;
+        if (ctx = context[ParseRuleName.localdecl]) return this.visit(ctx);
+        if (ctx = context[ParseRuleName.commentdecl]) return this.visit(ctx);
     }
 
     [ParseRuleName.localdecl](ctx) {
@@ -146,7 +154,7 @@ export class JassVisitor extends ParserVisitor {
     }
 
     [ParseRuleName.statement](ctx) {
-        return ctx;
+        return ctx[ParseRuleName.localdecl]?.map(item => this.visit(item));
     }
 
     [ParseRuleName.callstatement](ctx) {

@@ -1,16 +1,9 @@
 import {JassParser, JassParserErrorType} from "../../jass/parser.mjs";
 import {JassVisitor} from "../../jass/visitor.mjs";
-import {DiagnosticSeverity, languages, Position, Range} from "vscode";
+// noinspection NpmUsedModulesInstalled
+import {DiagnosticSeverity, languages} from "vscode";
 import JassSemanticHightlight from "./jass-semantic-hightlight.mjs";
-
-/**
- * @param {import('chevrotain').IToken} token
- * @return {Range}
- */
-const IToken2Range = token => new Range(
-    new Position(token.startLine - 1, token.startColumn - 1),
-    new Position(token.endLine - 1, token.endColumn),
-);
+import ITokenToRange from "../utils/i-token-to-range.mjs";
 
 /** @implements {DocumentSemanticTokensProvider} */
 export class JassDocumentSemanticTokensProvider {
@@ -42,6 +35,8 @@ export class JassDocumentSemanticTokensProvider {
         console.log('provideDocumentSemanticTokens');
         const text = document.getText();
 
+        this.#collection.clear();
+
         const highlight = new JassSemanticHightlight();
         this.#visitor.higlight = highlight;
         this.#visitor.builder = highlight.builder;
@@ -54,24 +49,21 @@ export class JassDocumentSemanticTokensProvider {
             console.error(e);
         }
 
-        this.#collection.clear();
-
-        /** @type {Diagnostic[]} */ const diagnostics = [];
 
         for (const error of this.#parser.errorlist) {
             switch (error.type) {
                 case JassParserErrorType.NoViableAlt:
                 case JassParserErrorType.MismatchToken:
-                    diagnostics.push({
+                    highlight.diagnostics.push({
                         message: error.type,
-                        range: IToken2Range(error.token),
+                        range: ITokenToRange(error.token),
                         severity: DiagnosticSeverity.Error,
                     });
                     break;
             }
         }
 
-        if (diagnostics.length > 0) this.#collection.set(document.uri, diagnostics);
+        if (highlight.diagnostics.length > 0) this.#collection.set(document.uri, highlight.diagnostics);
 
         return highlight.build();
     }

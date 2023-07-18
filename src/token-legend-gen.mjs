@@ -7,72 +7,68 @@ import fs from 'fs';
  * @prop {string} color
  */
 
-/**
- *
- * @type {SemanticTokenRuleJson[]}
- */
+const keyword = '#2C7AD6';
+
+// noinspection JSValidateTypes
+/** @type {SemanticTokenRuleJson[]} */
 const ruledef = [
     {
-        id: 'jass_linecomment',
-        description: 'jass_linecomment',
+        id: 'jass_comment',
         color: '#308030'
     },
     {
-        id: 'jass_typedef_comment',
-        description: 'jass_typedef_comment',
-        color: '#608030',
-    },
-    {
         id: 'jass_type',
-        description: 'jass_type',
-        color: '#28edcf',
-    },
-    {
-        id: 'jass_type_keyword',
-        description: 'jass_type_keyword',
-        color: '#d3acf6',
-    },
-    {
-        id: 'jass_extends_keyword',
-        description: 'jass_extends_keyword',
-        color: '#d3acf6',
-
-    },
-    {
-        id: 'jass_constant_keyword',
-        description: 'jass_constant_keyword',
-        color: '#05ef09',
-    },
-    {
-        id: 'jass_native_keyword',
-        description: 'jass_native_keyword',
-        color: '#bb73ff',
+        color: '#4EC9B0',
     },
     {
         id: 'jass_function',
-        description: 'jass_function',
-        color: '#f5ec70',
+        color: '#DCDCAA',
     },
     {
-        id: 'jass_takes_keyword',
-        description: 'jass_takes_keyword',
-        color: '#8b78f8',
+        id: 'jass_function_native',
+        color: '#C586C0',
     },
     {
         id: 'jass_argument',
-        description: 'jass_argument',
-        color: '#d4dd27',
+        color: '#9CDCDA',
     },
     {
         id: 'jass_comma',
-        description: 'jass_comma',
-        color: '#868681',
+        color: '#FFFFFF',
+    },
+    // keyword
+    {
+        id: 'jass_type_keyword',
+        color: keyword,
+    },
+    {
+        id: 'jass_extends_keyword',
+        color: keyword,
+    },
+    {
+        id: 'jass_constant_keyword',
+        color: keyword,
+    },
+    {
+        id: 'jass_native_keyword',
+        color: keyword,
+    },
+    {
+        id: 'jass_function_keyword',
+        color: keyword,
+    },
+    {
+        id: 'jass_endfunction_keyword',
+        color: keyword,
+    },
+    {
+        id: 'jass_takes_keyword',
+        color: keyword,
     },
     {
         id: 'jass_returns_keyword',
-        description: 'jass_returns_keyword',
-        color: '#8e73ca',
-    }
+        color: keyword,
+    },
 ];
 
 const packagePath = '../package.json';
@@ -92,6 +88,8 @@ const legendList = []
 
 fs.writeFileSync(legendPath, `export const TokenLegend = {\n`, {flag: 'w+'});
 for (const rule of ruledef) {
+    rule.description ??= rule.id;
+
     semanticTokenColorCustomizations.rules[rule.id] = rule.color;
     delete rule.color;
     contributes['semanticTokenTypes'].push(rule);

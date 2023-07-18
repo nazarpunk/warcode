@@ -27,4 +27,5 @@ export default {
     terminator: 'terminator',
     typedecl: 'typedecl',
     vardecl: 'vardecl',
+    commentdecl: 'commentdecl',
 }
