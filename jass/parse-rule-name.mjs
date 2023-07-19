@@ -28,4 +28,5 @@ export default {
     typedecl: 'typedecl',
     vardecl: 'vardecl',
     commentdecl: 'commentdecl',
+    globalsdecl: 'globalsdecl',
 }

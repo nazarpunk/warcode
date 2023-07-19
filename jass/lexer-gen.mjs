@@ -22,6 +22,18 @@ const tokenList = [
         line_breaks: false,
     },
     {
+        name: 'globals',
+        pattern: /\bglobals\b/,
+        start_chars_hint: ['g'],
+        line_breaks: false,
+    },
+    {
+        name: 'endglobals',
+        pattern: /\bendglobals\b/,
+        start_chars_hint: ['e'],
+        line_breaks: false,
+    },
+    {
         name: 'extends',
         pattern: /\bextends\b/,
         start_chars_hint: ['e'],

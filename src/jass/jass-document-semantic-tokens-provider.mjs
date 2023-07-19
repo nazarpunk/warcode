@@ -51,11 +51,13 @@ export class JassDocumentSemanticTokensProvider {
             switch (error.type) {
                 case JassParserErrorType.NoViableAlt:
                 case JassParserErrorType.MismatchToken:
-                    this.#visitor.diagnostics.push({
-                        message: error.type,
-                        range: ITokenToRange(error.token),
-                        severity: DiagnosticSeverity.Error,
-                    });
+                    if (0) {
+                        this.#visitor.diagnostics.push({
+                            message: error.type,
+                            range: ITokenToRange(error.token),
+                            severity: DiagnosticSeverity.Error,
+                        });
+                    }
                     break;
             }
         }

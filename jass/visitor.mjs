@@ -26,7 +26,7 @@ export class JassVisitor extends ParserVisitor {
      */
     #mark = (location, type) => {
         if (this.builder === null) return;
-        if (location === undefined) return;
+        if (!location) return;
         this.builder?.push(
             location.startLine - 1,
             location.startColumn - 1,
@@ -46,6 +46,7 @@ export class JassVisitor extends ParserVisitor {
         if (node = ctx[ParseRuleName.nativedecl]) return this.visit(node);
         if (node = ctx[ParseRuleName.funcdecl]) return this.visit(node);
         if (node = ctx[ParseRuleName.commentdecl]) return this.visit(node);
+        if (node = ctx[ParseRuleName.globalsdecl]) return this.visit(node);
     }
 
     /** @param {import('chevrotain').CstNode} ctx */
@@ -57,6 +58,28 @@ export class JassVisitor extends ParserVisitor {
 
     [ParseRuleName.terminator]() {
         return null;
+    }
+
+    [ParseRuleName.globalsdecl](ctx) {
+
+        // TODO globals keyword
+        this.#mark(ctx[JassTokenMap.globals.name]?.[0], TokenLegend.jass_local_keyword);
+        this.#mark(ctx[JassTokenMap.endglobals.name]?.[0], TokenLegend.jass_local_keyword);
+
+        ctx[ParseRuleName.commentdecl]?.map(item => this.visit(item));
+
+        const vardecl = ctx[ParseRuleName.vardecl];
+
+        if (vardecl) for (const vd of vardecl) {
+            const typedname = this.visit(vd)?.[ParseRuleName.typedname];
+            if (typedname) {
+                const {type, name} = typedname;
+                this.#mark(type, TokenLegend.jass_type);
+                this.#mark(name, TokenLegend.jass_variable);
+            }
+        }
+
+        return ctx;
     }
 
     [ParseRuleName.typedecl](ctx) {
@@ -239,30 +262,41 @@ export class JassVisitor extends ParserVisitor {
     }
 
     [ParseRuleName.vardecl](ctx) {
+        this.#mark(ctx[JassTokenMap.constant.name]?.[0], TokenLegend.jass_constant_keyword);
         this.#mark(ctx[JassTokenMap.equals.name]?.[0], TokenLegend.jass_operator);
         this.visit(ctx[ParseRuleName.commentdecl]);
+        this.visit(ctx[ParseRuleName.expression]);
         return {
             [ParseRuleName.typedname]: this.visit(ctx[ParseRuleName.typedname]),
         };
     }
 
     [ParseRuleName.expression](ctx) {
-        return ctx;
+        return this.visit(ctx[ParseRuleName.comparator]);
     }
 
     [ParseRuleName.comparator](ctx) {
+        this.visit(ctx[ParseRuleName.addition]);
         return ctx;
     }
 
     [ParseRuleName.addition](ctx) {
+        ctx[JassTokenMap.add.name]?.map(item => this.#mark(item, TokenLegend.jass_operator));
+        ctx[JassTokenMap.sub.name]?.map(item => this.#mark(item, TokenLegend.jass_operator));
+        this.visit(ctx[ParseRuleName.multiplication]);
         return ctx;
     }
 
     [ParseRuleName.multiplication](ctx) {
+        ctx[JassTokenMap.mult.name]?.map(item => this.#mark(item, TokenLegend.jass_operator));
+        ctx[JassTokenMap.div.name]?.map(item => this.#mark(item, TokenLegend.jass_operator));
+        //console.log('multiplication', ctx);
+        this.visit(ctx[ParseRuleName.primary]);
         return ctx;
     }
 
     [ParseRuleName.primary](ctx) {
+        //console.log('primary', ctx);
         return ctx;
     }
 

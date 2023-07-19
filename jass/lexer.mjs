@@ -18,6 +18,18 @@ export const JassTokenMap = {
         start_chars_hint: ["t"],
         line_breaks: false,
     }),
+    globals: createToken({
+        name: 'globals',
+        pattern: /\bglobals\b/,
+        start_chars_hint: ["g"],
+        line_breaks: false,
+    }),
+    endglobals: createToken({
+        name: 'endglobals',
+        pattern: /\bendglobals\b/,
+        start_chars_hint: ["e"],
+        line_breaks: false,
+    }),
     extends: createToken({
         name: 'extends',
         pattern: /\bextends\b/,
@@ -269,7 +281,7 @@ export const JassTokenMap = {
 }
 
 /** @type {import('chevrotain').TokenType[]} */
-export const JassTokenList = [JassTokenMap.whitespace, JassTokenMap.comment, JassTokenMap.type, JassTokenMap.extends, JassTokenMap.constant, JassTokenMap.native, JassTokenMap.function, JassTokenMap.takes, JassTokenMap.nothing, JassTokenMap.returns, JassTokenMap.local, JassTokenMap.and, JassTokenMap.or, JassTokenMap.call, JassTokenMap.not, JassTokenMap.set, JassTokenMap.loop, JassTokenMap.then, JassTokenMap.exitwhen, JassTokenMap.endloop, JassTokenMap.elseif, JassTokenMap.else, JassTokenMap.endif, JassTokenMap.endfunction, JassTokenMap.comma, JassTokenMap.equalsequals, JassTokenMap.equals, JassTokenMap.notequals, JassTokenMap.add, JassTokenMap.sub, JassTokenMap.mult, JassTokenMap.div, JassTokenMap.if, JassTokenMap.stringliteral, JassTokenMap.lparen, JassTokenMap.rparen, JassTokenMap.lsquareparen, JassTokenMap.rsquareparen, JassTokenMap.idliteral, JassTokenMap.integer, JassTokenMap.real, JassTokenMap.linebreak, JassTokenMap.identifier];
+export const JassTokenList = [JassTokenMap.whitespace, JassTokenMap.comment, JassTokenMap.type, JassTokenMap.globals, JassTokenMap.endglobals, JassTokenMap.extends, JassTokenMap.constant, JassTokenMap.native, JassTokenMap.function, JassTokenMap.takes, JassTokenMap.nothing, JassTokenMap.returns, JassTokenMap.local, JassTokenMap.and, JassTokenMap.or, JassTokenMap.call, JassTokenMap.not, JassTokenMap.set, JassTokenMap.loop, JassTokenMap.then, JassTokenMap.exitwhen, JassTokenMap.endloop, JassTokenMap.elseif, JassTokenMap.else, JassTokenMap.endif, JassTokenMap.endfunction, JassTokenMap.comma, JassTokenMap.equalsequals, JassTokenMap.equals, JassTokenMap.notequals, JassTokenMap.add, JassTokenMap.sub, JassTokenMap.mult, JassTokenMap.div, JassTokenMap.if, JassTokenMap.stringliteral, JassTokenMap.lparen, JassTokenMap.rparen, JassTokenMap.lsquareparen, JassTokenMap.rsquareparen, JassTokenMap.idliteral, JassTokenMap.integer, JassTokenMap.real, JassTokenMap.linebreak, JassTokenMap.identifier];
 
 export const JassLexer = new Lexer(JassTokenList);
 for (const error of JassLexer.lexerDefinitionErrors) console.error(error);
