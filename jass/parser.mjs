@@ -103,17 +103,17 @@ export class JassParser extends CstParser {
                 {ALT: () => $.CONSUME(JassTokenMap.nothing)},
                 {
                     ALT: () => {
-                        $.SUBRULE($[ParseRuleName.funcarg])
+                        $.SUBRULE($[ParseRuleName.typedname])
                         $.MANY(() => {
                             $.CONSUME(JassTokenMap.comma);
-                            $.SUBRULE2($[ParseRuleName.funcarg]);
+                            $.SUBRULE2($[ParseRuleName.typedname]);
                         })
                     }
                 },
             ]);
         });
 
-        $.RULE(ParseRuleName.funcarg, () => {
+        $.RULE(ParseRuleName.typedname, () => {
             $.CONSUME(JassTokenMap.identifier)
             $.CONSUME2(JassTokenMap.identifier)
         });
@@ -155,8 +155,7 @@ export class JassParser extends CstParser {
         });
 
         $.RULE(ParseRuleName.vardecl, () => {
-            $.CONSUME(JassTokenMap.identifier)
-            $.CONSUME2(JassTokenMap.identifier)
+            $.SUBRULE($[ParseRuleName.typedname]);
             $.OPTION(() => {
                 $.CONSUME3(JassTokenMap.equals)
                 $.SUBRULE($[ParseRuleName.expression])

@@ -64,6 +64,10 @@
         "description": "jass_variable"
       },
       {
+        "id": "jass_operator",
+        "description": "jass_operator"
+      },
+      {
         "id": "jass_type_keyword",
         "description": "jass_type_keyword"
       },
@@ -110,6 +114,7 @@
           "jass_argument": "#9CDCDA",
           "jass_comma": "#FFFFFF",
           "jass_variable": "#94d564",
+          "jass_operator": "#e7be60",
           "jass_type_keyword": "#2C7AD6",
           "jass_local_keyword": "#2C7AD6",
           "jass_extends_keyword": "#2C7AD6",

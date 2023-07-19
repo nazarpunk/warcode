@@ -40,6 +40,10 @@ const ruledef = [
         id: 'jass_variable',
         color: '#94d564',
     },
+    {
+        id: 'jass_operator',
+        color: '#e7be60',
+    },
     // keyword
     {
         id: 'jass_type_keyword',

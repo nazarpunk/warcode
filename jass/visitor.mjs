@@ -52,10 +52,7 @@ export class JassVisitor extends ParserVisitor {
     [ParseRuleName.commentdecl](ctx) {
         const comment = ctx[JassTokenMap.comment.name]?.[0];
         this.#mark(comment, TokenLegend.jass_comment);
-        return {
-            'type': ParseRuleName.commentdecl,
-            'body': comment?.image.replace(/^\s*\/+\s*/g, '')
-        }
+        return comment?.image.replace(/^\s*\/+\s*/g, '');
     }
 
     [ParseRuleName.terminator]() {
@@ -74,7 +71,6 @@ export class JassVisitor extends ParserVisitor {
 
         this.visit(ctx[ParseRuleName.commentdecl]);
         return {
-            type: ParseRuleName.typedecl,
             name: name?.image,
             base: base?.image,
         }
@@ -91,7 +87,6 @@ export class JassVisitor extends ParserVisitor {
 
         this.visit(ctx[ParseRuleName.commentdecl]);
         return {
-            type: ParseRuleName.nativedecl,
             name: name?.image,
             arguments: this.visit(ctx[ParseRuleName.funcarglist]),
             return: this.visit(ctx[ParseRuleName.funcreturntype]),
@@ -99,57 +94,104 @@ export class JassVisitor extends ParserVisitor {
     }
 
     [ParseRuleName.funcdecl](ctx) {
-        const name = ctx[JassTokenMap.identifier.name]?.[0];
-
         this.#mark(ctx[JassTokenMap.function.name]?.[0], TokenLegend.jass_function_keyword);
-        this.#mark(name, TokenLegend.jass_function);
+        this.#mark(ctx[JassTokenMap.identifier.name]?.[0], TokenLegend.jass_function);
         this.#mark(ctx[JassTokenMap.takes.name]?.[0], TokenLegend.jass_takes_keyword);
         this.#mark(ctx[JassTokenMap.returns.name]?.[0], TokenLegend.jass_returns_keyword);
         this.#mark(ctx[JassTokenMap.endfunction.name]?.[0], TokenLegend.jass_endfunction_keyword);
 
         this.visit(ctx[ParseRuleName.commentdecl]);
 
-        const locals = ctx?.[ParseRuleName.localgroup]?.map(item => this.visit(item));
-        console.log('===', locals);
+        const locals = ctx?.[ParseRuleName.localgroup];
+
+        // argument
+        /** @type {Object.<string,import('chevrotain').IToken[]>}*/
+        const args = this.visit(ctx[ParseRuleName.funcarglist]);
+
+        // locals, check locals with same name, check local redeclare argument
+        if (locals) {
+            /** @type {Object.<string,import('chevrotain').IToken[]>}*/
+            const localMap = {};
+
+            for (const local of locals) {
+                const typedname = this.visit(local)?.[ParseRuleName.typedname];
+                if (!typedname) continue;
+                const {type, name} = typedname;
+                this.#mark(type, TokenLegend.jass_type);
+                this.#mark(name, TokenLegend.jass_variable);
+                if (name) {
+                    (localMap[name.image] ??= []).push(name);
+                    const argList = args.map[name.image];
+                    if (argList) for (const t of [name, ...argList]) {
+                        this.diagnostics?.push({
+                            message: `Local variable redeclare argument: ${t.image}`,
+                            range: ITokenToRange(t),
+                            severity: DiagnosticSeverity.Warning,
+                        });
+                    }
+                }
+            }
+
+            for (const v of Object.values(localMap)) {
+                if (v.length < 2) continue;
+                for (const t of v) {
+                    this.diagnostics?.push({
+                        message: `Local variable with same name: ${t.image}`,
+                        range: ITokenToRange(t),
+                        severity: DiagnosticSeverity.Warning,
+                    });
+                }
+            }
+        }
 
         return {
-            type: ParseRuleName.funcdecl,
-            name: name?.image,
-            locals: locals,
             statement: this.visit(ctx[ParseRuleName.statement]),
-            arguments: this.visit(ctx[ParseRuleName.funcarglist]),
             return: this.visit(ctx[ParseRuleName.funcreturntype]),
         };
     }
 
-    [ParseRuleName.funcarg](ctx) {
-        const t = ctx[JassTokenMap.identifier.name];
-        if (t?.length !== 2) return null;
-        this.#mark(t[0], TokenLegend.jass_type);
-        this.#mark(t[1], TokenLegend.jass_argument);
-        return t;
+    [ParseRuleName.typedname](ctx) {
+        const list = ctx[JassTokenMap.identifier.name];
+        let [type, name] = list;
+        if (type.isInsertedInRecovery) type = null;
+        if (name.isInsertedInRecovery) name = null;
+        return {
+            type: type,
+            name: name,
+        };
     }
 
     [ParseRuleName.funcarglist](ctx) {
-        if (ctx.nothing) return [];
-        if (ctx[JassTokenMap.comma.name]) for (const comma of ctx[JassTokenMap.comma.name]) {
+        let token;
+
+        // nothing
+        if (token = ctx?.[JassTokenMap.nothing.name]?.[0]) {
+            this.#mark(token, TokenLegend.jass_type);
+            return {map: {}, list: []};
+        }
+
+        // commas
+        if (token = ctx[JassTokenMap.comma.name]) for (const comma of token) {
             this.#mark(comma, TokenLegend.jass_comma);
         }
 
-        // check same argument name
+        // args
         /** @type {import('chevrotain').IToken[][]} */
-        const args = ctx?.[ParseRuleName.funcarg]?.map(item => this.visit(item));
+        const args = ctx?.[ParseRuleName.typedname]?.map(item => this.visit(item));
+
+        /** @type {Object.<string,import('chevrotain').IToken[]>}*/
+        const argMap = {};
+
+        // typedname, check type same name
         if (args) {
-            /** @type {Object.<string,import('chevrotain').IToken[]>}*/
-            const obj = {};
             for (const arg of args) {
-                if (!arg || arg.length !== 2) continue;
-                const [type, name] = arg;
-                if (type.isInsertedInRecovery || name.isInsertedInRecovery) continue;
-                (obj[name.image] ??= []).push(name);
+                const {type, name} = arg;
+                this.#mark(type, TokenLegend.jass_type);
+                this.#mark(name, TokenLegend.jass_argument);
+                if (name) (argMap[name.image] ??= []).push(name);
             }
 
-            for (const v of Object.values(obj)) {
+            for (const v of Object.values(argMap)) {
                 if (v.length < 2) continue;
                 for (const t of v) {
                     this.diagnostics?.push({
@@ -161,11 +203,11 @@ export class JassVisitor extends ParserVisitor {
             }
         }
 
-        // mark
-        this.#mark(ctx?.[JassTokenMap.nothing.name]?.[0], TokenLegend.jass_type);
-
         // return
-        return args;
+        return {
+            map: argMap,
+            list: args,
+        };
     }
 
     [ParseRuleName.funcreturntype](ctx) {
@@ -185,8 +227,6 @@ export class JassVisitor extends ParserVisitor {
     }
 
     [ParseRuleName.localgroup](context) {
-        console.log('--localgroup', context);
-
         if (context[JassTokenMap.linebreak.name]) return null;
         let ctx;
         if (ctx = context[ParseRuleName.localdecl]) return this.visit(ctx);
@@ -199,9 +239,11 @@ export class JassVisitor extends ParserVisitor {
     }
 
     [ParseRuleName.vardecl](ctx) {
+        this.#mark(ctx[JassTokenMap.equals.name]?.[0], TokenLegend.jass_operator);
         this.visit(ctx[ParseRuleName.commentdecl]);
-        console.log('--vardecl', ctx);
-        return ctx;
+        return {
+            [ParseRuleName.typedname]: this.visit(ctx[ParseRuleName.typedname]),
+        };
     }
 
     [ParseRuleName.expression](ctx) {

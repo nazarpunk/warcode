@@ -9514,19 +9514,19 @@ for (const error of JassLexer.lexerDefinitionErrors)
 
 // jass/parse-rule-name.mjs
 var parse_rule_name_default = {
+  jass: "jass",
   addition: "addition",
   arrayaccess: "arrayaccess",
   callstatement: "callstatement",
   comparator: "comparator",
   exitwhenstatement: "exitwhenstatement",
   expression: "expression",
-  funcarg: "funcarg",
+  typedname: "typedname",
   funcarglist: "funcarglist",
   funcdecl: "funcdecl",
   funcreturntype: "funcreturntype",
   funccall: "funccall",
   ifstatement: "ifstatement",
-  jass: "jass",
   linebreakdecl: "linebreakdecl",
   localgroup: "localgroup",
   localdecl: "localdecl",
@@ -9629,16 +9629,16 @@ var JassParser = class extends CstParser {
         { ALT: () => $.CONSUME(JassTokenMap.nothing) },
         {
           ALT: () => {
-            $.SUBRULE($[parse_rule_name_default.funcarg]);
+            $.SUBRULE($[parse_rule_name_default.typedname]);
             $.MANY(() => {
               $.CONSUME(JassTokenMap.comma);
-              $.SUBRULE2($[parse_rule_name_default.funcarg]);
+              $.SUBRULE2($[parse_rule_name_default.typedname]);
             });
           }
         }
       ]);
     });
-    $.RULE(parse_rule_name_default.funcarg, () => {
+    $.RULE(parse_rule_name_default.typedname, () => {
       $.CONSUME(JassTokenMap.identifier);
       $.CONSUME2(JassTokenMap.identifier);
     });
@@ -9675,8 +9675,7 @@ var JassParser = class extends CstParser {
       $.SUBRULE($[parse_rule_name_default.vardecl]);
     });
     $.RULE(parse_rule_name_default.vardecl, () => {
-      $.CONSUME(JassTokenMap.identifier);
-      $.CONSUME2(JassTokenMap.identifier);
+      $.SUBRULE($[parse_rule_name_default.typedname]);
       $.OPTION(() => {
         $.CONSUME3(JassTokenMap.equals);
         $.SUBRULE($[parse_rule_name_default.expression]);
@@ -9877,15 +9876,16 @@ var TokenLegend = {
   jass_argument: 4,
   jass_comma: 5,
   jass_variable: 6,
-  jass_type_keyword: 7,
-  jass_local_keyword: 8,
-  jass_extends_keyword: 9,
-  jass_constant_keyword: 10,
-  jass_native_keyword: 11,
-  jass_function_keyword: 12,
-  jass_endfunction_keyword: 13,
-  jass_takes_keyword: 14,
-  jass_returns_keyword: 15
+  jass_operator: 7,
+  jass_type_keyword: 8,
+  jass_local_keyword: 9,
+  jass_extends_keyword: 10,
+  jass_constant_keyword: 11,
+  jass_native_keyword: 12,
+  jass_function_keyword: 13,
+  jass_endfunction_keyword: 14,
+  jass_takes_keyword: 15,
+  jass_returns_keyword: 16
 };
 
 // src/utils/i-token-to-range.mjs
@@ -9945,10 +9945,7 @@ var JassVisitor = class extends ParserVisitor {
   [parse_rule_name_default.commentdecl](ctx) {
     const comment = ctx[JassTokenMap.comment.name]?.[0];
     __privateGet(this, _mark).call(this, comment, TokenLegend.jass_comment);
-    return {
-      "type": parse_rule_name_default.commentdecl,
-      "body": comment?.image.replace(/^\s*\/+\s*/g, "")
-    };
+    return comment?.image.replace(/^\s*\/+\s*/g, "");
   }
   [parse_rule_name_default.terminator]() {
     return null;
@@ -9962,7 +9959,6 @@ var JassVisitor = class extends ParserVisitor {
     __privateGet(this, _mark).call(this, ctx[JassTokenMap.extends.name]?.[0], TokenLegend.jass_extends_keyword);
     this.visit(ctx[parse_rule_name_default.commentdecl]);
     return {
-      type: parse_rule_name_default.typedecl,
       name: name?.image,
       base: base?.image
     };
@@ -9976,59 +9972,94 @@ var JassVisitor = class extends ParserVisitor {
     __privateGet(this, _mark).call(this, ctx[JassTokenMap.returns.name]?.[0], TokenLegend.jass_returns_keyword);
     this.visit(ctx[parse_rule_name_default.commentdecl]);
     return {
-      type: parse_rule_name_default.nativedecl,
       name: name?.image,
       arguments: this.visit(ctx[parse_rule_name_default.funcarglist]),
       return: this.visit(ctx[parse_rule_name_default.funcreturntype])
     };
   }
   [parse_rule_name_default.funcdecl](ctx) {
-    const name = ctx[JassTokenMap.identifier.name]?.[0];
+    var _a;
     __privateGet(this, _mark).call(this, ctx[JassTokenMap.function.name]?.[0], TokenLegend.jass_function_keyword);
-    __privateGet(this, _mark).call(this, name, TokenLegend.jass_function);
+    __privateGet(this, _mark).call(this, ctx[JassTokenMap.identifier.name]?.[0], TokenLegend.jass_function);
     __privateGet(this, _mark).call(this, ctx[JassTokenMap.takes.name]?.[0], TokenLegend.jass_takes_keyword);
     __privateGet(this, _mark).call(this, ctx[JassTokenMap.returns.name]?.[0], TokenLegend.jass_returns_keyword);
     __privateGet(this, _mark).call(this, ctx[JassTokenMap.endfunction.name]?.[0], TokenLegend.jass_endfunction_keyword);
     this.visit(ctx[parse_rule_name_default.commentdecl]);
-    const locals = ctx?.[parse_rule_name_default.localgroup]?.map((item) => this.visit(item));
-    console.log("===", locals);
+    const locals = ctx?.[parse_rule_name_default.localgroup];
+    const args = this.visit(ctx[parse_rule_name_default.funcarglist]);
+    if (locals) {
+      const localMap = {};
+      for (const local of locals) {
+        const typedname = this.visit(local)?.[parse_rule_name_default.typedname];
+        if (!typedname)
+          continue;
+        const { type, name } = typedname;
+        __privateGet(this, _mark).call(this, type, TokenLegend.jass_type);
+        __privateGet(this, _mark).call(this, name, TokenLegend.jass_variable);
+        if (name) {
+          (localMap[_a = name.image] ?? (localMap[_a] = [])).push(name);
+          const argList = args.map[name.image];
+          if (argList)
+            for (const t of [name, ...argList]) {
+              this.diagnostics?.push({
+                message: `Local variable redeclare argument: ${t.image}`,
+                range: i_token_to_range_default(t),
+                severity: import_vscode2.DiagnosticSeverity.Warning
+              });
+            }
+        }
+      }
+      for (const v of Object.values(localMap)) {
+        if (v.length < 2)
+          continue;
+        for (const t of v) {
+          this.diagnostics?.push({
+            message: `Local variable with same name: ${t.image}`,
+            range: i_token_to_range_default(t),
+            severity: import_vscode2.DiagnosticSeverity.Warning
+          });
+        }
+      }
+    }
     return {
-      type: parse_rule_name_default.funcdecl,
-      name: name?.image,
-      locals,
       statement: this.visit(ctx[parse_rule_name_default.statement]),
-      arguments: this.visit(ctx[parse_rule_name_default.funcarglist]),
       return: this.visit(ctx[parse_rule_name_default.funcreturntype])
     };
   }
-  [parse_rule_name_default.funcarg](ctx) {
-    const t = ctx[JassTokenMap.identifier.name];
-    if (t?.length !== 2)
-      return null;
-    __privateGet(this, _mark).call(this, t[0], TokenLegend.jass_type);
-    __privateGet(this, _mark).call(this, t[1], TokenLegend.jass_argument);
-    return t;
+  [parse_rule_name_default.typedname](ctx) {
+    const list = ctx[JassTokenMap.identifier.name];
+    let [type, name] = list;
+    if (type.isInsertedInRecovery)
+      type = null;
+    if (name.isInsertedInRecovery)
+      name = null;
+    return {
+      type,
+      name
+    };
   }
   [parse_rule_name_default.funcarglist](ctx) {
     var _a;
-    if (ctx.nothing)
-      return [];
-    if (ctx[JassTokenMap.comma.name])
-      for (const comma of ctx[JassTokenMap.comma.name]) {
+    let token;
+    if (token = ctx?.[JassTokenMap.nothing.name]?.[0]) {
+      __privateGet(this, _mark).call(this, token, TokenLegend.jass_type);
+      return { map: {}, list: [] };
+    }
+    if (token = ctx[JassTokenMap.comma.name])
+      for (const comma of token) {
         __privateGet(this, _mark).call(this, comma, TokenLegend.jass_comma);
       }
-    const args = ctx?.[parse_rule_name_default.funcarg]?.map((item) => this.visit(item));
+    const args = ctx?.[parse_rule_name_default.typedname]?.map((item) => this.visit(item));
+    const argMap = {};
     if (args) {
-      const obj = {};
       for (const arg of args) {
-        if (!arg || arg.length !== 2)
-          continue;
-        const [type, name] = arg;
-        if (type.isInsertedInRecovery || name.isInsertedInRecovery)
-          continue;
-        (obj[_a = name.image] ?? (obj[_a] = [])).push(name);
+        const { type, name } = arg;
+        __privateGet(this, _mark).call(this, type, TokenLegend.jass_type);
+        __privateGet(this, _mark).call(this, name, TokenLegend.jass_argument);
+        if (name)
+          (argMap[_a = name.image] ?? (argMap[_a] = [])).push(name);
       }
-      for (const v of Object.values(obj)) {
+      for (const v of Object.values(argMap)) {
         if (v.length < 2)
           continue;
         for (const t of v) {
@@ -10040,8 +10071,10 @@ var JassVisitor = class extends ParserVisitor {
         }
       }
     }
-    __privateGet(this, _mark).call(this, ctx?.[JassTokenMap.nothing.name]?.[0], TokenLegend.jass_type);
-    return args;
+    return {
+      map: argMap,
+      list: args
+    };
   }
   [parse_rule_name_default.funcreturntype](ctx) {
     let token;
@@ -10056,7 +10089,6 @@ var JassVisitor = class extends ParserVisitor {
     return null;
   }
   [parse_rule_name_default.localgroup](context) {
-    console.log("--localgroup", context);
     if (context[JassTokenMap.linebreak.name])
       return null;
     let ctx;
@@ -10070,9 +10102,11 @@ var JassVisitor = class extends ParserVisitor {
     return this.visit(ctx[parse_rule_name_default.vardecl]);
   }
   [parse_rule_name_default.vardecl](ctx) {
+    __privateGet(this, _mark).call(this, ctx[JassTokenMap.equals.name]?.[0], TokenLegend.jass_operator);
     this.visit(ctx[parse_rule_name_default.commentdecl]);
-    console.log("--vardecl", ctx);
-    return ctx;
+    return {
+      [parse_rule_name_default.typedname]: this.visit(ctx[parse_rule_name_default.typedname])
+    };
   }
   [parse_rule_name_default.expression](ctx) {
     return ctx;
