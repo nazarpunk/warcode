@@ -60,8 +60,16 @@
         "description": "jass_comma"
       },
       {
+        "id": "jass_variable",
+        "description": "jass_variable"
+      },
+      {
         "id": "jass_type_keyword",
         "description": "jass_type_keyword"
+      },
+      {
+        "id": "jass_local_keyword",
+        "description": "jass_local_keyword"
       },
       {
         "id": "jass_extends_keyword",
@@ -101,7 +109,9 @@
           "jass_function_native": "#C586C0",
           "jass_argument": "#9CDCDA",
           "jass_comma": "#FFFFFF",
+          "jass_variable": "#94d564",
           "jass_type_keyword": "#2C7AD6",
+          "jass_local_keyword": "#2C7AD6",
           "jass_extends_keyword": "#2C7AD6",
           "jass_constant_keyword": "#2C7AD6",
           "jass_native_keyword": "#2C7AD6",

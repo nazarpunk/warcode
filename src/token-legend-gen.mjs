@@ -36,9 +36,17 @@ const ruledef = [
         id: 'jass_comma',
         color: '#FFFFFF',
     },
+    {
+        id: 'jass_variable',
+        color: '#94d564',
+    },
     // keyword
     {
         id: 'jass_type_keyword',
+        color: keyword,
+    },
+    {
+        id: 'jass_local_keyword',
         color: keyword,
     },
     {

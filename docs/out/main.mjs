@@ -9876,14 +9876,16 @@ var TokenLegend = {
   jass_function_native: 3,
   jass_argument: 4,
   jass_comma: 5,
-  jass_type_keyword: 6,
-  jass_extends_keyword: 7,
-  jass_constant_keyword: 8,
-  jass_native_keyword: 9,
-  jass_function_keyword: 10,
-  jass_endfunction_keyword: 11,
-  jass_takes_keyword: 12,
-  jass_returns_keyword: 13
+  jass_variable: 6,
+  jass_type_keyword: 7,
+  jass_local_keyword: 8,
+  jass_extends_keyword: 9,
+  jass_constant_keyword: 10,
+  jass_native_keyword: 11,
+  jass_function_keyword: 12,
+  jass_endfunction_keyword: 13,
+  jass_takes_keyword: 14,
+  jass_returns_keyword: 15
 };
 
 // src/utils/i-token-to-range.mjs
@@ -9988,10 +9990,12 @@ var JassVisitor = class extends ParserVisitor {
     __privateGet(this, _mark).call(this, ctx[JassTokenMap.returns.name]?.[0], TokenLegend.jass_returns_keyword);
     __privateGet(this, _mark).call(this, ctx[JassTokenMap.endfunction.name]?.[0], TokenLegend.jass_endfunction_keyword);
     this.visit(ctx[parse_rule_name_default.commentdecl]);
+    const locals = ctx?.[parse_rule_name_default.localgroup]?.map((item) => this.visit(item));
+    console.log("===", locals);
     return {
       type: parse_rule_name_default.funcdecl,
       name: name?.image,
-      locals: ctx?.[parse_rule_name_default.localgroup]?.map((item) => this.visit(item)),
+      locals,
       statement: this.visit(ctx[parse_rule_name_default.statement]),
       arguments: this.visit(ctx[parse_rule_name_default.funcarglist]),
       return: this.visit(ctx[parse_rule_name_default.funcreturntype])
@@ -10027,12 +10031,13 @@ var JassVisitor = class extends ParserVisitor {
       for (const v of Object.values(obj)) {
         if (v.length < 2)
           continue;
-        for (const t of v)
+        for (const t of v) {
           this.diagnostics?.push({
             message: `Arguments with same name: ${t.image}`,
             range: i_token_to_range_default(t),
             severity: import_vscode2.DiagnosticSeverity.Warning
           });
+        }
       }
     }
     __privateGet(this, _mark).call(this, ctx?.[JassTokenMap.nothing.name]?.[0], TokenLegend.jass_type);
@@ -10051,6 +10056,7 @@ var JassVisitor = class extends ParserVisitor {
     return null;
   }
   [parse_rule_name_default.localgroup](context) {
+    console.log("--localgroup", context);
     if (context[JassTokenMap.linebreak.name])
       return null;
     let ctx;
@@ -10060,9 +10066,12 @@ var JassVisitor = class extends ParserVisitor {
       return this.visit(ctx);
   }
   [parse_rule_name_default.localdecl](ctx) {
-    return ctx;
+    __privateGet(this, _mark).call(this, ctx[JassTokenMap.local.name]?.[0], TokenLegend.jass_local_keyword);
+    return this.visit(ctx[parse_rule_name_default.vardecl]);
   }
   [parse_rule_name_default.vardecl](ctx) {
+    this.visit(ctx[parse_rule_name_default.commentdecl]);
+    console.log("--vardecl", ctx);
     return ctx;
   }
   [parse_rule_name_default.expression](ctx) {

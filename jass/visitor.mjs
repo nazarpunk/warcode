@@ -109,10 +109,13 @@ export class JassVisitor extends ParserVisitor {
 
         this.visit(ctx[ParseRuleName.commentdecl]);
 
+        const locals = ctx?.[ParseRuleName.localgroup]?.map(item => this.visit(item));
+        console.log('===', locals);
+
         return {
             type: ParseRuleName.funcdecl,
             name: name?.image,
-            locals: ctx?.[ParseRuleName.localgroup]?.map(item => this.visit(item)),
+            locals: locals,
             statement: this.visit(ctx[ParseRuleName.statement]),
             arguments: this.visit(ctx[ParseRuleName.funcarglist]),
             return: this.visit(ctx[ParseRuleName.funcreturntype]),
@@ -148,12 +151,13 @@ export class JassVisitor extends ParserVisitor {
 
             for (const v of Object.values(obj)) {
                 if (v.length < 2) continue;
-                for (const t of v)
+                for (const t of v) {
                     this.diagnostics?.push({
                         message: `Arguments with same name: ${t.image}`,
                         range: ITokenToRange(t),
                         severity: DiagnosticSeverity.Warning,
                     });
+                }
             }
         }
 
@@ -181,6 +185,8 @@ export class JassVisitor extends ParserVisitor {
     }
 
     [ParseRuleName.localgroup](context) {
+        console.log('--localgroup', context);
+
         if (context[JassTokenMap.linebreak.name]) return null;
         let ctx;
         if (ctx = context[ParseRuleName.localdecl]) return this.visit(ctx);
@@ -188,10 +194,13 @@ export class JassVisitor extends ParserVisitor {
     }
 
     [ParseRuleName.localdecl](ctx) {
-        return ctx;
+        this.#mark(ctx[JassTokenMap.local.name]?.[0], TokenLegend.jass_local_keyword);
+        return this.visit(ctx[ParseRuleName.vardecl]);
     }
 
     [ParseRuleName.vardecl](ctx) {
+        this.visit(ctx[ParseRuleName.commentdecl]);
+        console.log('--vardecl', ctx);
         return ctx;
     }
 
