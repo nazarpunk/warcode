@@ -23,6 +23,7 @@ export default {
     primary: 'primary',
     rootstatement: 'rootstatement',
     setstatement: 'setstatement',
+    returnstatement: 'returnstatement',
     statement: 'statement',
     terminator: 'terminator',
     typedecl: 'typedecl',

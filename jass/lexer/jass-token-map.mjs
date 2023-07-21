@@ -1,6 +1,6 @@
 import {createToken, Lexer} from 'chevrotain';
 
-export const JassTokenMap = {
+export default {
     whitespace: createToken({
         name: 'whitespace',
         pattern: /[^\S\r\n]+/,
@@ -12,82 +12,16 @@ export const JassTokenMap = {
         pattern: /\/\/[^\r\n]*/,
         line_breaks: false,
     }),
-    type: createToken({
-        name: 'type',
-        pattern: /\btype\b/,
-        start_chars_hint: ["t"],
-        line_breaks: false,
-    }),
-    globals: createToken({
-        name: 'globals',
-        pattern: /\bglobals\b/,
-        start_chars_hint: ["g"],
-        line_breaks: false,
-    }),
-    endglobals: createToken({
-        name: 'endglobals',
-        pattern: /\bendglobals\b/,
-        start_chars_hint: ["e"],
-        line_breaks: false,
-    }),
-    extends: createToken({
-        name: 'extends',
-        pattern: /\bextends\b/,
-        start_chars_hint: ["e"],
-        line_breaks: false,
-    }),
-    constant: createToken({
-        name: 'constant',
-        pattern: /\bconstant\b/,
-        start_chars_hint: ["c"],
-        line_breaks: false,
-    }),
-    native: createToken({
-        name: 'native',
-        pattern: /\bnative\b/,
-        start_chars_hint: ["n"],
-        line_breaks: false,
-    }),
-    function: createToken({
-        name: 'function',
-        pattern: /\bfunction\b/,
-        start_chars_hint: ["f"],
-        line_breaks: false,
-    }),
-    takes: createToken({
-        name: 'takes',
-        pattern: /\btakes\b/,
-        start_chars_hint: ["t"],
-        line_breaks: false,
-    }),
-    nothing: createToken({
-        name: 'nothing',
-        pattern: /\bnothing\b/,
-        start_chars_hint: ["n"],
-        line_breaks: false,
-    }),
-    returns: createToken({
-        name: 'returns',
-        pattern: /\breturns\b/,
-        start_chars_hint: ["r"],
-        line_breaks: false,
-    }),
-    local: createToken({
-        name: 'local',
-        pattern: /\blocal\b/,
-        start_chars_hint: ["l"],
-        line_breaks: false,
-    }),
     and: createToken({
         name: 'and',
         pattern: /\band\b/,
         start_chars_hint: ["a"],
         line_breaks: false,
     }),
-    or: createToken({
-        name: 'or',
-        pattern: /\bor\b/,
-        start_chars_hint: ["o"],
+    array: createToken({
+        name: 'array',
+        pattern: /\barray\b/,
+        start_chars_hint: ["a"],
         line_breaks: false,
     }),
     call: createToken({
@@ -96,39 +30,15 @@ export const JassTokenMap = {
         start_chars_hint: ["c"],
         line_breaks: false,
     }),
-    not: createToken({
-        name: 'not',
-        pattern: /\bnot\b/,
-        start_chars_hint: ["n"],
+    constant: createToken({
+        name: 'constant',
+        pattern: /\bconstant\b/,
+        start_chars_hint: ["c"],
         line_breaks: false,
     }),
-    set: createToken({
-        name: 'set',
-        pattern: /\bset\b/,
-        start_chars_hint: ["s"],
-        line_breaks: false,
-    }),
-    loop: createToken({
-        name: 'loop',
-        pattern: /\bloop\b/,
-        start_chars_hint: ["l"],
-        line_breaks: false,
-    }),
-    then: createToken({
-        name: 'then',
-        pattern: /\bthen\b/,
-        start_chars_hint: ["t"],
-        line_breaks: false,
-    }),
-    exitwhen: createToken({
-        name: 'exitwhen',
-        pattern: /\bexitwhen\b/,
-        start_chars_hint: ["e"],
-        line_breaks: false,
-    }),
-    endloop: createToken({
-        name: 'endloop',
-        pattern: /\bendloop\b/,
+    else: createToken({
+        name: 'else',
+        pattern: /\belse\b/,
         start_chars_hint: ["e"],
         line_breaks: false,
     }),
@@ -138,9 +48,15 @@ export const JassTokenMap = {
         start_chars_hint: ["e"],
         line_breaks: false,
     }),
-    else: createToken({
-        name: 'else',
-        pattern: /\belse\b/,
+    endfunction: createToken({
+        name: 'endfunction',
+        pattern: /\bendfunction\b/,
+        start_chars_hint: ["e"],
+        line_breaks: false,
+    }),
+    endglobals: createToken({
+        name: 'endglobals',
+        pattern: /\bendglobals\b/,
         start_chars_hint: ["e"],
         line_breaks: false,
     }),
@@ -150,10 +66,112 @@ export const JassTokenMap = {
         start_chars_hint: ["e"],
         line_breaks: false,
     }),
-    endfunction: createToken({
-        name: 'endfunction',
-        pattern: /\bendfunction\b/,
+    endloop: createToken({
+        name: 'endloop',
+        pattern: /\bendloop\b/,
         start_chars_hint: ["e"],
+        line_breaks: false,
+    }),
+    exitwhen: createToken({
+        name: 'exitwhen',
+        pattern: /\bexitwhen\b/,
+        start_chars_hint: ["e"],
+        line_breaks: false,
+    }),
+    extends: createToken({
+        name: 'extends',
+        pattern: /\bextends\b/,
+        start_chars_hint: ["e"],
+        line_breaks: false,
+    }),
+    function: createToken({
+        name: 'function',
+        pattern: /\bfunction\b/,
+        start_chars_hint: ["f"],
+        line_breaks: false,
+    }),
+    globals: createToken({
+        name: 'globals',
+        pattern: /\bglobals\b/,
+        start_chars_hint: ["g"],
+        line_breaks: false,
+    }),
+    if: createToken({
+        name: 'if',
+        pattern: /\bif\b/,
+        start_chars_hint: ["i"],
+        line_breaks: false,
+    }),
+    local: createToken({
+        name: 'local',
+        pattern: /\blocal\b/,
+        start_chars_hint: ["l"],
+        line_breaks: false,
+    }),
+    loop: createToken({
+        name: 'loop',
+        pattern: /\bloop\b/,
+        start_chars_hint: ["l"],
+        line_breaks: false,
+    }),
+    native: createToken({
+        name: 'native',
+        pattern: /\bnative\b/,
+        start_chars_hint: ["n"],
+        line_breaks: false,
+    }),
+    not: createToken({
+        name: 'not',
+        pattern: /\bnot\b/,
+        start_chars_hint: ["n"],
+        line_breaks: false,
+    }),
+    nothing: createToken({
+        name: 'nothing',
+        pattern: /\bnothing\b/,
+        start_chars_hint: ["n"],
+        line_breaks: false,
+    }),
+    or: createToken({
+        name: 'or',
+        pattern: /\bor\b/,
+        start_chars_hint: ["o"],
+        line_breaks: false,
+    }),
+    returns: createToken({
+        name: 'returns',
+        pattern: /\breturns\b/,
+        start_chars_hint: ["r"],
+        line_breaks: false,
+    }),
+    return: createToken({
+        name: 'return',
+        pattern: /\breturn\b/,
+        start_chars_hint: ["r"],
+        line_breaks: false,
+    }),
+    set: createToken({
+        name: 'set',
+        pattern: /\bset\b/,
+        start_chars_hint: ["s"],
+        line_breaks: false,
+    }),
+    takes: createToken({
+        name: 'takes',
+        pattern: /\btakes\b/,
+        start_chars_hint: ["t"],
+        line_breaks: false,
+    }),
+    then: createToken({
+        name: 'then',
+        pattern: /\bthen\b/,
+        start_chars_hint: ["t"],
+        line_breaks: false,
+    }),
+    type: createToken({
+        name: 'type',
+        pattern: /\btype\b/,
+        start_chars_hint: ["t"],
         line_breaks: false,
     }),
     comma: createToken({
@@ -184,6 +202,34 @@ export const JassTokenMap = {
         line_breaks: false,
         label: "!=",
     }),
+    lessorequal: createToken({
+        name: 'lessorequal',
+        pattern: /<=/,
+        start_chars_hint: ["<"],
+        line_breaks: false,
+        label: "<=",
+    }),
+    less: createToken({
+        name: 'less',
+        pattern: /</,
+        start_chars_hint: ["<"],
+        line_breaks: false,
+        label: "<",
+    }),
+    greatorequal: createToken({
+        name: 'greatorequal',
+        pattern: />=/,
+        start_chars_hint: [">"],
+        line_breaks: false,
+        label: ">=",
+    }),
+    great: createToken({
+        name: 'great',
+        pattern: />/,
+        start_chars_hint: [">"],
+        line_breaks: false,
+        label: ">",
+    }),
     add: createToken({
         name: 'add',
         pattern: /\+/,
@@ -211,12 +257,6 @@ export const JassTokenMap = {
         start_chars_hint: ["/"],
         line_breaks: false,
         label: "/",
-    }),
-    if: createToken({
-        name: 'if',
-        pattern: /if/,
-        start_chars_hint: ["i"],
-        line_breaks: false,
     }),
     stringliteral: createToken({
         name: 'stringliteral',
@@ -257,14 +297,14 @@ export const JassTokenMap = {
         pattern: /'.*'/,
         line_breaks: false,
     }),
-    integer: createToken({
-        name: 'integer',
-        pattern: /[0-9]+/,
-        line_breaks: false,
-    }),
     real: createToken({
         name: 'real',
         pattern: /[0-9]+\.[0-9]+/,
+        line_breaks: false,
+    }),
+    integer: createToken({
+        name: 'integer',
+        pattern: /0x[0-9a-z]+|\$[0-9a-z]+|\d+/i,
         line_breaks: false,
     }),
     linebreak: createToken({
@@ -279,9 +319,3 @@ export const JassTokenMap = {
         line_breaks: false,
     }),
 }
-
-/** @type {import('chevrotain').TokenType[]} */
-export const JassTokenList = [JassTokenMap.whitespace, JassTokenMap.comment, JassTokenMap.type, JassTokenMap.globals, JassTokenMap.endglobals, JassTokenMap.extends, JassTokenMap.constant, JassTokenMap.native, JassTokenMap.function, JassTokenMap.takes, JassTokenMap.nothing, JassTokenMap.returns, JassTokenMap.local, JassTokenMap.and, JassTokenMap.or, JassTokenMap.call, JassTokenMap.not, JassTokenMap.set, JassTokenMap.loop, JassTokenMap.then, JassTokenMap.exitwhen, JassTokenMap.endloop, JassTokenMap.elseif, JassTokenMap.else, JassTokenMap.endif, JassTokenMap.endfunction, JassTokenMap.comma, JassTokenMap.equalsequals, JassTokenMap.equals, JassTokenMap.notequals, JassTokenMap.add, JassTokenMap.sub, JassTokenMap.mult, JassTokenMap.div, JassTokenMap.if, JassTokenMap.stringliteral, JassTokenMap.lparen, JassTokenMap.rparen, JassTokenMap.lsquareparen, JassTokenMap.rsquareparen, JassTokenMap.idliteral, JassTokenMap.integer, JassTokenMap.real, JassTokenMap.linebreak, JassTokenMap.identifier];
-
-export const JassLexer = new Lexer(JassTokenList);
-for (const error of JassLexer.lexerDefinitionErrors) console.error(error);

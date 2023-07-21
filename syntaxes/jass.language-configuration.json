@@ -1,11 +1,4 @@
 {
-    "comments": {
-        "lineComment": "//"
-    },
-    "brackets": [
-        ["[", "]"],
-        ["(", ")"]
-    ],
     "autoClosingPairs": [
         ["[", "]"],
         ["(", ")"],

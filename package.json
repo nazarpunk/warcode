@@ -32,106 +32,21 @@
     "esbuild": "npm run esbuild-base",
     "esbuild-watch": "npm run esbuild-base -- --watch"
   },
-  "editor.semanticHighlighting.enabled": true,
+  "configurationDefaults": {
+    "jass": {
+      "editor.semanticHighlighting.enabled": true
+    }
+  },
+  "devDependencies": {
+    "chevrotain": "^11.0.1",
+    "esbuild": "^0.18.14",
+    "@vscode/vsce": "^2.15.0",
+    "@types/vscode": "^1.80.0"
+  },
+  "engines": {
+    "vscode": "^1.80.0"
+  },
   "contributes": {
-    "semanticTokenTypes": [
-      {
-        "id": "jass_comment",
-        "description": "jass_comment"
-      },
-      {
-        "id": "jass_type",
-        "description": "jass_type"
-      },
-      {
-        "id": "jass_function",
-        "description": "jass_function"
-      },
-      {
-        "id": "jass_function_native",
-        "description": "jass_function_native"
-      },
-      {
-        "id": "jass_argument",
-        "description": "jass_argument"
-      },
-      {
-        "id": "jass_comma",
-        "description": "jass_comma"
-      },
-      {
-        "id": "jass_variable",
-        "description": "jass_variable"
-      },
-      {
-        "id": "jass_operator",
-        "description": "jass_operator"
-      },
-      {
-        "id": "jass_number",
-        "description": "jass_number"
-      },
-      {
-        "id": "jass_type_keyword",
-        "description": "jass_type_keyword"
-      },
-      {
-        "id": "jass_local_keyword",
-        "description": "jass_local_keyword"
-      },
-      {
-        "id": "jass_extends_keyword",
-        "description": "jass_extends_keyword"
-      },
-      {
-        "id": "jass_constant_keyword",
-        "description": "jass_constant_keyword"
-      },
-      {
-        "id": "jass_native_keyword",
-        "description": "jass_native_keyword"
-      },
-      {
-        "id": "jass_function_keyword",
-        "description": "jass_function_keyword"
-      },
-      {
-        "id": "jass_endfunction_keyword",
-        "description": "jass_endfunction_keyword"
-      },
-      {
-        "id": "jass_takes_keyword",
-        "description": "jass_takes_keyword"
-      },
-      {
-        "id": "jass_returns_keyword",
-        "description": "jass_returns_keyword"
-      }
-    ],
-    "configurationDefaults": {
-      "editor.semanticTokenColorCustomizations": {
-        "rules": {
-          "jass_comment": "#308030",
-          "jass_type": "#4EC9B0",
-          "jass_function": "#DCDCAA",
-          "jass_function_native": "#C586C0",
-          "jass_argument": "#9CDCDA",
-          "jass_comma": "#FFFFFF",
-          "jass_variable": "#94d564",
-          "jass_operator": "#e7be60",
-          "jass_number": "#e760cc",
-          "jass_type_keyword": "#2C7AD6",
-          "jass_local_keyword": "#2C7AD6",
-          "jass_extends_keyword": "#2C7AD6",
-          "jass_constant_keyword": "#2C7AD6",
-          "jass_native_keyword": "#2C7AD6",
-          "jass_function_keyword": "#2C7AD6",
-          "jass_endfunction_keyword": "#2C7AD6",
-          "jass_takes_keyword": "#2C7AD6",
-          "jass_returns_keyword": "#2C7AD6"
-        }
-      }
-    },
     "languages": [
       {
         "id": "jass",
@@ -151,20 +66,204 @@
         "scopeName": "source.jass",
         "path": "./syntaxes/jass.tmLanguage.json"
       }
-    ]
-  },
-  "configurationDefaults": {
-    "jass": {
-      "editor.semanticHighlighting.enabled": true
+    ],
+    "semanticTokenTypes": [
+      {
+        "id": "jass_comment",
+        "description": ""
+      },
+      {
+        "id": "jass_and",
+        "description": ""
+      },
+      {
+        "id": "jass_array",
+        "description": ""
+      },
+      {
+        "id": "jass_call",
+        "description": ""
+      },
+      {
+        "id": "jass_constant",
+        "description": ""
+      },
+      {
+        "id": "jass_else",
+        "description": ""
+      },
+      {
+        "id": "jass_elseif",
+        "description": ""
+      },
+      {
+        "id": "jass_endfunction",
+        "description": ""
+      },
+      {
+        "id": "jass_endglobals",
+        "description": ""
+      },
+      {
+        "id": "jass_endif",
+        "description": ""
+      },
+      {
+        "id": "jass_endloop",
+        "description": ""
+      },
+      {
+        "id": "jass_exitwhen",
+        "description": ""
+      },
+      {
+        "id": "jass_extends",
+        "description": ""
+      },
+      {
+        "id": "jass_function",
+        "description": ""
+      },
+      {
+        "id": "jass_globals",
+        "description": ""
+      },
+      {
+        "id": "jass_if",
+        "description": ""
+      },
+      {
+        "id": "jass_local",
+        "description": ""
+      },
+      {
+        "id": "jass_loop",
+        "description": ""
+      },
+      {
+        "id": "jass_native",
+        "description": ""
+      },
+      {
+        "id": "jass_not",
+        "description": ""
+      },
+      {
+        "id": "jass_nothing",
+        "description": ""
+      },
+      {
+        "id": "jass_or",
+        "description": ""
+      },
+      {
+        "id": "jass_returns",
+        "description": ""
+      },
+      {
+        "id": "jass_return",
+        "description": ""
+      },
+      {
+        "id": "jass_set",
+        "description": ""
+      },
+      {
+        "id": "jass_takes",
+        "description": ""
+      },
+      {
+        "id": "jass_then",
+        "description": ""
+      },
+      {
+        "id": "jass_type",
+        "description": ""
+      },
+      {
+        "id": "jass_comma",
+        "description": ""
+      },
+      {
+        "id": "jass_idliteral",
+        "description": ""
+      },
+      {
+        "id": "jass_real",
+        "description": ""
+      },
+      {
+        "id": "jass_integer",
+        "description": ""
+      },
+      {
+        "id": "jass_variable",
+        "description": ""
+      },
+      {
+        "id": "jass_function_user",
+        "description": ""
+      },
+      {
+        "id": "jass_function_native",
+        "description": ""
+      },
+      {
+        "id": "jass_type_name",
+        "description": ""
+      },
+      {
+        "id": "jass_argument",
+        "description": ""
+      },
+      {
+        "id": "jass_operator",
+        "description": ""
+      }
+    ],
+    "configurationDefaults": {
+      "editor.semanticTokenColorCustomizations": {
+        "rules": {
+          "jass_comment": "#308030",
+          "jass_and": "#2C7AD6",
+          "jass_array": "#2C7AD6",
+          "jass_call": "#2C7AD6",
+          "jass_constant": "#2C7AD6",
+          "jass_else": "#2C7AD6",
+          "jass_elseif": "#2C7AD6",
+          "jass_endfunction": "#2C7AD6",
+          "jass_endglobals": "#2C7AD6",
+          "jass_endif": "#2C7AD6",
+          "jass_endloop": "#2C7AD6",
+          "jass_exitwhen": "#2C7AD6",
+          "jass_extends": "#2C7AD6",
+          "jass_function": "#2C7AD6",
+          "jass_globals": "#2C7AD6",
+          "jass_if": "#2C7AD6",
+          "jass_local": "#2C7AD6",
+          "jass_loop": "#2C7AD6",
+          "jass_native": "#2C7AD6",
+          "jass_not": "#2C7AD6",
+          "jass_nothing": "#2C7AD6",
+          "jass_or": "#2C7AD6",
+          "jass_returns": "#2C7AD6",
+          "jass_return": "#2C7AD6",
+          "jass_set": "#2C7AD6",
+          "jass_takes": "#2C7AD6",
+          "jass_then": "#2C7AD6",
+          "jass_type": "#2C7AD6",
+          "jass_comma": "#FFFFFF",
+          "jass_idliteral": "#e760cc",
+          "jass_real": "#e760cc",
+          "jass_integer": "#e760cc",
+          "jass_variable": "#94d564",
+          "jass_function_user": "#DCDCAA",
+          "jass_function_native": "#C586C0",
+          "jass_type_name": "#4EC9B0",
+          "jass_argument": "#9CDCDA",
+          "jass_operator": "#e7be60"
+        }
+      }
     }
-  },
-  "devDependencies": {
-    "chevrotain": "^11.0.1",
-    "esbuild": "^0.18.14",
-    "@vscode/vsce": "^2.15.0",
-    "@types/vscode": "^1.80.0"
-  },
-  "engines": {
-    "vscode": "^1.80.0"
   }
 }
