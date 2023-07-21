@@ -46,6 +46,7 @@ for (let [keyword, color] of Object.entries({
 });
 
 const numberColor = '#e760cc';
+const operatorColor = '#e7be60';
 
 /** @type {(import('chevrotain').ITokenConfig & {color:  string})[]} */
 const tokenList = [
@@ -72,81 +73,92 @@ const tokenList = [
         color: '#FFFFFF',
     },
     {
-        name: 'equalsequals',
+        name: 'equals',
         pattern: /==/,
         start_chars_hint: ['='],
         line_breaks: false,
-        label: '=='
+        label: '==',
+        color: operatorColor,
     },
     {
-        name: 'equals',
+        name: 'assign',
         pattern: /=/,
         start_chars_hint: ['='],
         line_breaks: false,
-        label: '='
+        label: '=',
+        color: operatorColor,
     },
     {
         name: 'notequals',
         pattern: /!=/,
         start_chars_hint: ['!'],
         line_breaks: false,
-        label: '!='
+        label: '!=',
+        color: operatorColor,
     },
     {
         name: 'lessorequal',
         pattern: /<=/,
         start_chars_hint: ['<'],
         line_breaks: false,
-        label: '<='
+        label: '<=',
+        color: operatorColor,
     },
     {
         name: 'less',
         pattern: /</,
         start_chars_hint: ['<'],
         line_breaks: false,
-        label: '<'
+        label: '<',
+        color: operatorColor,
     },
     {
         name: 'greatorequal',
         pattern: />=/,
         start_chars_hint: ['>'],
         line_breaks: false,
-        label: '>='
+        label: '>=',
+        color: operatorColor,
     },
     {
         name: 'great',
         pattern: />/,
         start_chars_hint: ['>'],
         line_breaks: false,
-        label: '>'
+        label: '>',
+        color: operatorColor,
     },
     {
         name: 'add',
         pattern: /\+/,
         start_chars_hint: ['+'],
         line_breaks: false,
-        label: '+'
+        label: '+',
+        color: operatorColor,
     },
     {
         name: 'sub',
         pattern: /-/,
         start_chars_hint: ['-'],
         line_breaks: false,
-        label: '-'
+        label: '-',
+        color: operatorColor,
     },
     {
         name: 'mult',
         pattern: /\*/,
         start_chars_hint: ['*'],
         line_breaks: false,
-        label: '*'
+        label: '*',
+        color: operatorColor,
     },
     {
         name: 'div',
         pattern: /\//,
         start_chars_hint: ['/'],
         line_breaks: false,
-        label: '/'
+        label: '/',
+        color: operatorColor,
     },
     {
         name: 'stringliteral',
@@ -280,8 +292,6 @@ legendMap = {
         jass_function_native: '#C586C0',
         jass_type_name: '#4EC9B0',
         jass_argument: '#9CDCDA',
-        jass_operator: '#e7be60',
-
     }
 }
 

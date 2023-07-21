@@ -8,14 +8,14 @@ var __accessCheck = (obj, member, msg) => {
   if (!member.has(obj))
     throw TypeError("Cannot " + msg);
 };
-var __privateGet = (obj, member, getter) => {
-  __accessCheck(obj, member, "read from private field");
-  return getter ? getter.call(obj) : member.get(obj);
-};
 var __privateAdd = (obj, member, value) => {
   if (member.has(obj))
     throw TypeError("Cannot add the same private member more than once");
   member instanceof WeakSet ? member.add(obj) : member.set(obj, value);
+};
+var __privateMethod = (obj, member, method) => {
+  __accessCheck(obj, member, "access private method");
+  return method;
 };
 
 // node_modules/chevrotain/lib/src/version.js
@@ -282,8 +282,8 @@ function getNative(object, key) {
 var getNative_default = getNative;
 
 // node_modules/lodash-es/_WeakMap.js
-var WeakMap2 = getNative_default(root_default, "WeakMap");
-var WeakMap_default = WeakMap2;
+var WeakMap = getNative_default(root_default, "WeakMap");
+var WeakMap_default = WeakMap;
 
 // node_modules/lodash-es/_baseCreate.js
 var objectCreate = Object.create;
@@ -9240,39 +9240,41 @@ function createSyntaxDiagramsCode(grammar, { resourceBase = `https://unpkg.com/c
 }
 
 // jass/parse-rule-name.mjs
-var parse_rule_name_default = {
-  jass: "jass",
-  addition: "addition",
-  arrayaccess: "arrayaccess",
-  callstatement: "callstatement",
-  comparator: "comparator",
-  exitwhenstatement: "exitwhenstatement",
-  expression: "expression",
-  typedname: "typedname",
-  funcarglist: "funcarglist",
-  funcdecl: "funcdecl",
-  funcreturntype: "funcreturntype",
-  funccall: "funccall",
-  ifstatement: "ifstatement",
-  linebreakdecl: "linebreakdecl",
-  localgroup: "localgroup",
-  localdecl: "localdecl",
-  loopstatement: "loopstatement",
-  multiplication: "multiplication",
-  nativedecl: "nativedecl",
-  optionalelse: "optionalelse",
-  optionalelseIf: "optionalelseIf",
-  primary: "primary",
-  rootstatement: "rootstatement",
-  setstatement: "setstatement",
-  returnstatement: "returnstatement",
-  statement: "statement",
-  terminator: "terminator",
-  typedecl: "typedecl",
-  vardecl: "vardecl",
-  commentdecl: "commentdecl",
-  globalsdecl: "globalsdecl"
+var names = {
+  jass: "",
+  root: "",
+  type_declare: "",
+  globals_declare: "",
+  linebreak_declare: "",
+  variable_declare: "",
+  native_declare: "",
+  function_declare: "",
+  function_locals: "",
+  function_returns: "",
+  function_args: "",
+  function_call: "",
+  return_statement: "",
+  if_statement: "",
+  else_statement: "",
+  elseif_statement: "",
+  addition: "",
+  arrayaccess: "",
+  call_statement: "",
+  comparator: "",
+  exitwhen_statement: "",
+  expression: "",
+  typedname: "",
+  loop_statement: "",
+  multiplication: "",
+  primary: "",
+  set_statement: "",
+  statement: "",
+  end: ""
 };
+for (const key of Object.keys(names)) {
+  names[key] = key;
+}
+var parse_rule_name_default = names;
 
 // jass/lexer/jass-token-map.mjs
 var jass_token_map_default = {
@@ -9456,15 +9458,15 @@ var jass_token_map_default = {
     label: ",",
     line_breaks: false
   }),
-  equalsequals: createToken({
-    name: "equalsequals",
+  equals: createToken({
+    name: "equals",
     pattern: /==/,
     start_chars_hint: ["="],
     line_breaks: false,
     label: "=="
   }),
-  equals: createToken({
-    name: "equals",
+  assign: createToken({
+    name: "assign",
     pattern: /=/,
     start_chars_hint: ["="],
     line_breaks: false,
@@ -9596,7 +9598,7 @@ var jass_token_map_default = {
 };
 
 // jass/lexer/jass-token-list.mjs
-var list = [jass_token_map_default.whitespace, jass_token_map_default.comment, jass_token_map_default.and, jass_token_map_default.array, jass_token_map_default.call, jass_token_map_default.constant, jass_token_map_default.else, jass_token_map_default.elseif, jass_token_map_default.endfunction, jass_token_map_default.endglobals, jass_token_map_default.endif, jass_token_map_default.endloop, jass_token_map_default.exitwhen, jass_token_map_default.extends, jass_token_map_default.function, jass_token_map_default.globals, jass_token_map_default.if, jass_token_map_default.local, jass_token_map_default.loop, jass_token_map_default.native, jass_token_map_default.not, jass_token_map_default.nothing, jass_token_map_default.or, jass_token_map_default.returns, jass_token_map_default.return, jass_token_map_default.set, jass_token_map_default.takes, jass_token_map_default.then, jass_token_map_default.type, jass_token_map_default.comma, jass_token_map_default.equalsequals, jass_token_map_default.equals, jass_token_map_default.notequals, jass_token_map_default.lessorequal, jass_token_map_default.less, jass_token_map_default.greatorequal, jass_token_map_default.great, jass_token_map_default.add, jass_token_map_default.sub, jass_token_map_default.mult, jass_token_map_default.div, jass_token_map_default.stringliteral, jass_token_map_default.lparen, jass_token_map_default.rparen, jass_token_map_default.lsquareparen, jass_token_map_default.rsquareparen, jass_token_map_default.idliteral, jass_token_map_default.real, jass_token_map_default.integer, jass_token_map_default.linebreak, jass_token_map_default.identifier];
+var list = [jass_token_map_default.whitespace, jass_token_map_default.comment, jass_token_map_default.and, jass_token_map_default.array, jass_token_map_default.call, jass_token_map_default.constant, jass_token_map_default.else, jass_token_map_default.elseif, jass_token_map_default.endfunction, jass_token_map_default.endglobals, jass_token_map_default.endif, jass_token_map_default.endloop, jass_token_map_default.exitwhen, jass_token_map_default.extends, jass_token_map_default.function, jass_token_map_default.globals, jass_token_map_default.if, jass_token_map_default.local, jass_token_map_default.loop, jass_token_map_default.native, jass_token_map_default.not, jass_token_map_default.nothing, jass_token_map_default.or, jass_token_map_default.returns, jass_token_map_default.return, jass_token_map_default.set, jass_token_map_default.takes, jass_token_map_default.then, jass_token_map_default.type, jass_token_map_default.comma, jass_token_map_default.equals, jass_token_map_default.assign, jass_token_map_default.notequals, jass_token_map_default.lessorequal, jass_token_map_default.less, jass_token_map_default.greatorequal, jass_token_map_default.great, jass_token_map_default.add, jass_token_map_default.sub, jass_token_map_default.mult, jass_token_map_default.div, jass_token_map_default.stringliteral, jass_token_map_default.lparen, jass_token_map_default.rparen, jass_token_map_default.lsquareparen, jass_token_map_default.rsquareparen, jass_token_map_default.idliteral, jass_token_map_default.real, jass_token_map_default.integer, jass_token_map_default.linebreak, jass_token_map_default.identifier];
 var jass_token_list_default = list;
 
 // jass/lexer/jass-lexer.mjs
@@ -9648,56 +9650,94 @@ var JassParser = class extends CstParser {
     /**@type {JassParserError[]} */
     __publicField(this, "errorlist", []);
     const $ = this;
-    $.RULE(parse_rule_name_default.jass, () => $.MANY(() => $.SUBRULE($[parse_rule_name_default.rootstatement])));
-    $.RULE(parse_rule_name_default.rootstatement, () => {
+    $.RULE(parse_rule_name_default.jass, () => $.MANY(() => $.SUBRULE($[parse_rule_name_default.root])));
+    $.RULE(parse_rule_name_default.root, () => {
       $.OR([
-        { ALT: () => $.SUBRULE($[parse_rule_name_default.commentdecl]) },
+        { ALT: () => $.SUBRULE($[parse_rule_name_default.type_declare]) },
+        { ALT: () => $.SUBRULE($[parse_rule_name_default.native_declare]) },
+        { ALT: () => $.SUBRULE($[parse_rule_name_default.function_declare]) },
+        { ALT: () => $.SUBRULE($[parse_rule_name_default.globals_declare]) },
         { ALT: () => $.CONSUME(jass_token_map_default.linebreak) },
-        { ALT: () => $.SUBRULE($[parse_rule_name_default.typedecl]) },
-        { ALT: () => $.SUBRULE($[parse_rule_name_default.nativedecl]) },
-        { ALT: () => $.SUBRULE($[parse_rule_name_default.funcdecl]) },
-        { ALT: () => $.SUBRULE($[parse_rule_name_default.globalsdecl]) }
+        { ALT: () => $.CONSUME(jass_token_map_default.comment) }
       ]);
     });
-    $.RULE(parse_rule_name_default.globalsdecl, () => {
-      $.CONSUME(jass_token_map_default.globals);
-      $.OPTION(() => $.SUBRULE($[parse_rule_name_default.commentdecl]));
-      $.CONSUME2(jass_token_map_default.linebreak);
-      $.MANY(() => $.OR([
-        { ALT: () => $.SUBRULE2($[parse_rule_name_default.commentdecl]) },
-        { ALT: () => $.CONSUME(jass_token_map_default.linebreak) },
-        { ALT: () => $.SUBRULE($[parse_rule_name_default.vardecl]) }
-      ]));
-      $.CONSUME3(jass_token_map_default.endglobals);
-      $.SUBRULE($[parse_rule_name_default.terminator]);
-    });
-    $.RULE(parse_rule_name_default.commentdecl, () => $.CONSUME(jass_token_map_default.comment));
-    $.RULE(parse_rule_name_default.typedecl, () => {
+    $.RULE(parse_rule_name_default.type_declare, () => {
       $.CONSUME(jass_token_map_default.type);
       $.CONSUME(jass_token_map_default.identifier);
       $.CONSUME(jass_token_map_default.extends);
       $.CONSUME2(jass_token_map_default.identifier);
-      $.OPTION(() => $.SUBRULE($[parse_rule_name_default.commentdecl]));
-      $.SUBRULE($[parse_rule_name_default.terminator]);
+      $.SUBRULE($[parse_rule_name_default.end]);
     });
-    $.RULE(parse_rule_name_default.terminator, () => {
-      $.OR([
-        { ALT: () => $.CONSUME(EOF) },
-        { ALT: () => $.CONSUME2(jass_token_map_default.linebreak) }
-      ]);
-    });
-    $.RULE(parse_rule_name_default.nativedecl, () => {
+    $.RULE(parse_rule_name_default.native_declare, () => {
       $.OPTION(() => $.CONSUME(jass_token_map_default.constant));
       $.CONSUME(jass_token_map_default.native);
       $.CONSUME2(jass_token_map_default.identifier);
       $.CONSUME3(jass_token_map_default.takes);
-      $.SUBRULE($[parse_rule_name_default.funcarglist]);
+      $.SUBRULE($[parse_rule_name_default.function_args]);
       $.CONSUME4(jass_token_map_default.returns);
-      $.SUBRULE($[parse_rule_name_default.funcreturntype]);
-      $.OPTION2(() => $.SUBRULE($[parse_rule_name_default.commentdecl]));
-      $.SUBRULE($[parse_rule_name_default.terminator]);
+      $.SUBRULE($[parse_rule_name_default.function_returns]);
+      $.SUBRULE($[parse_rule_name_default.end]);
     });
-    $.RULE(parse_rule_name_default.funcarglist, () => {
+    $.RULE(parse_rule_name_default.function_declare, () => {
+      $.CONSUME(jass_token_map_default.function);
+      $.CONSUME2(jass_token_map_default.identifier);
+      $.CONSUME3(jass_token_map_default.takes);
+      $.SUBRULE($[parse_rule_name_default.function_args]);
+      $.CONSUME4(jass_token_map_default.returns);
+      $.SUBRULE($[parse_rule_name_default.function_returns]);
+      $.SUBRULE($[parse_rule_name_default.end]);
+      $.MANY1(() => $.SUBRULE($[parse_rule_name_default.function_locals]));
+      $.MANY2(() => $.SUBRULE($[parse_rule_name_default.statement]));
+      $.CONSUME(jass_token_map_default.endfunction);
+      $.SUBRULE2($[parse_rule_name_default.end]);
+    });
+    $.RULE(parse_rule_name_default.variable_declare, () => {
+      $.OPTION(() => $.OR([
+        { ALT: () => $.CONSUME(jass_token_map_default.constant) },
+        { ALT: () => $.CONSUME(jass_token_map_default.local) }
+      ]));
+      $.SUBRULE($[parse_rule_name_default.typedname]);
+      $.OPTION2(() => {
+        $.CONSUME(jass_token_map_default.assign);
+        $.SUBRULE($[parse_rule_name_default.expression]);
+      });
+      $.SUBRULE($[parse_rule_name_default.end]);
+    });
+    $.RULE(parse_rule_name_default.globals_declare, () => {
+      $.CONSUME(jass_token_map_default.globals);
+      $.SUBRULE($[parse_rule_name_default.end]);
+      $.MANY(() => $.OR([
+        { ALT: () => $.SUBRULE($[parse_rule_name_default.variable_declare]) },
+        { ALT: () => $.CONSUME(jass_token_map_default.linebreak) },
+        { ALT: () => $.CONSUME(jass_token_map_default.comment) }
+      ]));
+      $.CONSUME3(jass_token_map_default.endglobals);
+      $.SUBRULE2($[parse_rule_name_default.end]);
+    });
+    $.RULE(parse_rule_name_default.if_statement, () => {
+      $.CONSUME(jass_token_map_default.if);
+      $.SUBRULE($[parse_rule_name_default.expression]);
+      $.CONSUME(jass_token_map_default.then);
+      $.SUBRULE($[parse_rule_name_default.end]);
+      $.MANY(() => $.SUBRULE($[parse_rule_name_default.statement]));
+      $.MANY2(() => $.SUBRULE($[parse_rule_name_default.elseif_statement]));
+      $.OPTION(() => $.SUBRULE($[parse_rule_name_default.else_statement]));
+      $.CONSUME(jass_token_map_default.endif);
+      $.SUBRULE2($[parse_rule_name_default.end]);
+    });
+    $.RULE(parse_rule_name_default.elseif_statement, () => {
+      $.CONSUME(jass_token_map_default.elseif);
+      $.SUBRULE($[parse_rule_name_default.expression]);
+      $.CONSUME(jass_token_map_default.then);
+      $.SUBRULE($[parse_rule_name_default.end]);
+      $.MANY(() => $.SUBRULE($[parse_rule_name_default.statement]));
+    });
+    $.RULE(parse_rule_name_default.else_statement, () => {
+      $.CONSUME(jass_token_map_default.else);
+      $.SUBRULE($[parse_rule_name_default.end]);
+      $.MANY(() => $.SUBRULE($[parse_rule_name_default.statement]));
+    });
+    $.RULE(parse_rule_name_default.function_args, () => {
       $.OR([
         { ALT: () => $.CONSUME(jass_token_map_default.nothing) },
         {
@@ -9716,53 +9756,22 @@ var JassParser = class extends CstParser {
       $.OPTION2(() => $.CONSUME(jass_token_map_default.array));
       $.CONSUME2(jass_token_map_default.identifier);
     });
-    $.RULE(parse_rule_name_default.funcreturntype, () => {
+    $.RULE(parse_rule_name_default.function_returns, () => {
       $.OR([
         { ALT: () => $.CONSUME(jass_token_map_default.nothing) },
         { ALT: () => $.CONSUME(jass_token_map_default.identifier) }
       ]);
     });
-    $.RULE(parse_rule_name_default.funcdecl, () => {
-      $.CONSUME(jass_token_map_default.function);
-      $.CONSUME2(jass_token_map_default.identifier);
-      $.CONSUME3(jass_token_map_default.takes);
-      $.SUBRULE($[parse_rule_name_default.funcarglist]);
-      $.CONSUME4(jass_token_map_default.returns);
-      $.SUBRULE($[parse_rule_name_default.funcreturntype]);
-      $.OPTION(() => $.SUBRULE($[parse_rule_name_default.commentdecl]));
-      $.CONSUME5(jass_token_map_default.linebreak);
-      $.MANY1(() => $.SUBRULE($[parse_rule_name_default.localgroup]));
-      $.MANY2(() => $.SUBRULE($[parse_rule_name_default.statement]));
-      $.CONSUME8(jass_token_map_default.endfunction);
-      $.OPTION2(() => $.SUBRULE2($[parse_rule_name_default.commentdecl]));
-      $.SUBRULE($[parse_rule_name_default.terminator]);
-    });
-    $.RULE(parse_rule_name_default.localgroup, () => {
+    $.RULE(parse_rule_name_default.function_locals, () => {
       $.OR([
-        { ALT: () => $.SUBRULE($[parse_rule_name_default.commentdecl]) },
+        { ALT: () => $.CONSUME(jass_token_map_default.comment) },
         { ALT: () => $.CONSUME(jass_token_map_default.linebreak) },
-        { ALT: () => $.SUBRULE($[parse_rule_name_default.localdecl]) }
+        { ALT: () => $.SUBRULE($[parse_rule_name_default.variable_declare]) }
       ]);
     });
-    $.RULE(parse_rule_name_default.localdecl, () => {
-      $.CONSUME(jass_token_map_default.local);
-      $.SUBRULE($[parse_rule_name_default.vardecl]);
-    });
-    $.RULE(parse_rule_name_default.vardecl, () => {
-      $.OPTION(() => $.CONSUME(jass_token_map_default.constant));
-      $.SUBRULE($[parse_rule_name_default.typedname]);
-      $.OPTION2(() => {
-        $.CONSUME(jass_token_map_default.equals);
-        $.SUBRULE($[parse_rule_name_default.expression]);
-      });
-      $.OPTION3(() => $.SUBRULE($[parse_rule_name_default.commentdecl]));
-      $.CONSUME(jass_token_map_default.linebreak);
-    });
-    $.RULE(parse_rule_name_default.expression, () => {
-      $.OR([{
-        ALT: () => $.SUBRULE($[parse_rule_name_default.comparator])
-      }]);
-    });
+    $.RULE(parse_rule_name_default.expression, () => $.OR([{
+      ALT: () => $.SUBRULE($[parse_rule_name_default.comparator])
+    }]));
     $.RULE(parse_rule_name_default.comparator, () => {
       $.OR([
         {
@@ -9770,9 +9779,9 @@ var JassParser = class extends CstParser {
             $.SUBRULE($[parse_rule_name_default.addition]);
             $.MANY(() => {
               $.OR2([
-                { ALT: () => $.CONSUME(jass_token_map_default.equalsequals) },
                 { ALT: () => $.CONSUME(jass_token_map_default.and) },
                 { ALT: () => $.CONSUME(jass_token_map_default.or) },
+                { ALT: () => $.CONSUME(jass_token_map_default.equals) },
                 { ALT: () => $.CONSUME(jass_token_map_default.notequals) },
                 { ALT: () => $.CONSUME(jass_token_map_default.less) },
                 { ALT: () => $.CONSUME(jass_token_map_default.lessorequal) },
@@ -9832,7 +9841,7 @@ var JassParser = class extends CstParser {
           }
         },
         {
-          ALT: () => $.SUBRULE($[parse_rule_name_default.funccall])
+          ALT: () => $.SUBRULE($[parse_rule_name_default.function_call])
         },
         {
           ALT: () => {
@@ -9843,8 +9852,9 @@ var JassParser = class extends CstParser {
         },
         {
           ALT: () => {
+            $.OPTION3(() => $.CONSUME5(jass_token_map_default.sub));
             $.CONSUME3(jass_token_map_default.identifier);
-            $.OPTION3(() => $.SUBRULE($[parse_rule_name_default.arrayaccess]));
+            $.OPTION4(() => $.SUBRULE($[parse_rule_name_default.arrayaccess]));
           }
         },
         {
@@ -9872,7 +9882,7 @@ var JassParser = class extends CstParser {
       $.SUBRULE3($[parse_rule_name_default.expression]);
       $.CONSUME(jass_token_map_default.rsquareparen);
     });
-    $.RULE(parse_rule_name_default.funccall, () => {
+    $.RULE(parse_rule_name_default.function_call, () => {
       $.CONSUME(jass_token_map_default.identifier);
       $.CONSUME2(jass_token_map_default.lparen);
       $.OPTION(() => {
@@ -9886,64 +9896,54 @@ var JassParser = class extends CstParser {
     });
     $.RULE(parse_rule_name_default.statement, () => {
       $.OR4([
-        { ALT: () => $.SUBRULE($[parse_rule_name_default.commentdecl]) },
+        { ALT: () => $.SUBRULE($[parse_rule_name_default.call_statement]) },
+        { ALT: () => $.SUBRULE($[parse_rule_name_default.set_statement]) },
+        { ALT: () => $.SUBRULE($[parse_rule_name_default.loop_statement]) },
+        { ALT: () => $.SUBRULE($[parse_rule_name_default.exitwhen_statement]) },
+        { ALT: () => $.SUBRULE($[parse_rule_name_default.if_statement]) },
+        { ALT: () => $.SUBRULE($[parse_rule_name_default.return_statement]) },
         { ALT: () => $.CONSUME(jass_token_map_default.linebreak) },
-        { ALT: () => $.SUBRULE($[parse_rule_name_default.callstatement]) },
-        { ALT: () => $.SUBRULE($[parse_rule_name_default.setstatement]) },
-        { ALT: () => $.SUBRULE($[parse_rule_name_default.loopstatement]) },
-        { ALT: () => $.SUBRULE($[parse_rule_name_default.exitwhenstatement]) },
-        { ALT: () => $.SUBRULE($[parse_rule_name_default.ifstatement]) },
-        { ALT: () => $.SUBRULE($[parse_rule_name_default.returnstatement]) }
+        { ALT: () => $.CONSUME(jass_token_map_default.comment) }
       ]);
     });
-    $.RULE(parse_rule_name_default.callstatement, () => {
+    $.RULE(parse_rule_name_default.call_statement, () => {
       $.CONSUME(jass_token_map_default.call);
-      $.SUBRULE($[parse_rule_name_default.funccall]);
-    });
-    $.RULE(parse_rule_name_default.returnstatement, () => {
-      $.CONSUME(jass_token_map_default.return);
-      $.OPTION(() => $.SUBRULE($[parse_rule_name_default.expression]));
-      $.OPTION2(() => $.SUBRULE2($[parse_rule_name_default.commentdecl]));
+      $.SUBRULE($[parse_rule_name_default.function_call]);
+      $.OPTION(() => $.CONSUME(jass_token_map_default.comment));
       $.CONSUME2(jass_token_map_default.linebreak);
     });
-    $.RULE(parse_rule_name_default.setstatement, () => {
+    $.RULE(parse_rule_name_default.return_statement, () => {
+      $.CONSUME(jass_token_map_default.return);
+      $.OPTION(() => $.SUBRULE($[parse_rule_name_default.expression]));
+      $.OPTION2(() => $.CONSUME(jass_token_map_default.comment));
+      $.CONSUME2(jass_token_map_default.linebreak);
+    });
+    $.RULE(parse_rule_name_default.set_statement, () => {
       $.CONSUME(jass_token_map_default.set);
       $.CONSUME(jass_token_map_default.identifier);
-      $.OPTION3(() => $.SUBRULE($[parse_rule_name_default.arrayaccess]));
-      $.CONSUME(jass_token_map_default.equals);
+      $.OPTION(() => $.SUBRULE($[parse_rule_name_default.arrayaccess]));
+      $.CONSUME(jass_token_map_default.assign);
       $.SUBRULE($[parse_rule_name_default.expression]);
+      $.OPTION2(() => $.CONSUME(jass_token_map_default.comment));
+      $.CONSUME(jass_token_map_default.linebreak);
     });
-    $.RULE(parse_rule_name_default.loopstatement, () => {
+    $.RULE(parse_rule_name_default.loop_statement, () => {
       $.CONSUME(jass_token_map_default.loop);
+      $.SUBRULE($[parse_rule_name_default.end]);
       $.MANY(() => $.SUBRULE($[parse_rule_name_default.statement]));
       $.CONSUME(jass_token_map_default.endloop);
+      $.SUBRULE2($[parse_rule_name_default.end]);
     });
-    $.RULE(parse_rule_name_default.exitwhenstatement, () => {
+    $.RULE(parse_rule_name_default.exitwhen_statement, () => {
       $.CONSUME(jass_token_map_default.exitwhen);
       $.SUBRULE($[parse_rule_name_default.expression]);
     });
-    $.RULE(parse_rule_name_default.ifstatement, () => {
-      $.CONSUME(jass_token_map_default.if);
-      $.SUBRULE9($[parse_rule_name_default.expression]);
-      $.CONSUME(jass_token_map_default.then);
-      $.OPTION(() => $.SUBRULE($[parse_rule_name_default.commentdecl]));
-      $.CONSUME2(jass_token_map_default.linebreak);
-      $.MANY(() => $.SUBRULE($[parse_rule_name_default.statement]));
-      $.MANY2(() => $.SUBRULE($[parse_rule_name_default.optionalelseIf]));
-      $.OPTION2(() => $.SUBRULE($[parse_rule_name_default.optionalelse]));
-      $.CONSUME3(jass_token_map_default.endif);
-      $.OPTION3(() => $.SUBRULE2($[parse_rule_name_default.commentdecl]));
-      $.CONSUME4(jass_token_map_default.linebreak);
-    });
-    $.RULE(parse_rule_name_default.optionalelseIf, () => {
-      $.CONSUME(jass_token_map_default.elseif);
-      $.SUBRULE3($[parse_rule_name_default.expression]);
-      $.CONSUME4(jass_token_map_default.then);
-      $.MANY4(() => $.SUBRULE($[parse_rule_name_default.statement]));
-    });
-    $.RULE(parse_rule_name_default.optionalelse, () => {
-      $.CONSUME(jass_token_map_default.else);
-      $.MANY(() => $.SUBRULE($[parse_rule_name_default.statement]));
+    $.RULE(parse_rule_name_default.end, () => {
+      $.OPTION(() => $.CONSUME(jass_token_map_default.comment));
+      $.OR([
+        { ALT: () => $.CONSUME(jass_token_map_default.linebreak) },
+        { ALT: () => $.CONSUME2(EOF) }
+      ]);
     });
     this.performSelfAnalysis();
   }
@@ -9994,135 +9994,131 @@ var jass_token_legend_default = {
   jass_then: 26,
   jass_type: 27,
   jass_comma: 28,
-  jass_idliteral: 29,
-  jass_real: 30,
-  jass_integer: 31,
-  jass_variable: 32,
-  jass_function_user: 33,
-  jass_function_native: 34,
-  jass_type_name: 35,
-  jass_argument: 36,
-  jass_operator: 37
+  jass_equals: 29,
+  jass_assign: 30,
+  jass_notequals: 31,
+  jass_lessorequal: 32,
+  jass_less: 33,
+  jass_greatorequal: 34,
+  jass_great: 35,
+  jass_add: 36,
+  jass_sub: 37,
+  jass_mult: 38,
+  jass_div: 39,
+  jass_idliteral: 40,
+  jass_real: 41,
+  jass_integer: 42,
+  jass_variable: 43,
+  jass_function_user: 44,
+  jass_function_native: 45,
+  jass_type_name: 46,
+  jass_argument: 47
 };
 
 // jass/visitor.mjs
 var parser = new JassParser();
 var ParserVisitor = parser.getBaseCstVisitorConstructor();
-var _mark;
+var _mark, mark_fn, _comment, comment_fn;
 var JassVisitor = class extends ParserVisitor {
   constructor() {
     super();
-    /** @type {import('vscode').Diagnostic[]} */
-    __publicField(this, "diagnostics");
-    /** @type {SemanticTokensBuilder} */
-    __publicField(this, "builder");
     /**
      * @param {import('chevrotain').IToken} location
      * @param  {import('vscode').JassTokenLegend} type
      */
-    __privateAdd(this, _mark, (location, type) => {
-      if (this.builder === null)
-        return;
-      if (!location)
-        return;
-      this.builder?.push(
-        location.startLine - 1,
-        location.startColumn - 1,
-        location.endColumn - location.startColumn + 1,
-        type
-      );
-    });
+    __privateAdd(this, _mark);
+    __privateAdd(this, _comment);
+    /** @type {import('vscode').Diagnostic[]} */
+    __publicField(this, "diagnostics");
+    /** @type {SemanticTokensBuilder} */
+    __publicField(this, "builder");
     this.validateVisitor();
   }
   [parse_rule_name_default.jass](ctx) {
-    return ctx[parse_rule_name_default.rootstatement]?.map((item) => this.visit(item));
+    return ctx[parse_rule_name_default.root]?.map((item) => this.visit(item));
   }
-  [parse_rule_name_default.rootstatement](ctx) {
-    if (ctx[jass_token_map_default.linebreak.name])
-      return null;
+  [parse_rule_name_default.root](ctx) {
+    __privateMethod(this, _comment, comment_fn).call(this, ctx);
     let node;
-    if (node = ctx[parse_rule_name_default.commentdecl])
+    if (node = ctx[parse_rule_name_default.type_declare])
       return this.visit(node);
-    if (node = ctx[parse_rule_name_default.typedecl])
+    if (node = ctx[parse_rule_name_default.native_declare])
       return this.visit(node);
-    if (node = ctx[parse_rule_name_default.nativedecl])
+    if (node = ctx[parse_rule_name_default.function_declare])
       return this.visit(node);
-    if (node = ctx[parse_rule_name_default.funcdecl])
-      return this.visit(node);
-    if (node = ctx[parse_rule_name_default.globalsdecl])
+    if (node = ctx[parse_rule_name_default.globals_declare])
       return this.visit(node);
   }
-  /** @param {import('chevrotain').CstNode} ctx */
-  [parse_rule_name_default.commentdecl](ctx) {
-    const comment = ctx[jass_token_map_default.comment.name]?.[0];
-    __privateGet(this, _mark).call(this, comment, jass_token_legend_default.jass_comment);
-    return comment?.image.replace(/^\s*\/+\s*/g, "");
+  [parse_rule_name_default.end](ctx) {
+    __privateMethod(this, _mark, mark_fn).call(this, ctx[jass_token_map_default.comment.name]?.[0], jass_token_legend_default.jass_comment);
   }
-  [parse_rule_name_default.terminator]() {
-    return null;
-  }
-  [parse_rule_name_default.globalsdecl](ctx) {
-    __privateGet(this, _mark).call(this, ctx[jass_token_map_default.globals.name]?.[0], jass_token_legend_default.jass_globals);
-    __privateGet(this, _mark).call(this, ctx[jass_token_map_default.endglobals.name]?.[0], jass_token_legend_default.jass_endglobals);
-    ctx[parse_rule_name_default.commentdecl]?.map((item) => this.visit(item));
-    const vardecl = ctx[parse_rule_name_default.vardecl];
+  [parse_rule_name_default.globals_declare](ctx) {
+    __privateMethod(this, _comment, comment_fn).call(this, ctx);
+    __privateMethod(this, _mark, mark_fn).call(this, ctx[jass_token_map_default.globals.name]?.[0], jass_token_legend_default.jass_globals);
+    __privateMethod(this, _mark, mark_fn).call(this, ctx[jass_token_map_default.endglobals.name]?.[0], jass_token_legend_default.jass_endglobals);
+    const vardecl = ctx[parse_rule_name_default.variable_declare];
     if (vardecl)
       for (const vd of vardecl) {
-        const typedname = this.visit(vd)?.[parse_rule_name_default.typedname];
+        const variable = this.visit(vd);
+        const typedname = variable?.[parse_rule_name_default.typedname];
+        const local = variable?.[jass_token_map_default.local.name];
+        if (local)
+          this.diagnostics?.push({
+            message: `Local variable not allowed in globals block`,
+            range: i_token_to_range_default(local),
+            severity: import_vscode2.DiagnosticSeverity.Error
+          });
         if (typedname) {
           const { type, name } = typedname;
-          __privateGet(this, _mark).call(this, type, jass_token_legend_default.jass_type_name);
-          __privateGet(this, _mark).call(this, name, jass_token_legend_default.jass_variable);
+          __privateMethod(this, _mark, mark_fn).call(this, type, jass_token_legend_default.jass_type_name);
+          __privateMethod(this, _mark, mark_fn).call(this, name, jass_token_legend_default.jass_variable);
         }
       }
     return ctx;
   }
-  [parse_rule_name_default.typedecl](ctx) {
+  [parse_rule_name_default.type_declare](ctx) {
+    ctx[parse_rule_name_default.end]?.map((item) => this.visit(item));
     const name = ctx[jass_token_map_default.identifier.name]?.[0];
     const base = ctx[jass_token_map_default.identifier.name]?.[1];
-    __privateGet(this, _mark).call(this, name, jass_token_legend_default.jass_type_name);
-    __privateGet(this, _mark).call(this, base, jass_token_legend_default.jass_type_name);
-    __privateGet(this, _mark).call(this, ctx[jass_token_map_default.type.name]?.[0], jass_token_legend_default.jass_type);
-    __privateGet(this, _mark).call(this, ctx[jass_token_map_default.extends.name]?.[0], jass_token_legend_default.jass_extends);
-    this.visit(ctx[parse_rule_name_default.commentdecl]);
+    __privateMethod(this, _mark, mark_fn).call(this, name, jass_token_legend_default.jass_type_name);
+    __privateMethod(this, _mark, mark_fn).call(this, base, jass_token_legend_default.jass_type_name);
+    __privateMethod(this, _mark, mark_fn).call(this, ctx[jass_token_map_default.type.name]?.[0], jass_token_legend_default.jass_type);
+    __privateMethod(this, _mark, mark_fn).call(this, ctx[jass_token_map_default.extends.name]?.[0], jass_token_legend_default.jass_extends);
     return {
       name: name?.image,
       base: base?.image
     };
   }
-  [parse_rule_name_default.nativedecl](ctx) {
-    const name = ctx[jass_token_map_default.identifier.name]?.[0];
-    __privateGet(this, _mark).call(this, ctx[jass_token_map_default.constant.name]?.[0], jass_token_legend_default.jass_constant);
-    __privateGet(this, _mark).call(this, name, jass_token_legend_default.jass_function_native);
-    __privateGet(this, _mark).call(this, ctx[jass_token_map_default.native.name]?.[0], jass_token_legend_default.jass_native);
-    __privateGet(this, _mark).call(this, ctx[jass_token_map_default.takes.name]?.[0], jass_token_legend_default.jass_takes);
-    __privateGet(this, _mark).call(this, ctx[jass_token_map_default.returns.name]?.[0], jass_token_legend_default.jass_returns);
-    this.visit(ctx[parse_rule_name_default.commentdecl]);
-    return {
-      name: name?.image,
-      arguments: this.visit(ctx[parse_rule_name_default.funcarglist]),
-      return: this.visit(ctx[parse_rule_name_default.funcreturntype])
-    };
+  [parse_rule_name_default.native_declare](ctx) {
+    __privateMethod(this, _comment, comment_fn).call(this, ctx);
+    __privateMethod(this, _mark, mark_fn).call(this, ctx[jass_token_map_default.constant.name]?.[0], jass_token_legend_default.jass_constant);
+    __privateMethod(this, _mark, mark_fn).call(this, ctx[jass_token_map_default.identifier.name]?.[0], jass_token_legend_default.jass_function_native);
+    __privateMethod(this, _mark, mark_fn).call(this, ctx[jass_token_map_default.native.name]?.[0], jass_token_legend_default.jass_native);
+    __privateMethod(this, _mark, mark_fn).call(this, ctx[jass_token_map_default.takes.name]?.[0], jass_token_legend_default.jass_takes);
+    __privateMethod(this, _mark, mark_fn).call(this, ctx[jass_token_map_default.returns.name]?.[0], jass_token_legend_default.jass_returns);
+    this.visit(ctx[parse_rule_name_default.function_args]);
+    this.visit(ctx[parse_rule_name_default.function_returns]);
   }
-  [parse_rule_name_default.funcdecl](ctx) {
+  [parse_rule_name_default.function_declare](ctx) {
     var _a;
-    __privateGet(this, _mark).call(this, ctx[jass_token_map_default.function.name]?.[0], jass_token_legend_default.jass_function);
-    __privateGet(this, _mark).call(this, ctx[jass_token_map_default.identifier.name]?.[0], jass_token_legend_default.jass_function_user);
-    __privateGet(this, _mark).call(this, ctx[jass_token_map_default.takes.name]?.[0], jass_token_legend_default.jass_takes);
-    __privateGet(this, _mark).call(this, ctx[jass_token_map_default.returns.name]?.[0], jass_token_legend_default.jass_returns);
-    __privateGet(this, _mark).call(this, ctx[jass_token_map_default.endfunction.name]?.[0], jass_token_legend_default.jass_endfunction);
-    this.visit(ctx[parse_rule_name_default.commentdecl]);
-    const locals = ctx?.[parse_rule_name_default.localgroup];
-    const args = this.visit(ctx[parse_rule_name_default.funcarglist]);
-    for (const arg of args.list) {
-      const array = arg[jass_token_map_default.array.name];
-      if (array)
-        this.diagnostics?.push({
-          message: `Array not allowed in function argument`,
-          range: i_token_to_range_default(array),
-          severity: import_vscode2.DiagnosticSeverity.Error
-        });
-    }
+    __privateMethod(this, _comment, comment_fn).call(this, ctx);
+    __privateMethod(this, _mark, mark_fn).call(this, ctx[jass_token_map_default.function.name]?.[0], jass_token_legend_default.jass_function);
+    __privateMethod(this, _mark, mark_fn).call(this, ctx[jass_token_map_default.identifier.name]?.[0], jass_token_legend_default.jass_function_user);
+    __privateMethod(this, _mark, mark_fn).call(this, ctx[jass_token_map_default.takes.name]?.[0], jass_token_legend_default.jass_takes);
+    __privateMethod(this, _mark, mark_fn).call(this, ctx[jass_token_map_default.returns.name]?.[0], jass_token_legend_default.jass_returns);
+    __privateMethod(this, _mark, mark_fn).call(this, ctx[jass_token_map_default.endfunction.name]?.[0], jass_token_legend_default.jass_endfunction);
+    const locals = ctx?.[parse_rule_name_default.function_locals];
+    const args = this.visit(ctx[parse_rule_name_default.function_args]);
+    if (args?.list)
+      for (const arg of args.list) {
+        const array = arg[jass_token_map_default.array.name];
+        if (array)
+          this.diagnostics?.push({
+            message: `Array not allowed in function argument`,
+            range: i_token_to_range_default(array),
+            severity: import_vscode2.DiagnosticSeverity.Error
+          });
+      }
     if (locals) {
       const localMap = {};
       for (const local of locals) {
@@ -10130,8 +10126,8 @@ var JassVisitor = class extends ParserVisitor {
         if (!typedname)
           continue;
         const { type, name } = typedname;
-        __privateGet(this, _mark).call(this, type, jass_token_legend_default.jass_type_name);
-        __privateGet(this, _mark).call(this, name, jass_token_legend_default.jass_variable);
+        __privateMethod(this, _mark, mark_fn).call(this, type, jass_token_legend_default.jass_type_name);
+        __privateMethod(this, _mark, mark_fn).call(this, name, jass_token_legend_default.jass_variable);
         if (name) {
           (localMap[_a = name.image] ?? (localMap[_a] = [])).push(name);
           const argList = args.map[name.image];
@@ -10162,19 +10158,44 @@ var JassVisitor = class extends ParserVisitor {
       for (const statement of statements) {
         this.visit(statement);
       }
-    this.visit(ctx[parse_rule_name_default.funcreturntype]);
+    this.visit(ctx[parse_rule_name_default.function_returns]);
     return {};
+  }
+  [parse_rule_name_default.function_locals](ctx) {
+    __privateMethod(this, _comment, comment_fn).call(this, ctx);
+    const variableDeclare = ctx[parse_rule_name_default.variable_declare];
+    if (!variableDeclare)
+      return null;
+    const variable = this.visit(variableDeclare);
+    const constant2 = variable?.[jass_token_map_default.constant.name];
+    if (constant2)
+      this.diagnostics?.push({
+        message: `Constant not allowed in function`,
+        range: i_token_to_range_default(constant2),
+        severity: import_vscode2.DiagnosticSeverity.Error
+      });
+    const local = variable?.[jass_token_map_default.local.name];
+    if (!local) {
+      const { type } = variable?.[parse_rule_name_default.typedname];
+      if (type)
+        this.diagnostics?.push({
+          message: `Missing local keyword`,
+          range: i_token_to_range_default(type),
+          severity: import_vscode2.DiagnosticSeverity.Error
+        });
+    }
+    return variable;
   }
   [parse_rule_name_default.typedname](ctx) {
     const array = ctx[jass_token_map_default.array.name]?.[0];
-    __privateGet(this, _mark).call(this, array, jass_token_legend_default.jass_array);
+    __privateMethod(this, _mark, mark_fn).call(this, array, jass_token_legend_default.jass_array);
     const list2 = ctx[jass_token_map_default.identifier.name];
     if (!list2)
       return {};
     let [type, name] = list2;
-    if (type.isInsertedInRecovery)
+    if (type?.isInsertedInRecovery ?? false)
       type = null;
-    if (name.isInsertedInRecovery)
+    if (name?.isInsertedInRecovery ?? false)
       name = null;
     return {
       type,
@@ -10182,24 +10203,33 @@ var JassVisitor = class extends ParserVisitor {
       array
     };
   }
-  [parse_rule_name_default.funcarglist](ctx) {
+  [parse_rule_name_default.function_call](ctx) {
+    __privateMethod(this, _mark, mark_fn).call(this, ctx[jass_token_map_default.identifier.name]?.[0], jass_token_legend_default.jass_function_user);
+    let token;
+    if (token = ctx[jass_token_map_default.comma.name])
+      for (const comma of token) {
+        __privateMethod(this, _mark, mark_fn).call(this, comma, jass_token_legend_default.jass_comma);
+      }
+    return ctx;
+  }
+  [parse_rule_name_default.function_args](ctx) {
     var _a;
     let token;
     if (token = ctx?.[jass_token_map_default.nothing.name]?.[0]) {
-      __privateGet(this, _mark).call(this, token, jass_token_legend_default.jass_type_name);
+      __privateMethod(this, _mark, mark_fn).call(this, token, jass_token_legend_default.jass_type_name);
       return { map: {}, list: [] };
     }
     if (token = ctx[jass_token_map_default.comma.name])
       for (const comma of token) {
-        __privateGet(this, _mark).call(this, comma, jass_token_legend_default.jass_comma);
+        __privateMethod(this, _mark, mark_fn).call(this, comma, jass_token_legend_default.jass_comma);
       }
     const args = ctx?.[parse_rule_name_default.typedname]?.map((item) => this.visit(item));
     const argMap = {};
     if (args) {
       for (const arg of args) {
         const { type, name } = arg;
-        __privateGet(this, _mark).call(this, type, jass_token_legend_default.jass_type_name);
-        __privateGet(this, _mark).call(this, name, jass_token_legend_default.jass_argument);
+        __privateMethod(this, _mark, mark_fn).call(this, type, jass_token_legend_default.jass_type_name);
+        __privateMethod(this, _mark, mark_fn).call(this, name, jass_token_legend_default.jass_argument);
         if (name)
           (argMap[_a = name.image] ?? (argMap[_a] = [])).push(name);
       }
@@ -10220,33 +10250,21 @@ var JassVisitor = class extends ParserVisitor {
       list: args
     };
   }
-  [parse_rule_name_default.funcreturntype](ctx) {
+  [parse_rule_name_default.function_returns](ctx) {
     let token;
     if (token = ctx[jass_token_map_default.nothing.name]?.[0]) {
-      __privateGet(this, _mark).call(this, token, jass_token_legend_default.jass_type_name);
+      __privateMethod(this, _mark, mark_fn).call(this, token, jass_token_legend_default.jass_type_name);
       return token.image;
     }
     if (token = ctx[jass_token_map_default.identifier.name]?.[0]) {
-      __privateGet(this, _mark).call(this, token, jass_token_legend_default.jass_type_name);
+      __privateMethod(this, _mark, mark_fn).call(this, token, jass_token_legend_default.jass_type_name);
       return token.image;
     }
     return null;
   }
-  [parse_rule_name_default.localgroup](context) {
-    if (context[jass_token_map_default.linebreak.name])
-      return null;
-    let ctx;
-    if (ctx = context[parse_rule_name_default.localdecl])
-      return this.visit(ctx);
-    if (ctx = context[parse_rule_name_default.commentdecl])
-      return this.visit(ctx);
-  }
-  [parse_rule_name_default.localdecl](ctx) {
-    __privateGet(this, _mark).call(this, ctx[jass_token_map_default.local.name]?.[0], jass_token_legend_default.jass_local);
-    return this.visit(ctx[parse_rule_name_default.vardecl]);
-  }
-  [parse_rule_name_default.vardecl](ctx) {
-    const equals = ctx[jass_token_map_default.equals.name]?.[0];
+  [parse_rule_name_default.variable_declare](ctx) {
+    __privateMethod(this, _comment, comment_fn).call(this, ctx);
+    const equals = ctx[jass_token_map_default.assign.name]?.[0];
     const typedname = this.visit(ctx[parse_rule_name_default.typedname]);
     const array = typedname[jass_token_map_default.array.name];
     if (equals && array)
@@ -10255,12 +10273,18 @@ var JassVisitor = class extends ParserVisitor {
         range: i_token_to_range_default(array),
         severity: import_vscode2.DiagnosticSeverity.Error
       });
-    __privateGet(this, _mark).call(this, ctx[jass_token_map_default.constant.name]?.[0], jass_token_legend_default.jass_constant);
-    __privateGet(this, _mark).call(this, ctx[jass_token_map_default.equals.name]?.[0], jass_token_legend_default.jass_operator);
-    this.visit(ctx[parse_rule_name_default.commentdecl]);
+    const local = ctx[jass_token_map_default.local.name]?.[0];
+    if (local)
+      __privateMethod(this, _mark, mark_fn).call(this, local, jass_token_legend_default.jass_local);
+    const constant2 = ctx[jass_token_map_default.constant.name]?.[0];
+    if (constant2)
+      __privateMethod(this, _mark, mark_fn).call(this, constant2, jass_token_legend_default.jass_constant);
+    __privateMethod(this, _mark, mark_fn).call(this, ctx[jass_token_map_default.assign.name]?.[0], jass_token_legend_default.jass_equals);
     this.visit(ctx[parse_rule_name_default.expression]);
     return {
-      [parse_rule_name_default.typedname]: typedname
+      [parse_rule_name_default.typedname]: typedname,
+      [jass_token_map_default.local.name]: local,
+      [jass_token_map_default.constant.name]: constant2
     };
   }
   [parse_rule_name_default.expression](ctx) {
@@ -10271,14 +10295,14 @@ var JassVisitor = class extends ParserVisitor {
     return ctx;
   }
   [parse_rule_name_default.addition](ctx) {
-    ctx[jass_token_map_default.add.name]?.map((item) => __privateGet(this, _mark).call(this, item, jass_token_legend_default.jass_operator));
-    ctx[jass_token_map_default.sub.name]?.map((item) => __privateGet(this, _mark).call(this, item, jass_token_legend_default.jass_operator));
+    ctx[jass_token_map_default.add.name]?.map((item) => __privateMethod(this, _mark, mark_fn).call(this, item, jass_token_legend_default.jass_add));
+    ctx[jass_token_map_default.sub.name]?.map((item) => __privateMethod(this, _mark, mark_fn).call(this, item, jass_token_legend_default.jass_sub));
     this.visit(ctx[parse_rule_name_default.multiplication]);
     return ctx;
   }
   [parse_rule_name_default.multiplication](ctx) {
-    ctx[jass_token_map_default.mult.name]?.map((item) => __privateGet(this, _mark).call(this, item, jass_token_legend_default.jass_operator));
-    ctx[jass_token_map_default.div.name]?.map((item) => __privateGet(this, _mark).call(this, item, jass_token_legend_default.jass_operator));
+    ctx[jass_token_map_default.mult.name]?.map((item) => __privateMethod(this, _mark, mark_fn).call(this, item, jass_token_legend_default.jass_mult));
+    ctx[jass_token_map_default.div.name]?.map((item) => __privateMethod(this, _mark, mark_fn).call(this, item, jass_token_legend_default.jass_div));
     this.visit(ctx[parse_rule_name_default.primary]);
     return ctx;
   }
@@ -10288,57 +10312,96 @@ var JassVisitor = class extends ParserVisitor {
   [parse_rule_name_default.arrayaccess](ctx) {
     return ctx;
   }
-  [parse_rule_name_default.funccall](ctx) {
-    return ctx;
-  }
-  //region statement
   [parse_rule_name_default.statement](ctx) {
-    if (ctx[jass_token_map_default.linebreak.name])
-      return null;
+    __privateMethod(this, _comment, comment_fn).call(this, ctx);
     let node;
-    if (node = ctx[parse_rule_name_default.commentdecl])
+    if (node = ctx[parse_rule_name_default.if_statement])
       return this.visit(node);
-    if (node = ctx[parse_rule_name_default.ifstatement])
+    if (node = ctx[parse_rule_name_default.set_statement])
       return this.visit(node);
-    if (node = ctx[parse_rule_name_default.returnstatement])
+    if (node = ctx[parse_rule_name_default.call_statement])
       return this.visit(node);
+    if (node = ctx[parse_rule_name_default.loop_statement])
+      return this.visit(node);
+    if (node = ctx[parse_rule_name_default.exitwhen_statement])
+      return this.visit(node);
+    if (node = ctx[parse_rule_name_default.return_statement])
+      return this.visit(node);
+    return null;
   }
-  //endregion
-  [parse_rule_name_default.callstatement](ctx) {
+  [parse_rule_name_default.call_statement](ctx) {
+    __privateMethod(this, _comment, comment_fn).call(this, ctx);
+    __privateMethod(this, _mark, mark_fn).call(this, ctx[jass_token_map_default.call.name]?.[0], jass_token_legend_default.jass_call);
+    this.visit(ctx[parse_rule_name_default.function_call]);
+    return null;
+  }
+  [parse_rule_name_default.set_statement](ctx) {
+    __privateMethod(this, _comment, comment_fn).call(this, ctx);
+    __privateMethod(this, _mark, mark_fn).call(this, ctx[jass_token_map_default.set.name]?.[0], jass_token_legend_default.jass_set);
+    __privateMethod(this, _mark, mark_fn).call(this, ctx[jass_token_map_default.identifier.name]?.[0], jass_token_legend_default.jass_variable);
+    __privateMethod(this, _mark, mark_fn).call(this, ctx[jass_token_map_default.assign.name]?.[0], jass_token_legend_default.jass_assign);
+    return null;
+  }
+  [parse_rule_name_default.loop_statement](ctx) {
+    __privateMethod(this, _comment, comment_fn).call(this, ctx);
+    __privateMethod(this, _mark, mark_fn).call(this, ctx[jass_token_map_default.loop.name]?.[0], jass_token_legend_default.jass_loop);
+    __privateMethod(this, _mark, mark_fn).call(this, ctx[jass_token_map_default.endloop.name]?.[0], jass_token_legend_default.jass_endloop);
+    ctx[parse_rule_name_default.statement]?.map((item) => this.visit(item));
     return ctx;
   }
-  [parse_rule_name_default.setstatement](ctx) {
+  [parse_rule_name_default.exitwhen_statement](ctx) {
+    __privateMethod(this, _mark, mark_fn).call(this, ctx[jass_token_map_default.exitwhen.name]?.[0], jass_token_legend_default.jass_loop);
     return ctx;
   }
-  [parse_rule_name_default.loopstatement](ctx) {
-    return ctx;
+  [parse_rule_name_default.return_statement](ctx) {
+    __privateMethod(this, _comment, comment_fn).call(this, ctx);
+    __privateMethod(this, _mark, mark_fn).call(this, ctx[jass_token_map_default.return.name]?.[0], jass_token_legend_default.jass_return);
+    return null;
   }
-  [parse_rule_name_default.exitwhenstatement](ctx) {
-    return ctx;
-  }
-  [parse_rule_name_default.returnstatement](ctx) {
-    this.visit(ctx[parse_rule_name_default.commentdecl]);
-    __privateGet(this, _mark).call(this, ctx[jass_token_map_default.return.name]?.[0], jass_token_legend_default.jass_return);
-    return ctx;
-  }
-  [parse_rule_name_default.ifstatement](ctx) {
-    ctx[parse_rule_name_default.commentdecl]?.map((item) => this.visit(item));
-    __privateGet(this, _mark).call(this, ctx[jass_token_map_default.if.name]?.[0], jass_token_legend_default.jass_if);
-    __privateGet(this, _mark).call(this, ctx[jass_token_map_default.then.name]?.[0], jass_token_legend_default.jass_then);
-    __privateGet(this, _mark).call(this, ctx[jass_token_map_default.endif.name]?.[0], jass_token_legend_default.jass_endif);
+  [parse_rule_name_default.if_statement](ctx) {
+    __privateMethod(this, _comment, comment_fn).call(this, ctx);
+    __privateMethod(this, _mark, mark_fn).call(this, ctx[jass_token_map_default.if.name]?.[0], jass_token_legend_default.jass_if);
+    __privateMethod(this, _mark, mark_fn).call(this, ctx[jass_token_map_default.then.name]?.[0], jass_token_legend_default.jass_then);
+    __privateMethod(this, _mark, mark_fn).call(this, ctx[jass_token_map_default.endif.name]?.[0], jass_token_legend_default.jass_endif);
     this.visit(ctx[parse_rule_name_default.expression]);
     ctx[parse_rule_name_default.statement]?.map((item) => this.visit(item));
-    console.log("ifstatement", ctx);
+    ctx[parse_rule_name_default.elseif_statement]?.map((item) => this.visit(item));
+    this.visit(ctx[parse_rule_name_default.else_statement]);
     return ctx;
   }
-  [parse_rule_name_default.optionalelseIf](ctx) {
+  [parse_rule_name_default.elseif_statement](ctx) {
+    __privateMethod(this, _comment, comment_fn).call(this, ctx);
+    this.visit(ctx[parse_rule_name_default.expression]);
+    __privateMethod(this, _mark, mark_fn).call(this, ctx[jass_token_map_default.elseif.name]?.[0], jass_token_legend_default.jass_elseif);
+    __privateMethod(this, _mark, mark_fn).call(this, ctx[jass_token_map_default.then.name]?.[0], jass_token_legend_default.jass_then);
+    ctx[parse_rule_name_default.statement]?.map((item) => this.visit(item));
     return ctx;
   }
-  [parse_rule_name_default.optionalelse](ctx) {
+  [parse_rule_name_default.else_statement](ctx) {
+    __privateMethod(this, _comment, comment_fn).call(this, ctx);
+    __privateMethod(this, _mark, mark_fn).call(this, ctx[jass_token_map_default.else.name]?.[0], jass_token_legend_default.jass_else);
+    ctx[parse_rule_name_default.statement]?.map((item) => this.visit(item));
     return ctx;
   }
 };
-_mark = new WeakMap();
+_mark = new WeakSet();
+mark_fn = function(location, type) {
+  if (this.builder === null)
+    return;
+  if (!location)
+    return;
+  this.builder?.push(
+    location.startLine - 1,
+    location.startColumn - 1,
+    location.endColumn - location.startColumn + 1,
+    type
+  );
+};
+_comment = new WeakSet();
+comment_fn = function(ctx) {
+  ctx[parse_rule_name_default.end]?.map((item) => this.visit(item));
+  ctx[jass_token_map_default.comment.name]?.map((item) => __privateMethod(this, _mark, mark_fn).call(this, item, jass_token_legend_default.jass_comment));
+};
 
 // docs/main.mjs
 var parser2 = new JassParser();

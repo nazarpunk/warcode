@@ -185,6 +185,50 @@
         "description": ""
       },
       {
+        "id": "jass_equals",
+        "description": ""
+      },
+      {
+        "id": "jass_assign",
+        "description": ""
+      },
+      {
+        "id": "jass_notequals",
+        "description": ""
+      },
+      {
+        "id": "jass_lessorequal",
+        "description": ""
+      },
+      {
+        "id": "jass_less",
+        "description": ""
+      },
+      {
+        "id": "jass_greatorequal",
+        "description": ""
+      },
+      {
+        "id": "jass_great",
+        "description": ""
+      },
+      {
+        "id": "jass_add",
+        "description": ""
+      },
+      {
+        "id": "jass_sub",
+        "description": ""
+      },
+      {
+        "id": "jass_mult",
+        "description": ""
+      },
+      {
+        "id": "jass_div",
+        "description": ""
+      },
+      {
         "id": "jass_idliteral",
         "description": ""
       },
@@ -214,10 +258,6 @@
       },
       {
         "id": "jass_argument",
-        "description": ""
-      },
-      {
-        "id": "jass_operator",
         "description": ""
       }
     ],
@@ -253,6 +293,17 @@
           "jass_then": "#2C7AD6",
           "jass_type": "#2C7AD6",
           "jass_comma": "#FFFFFF",
+          "jass_equals": "#e7be60",
+          "jass_assign": "#e7be60",
+          "jass_notequals": "#e7be60",
+          "jass_lessorequal": "#e7be60",
+          "jass_less": "#e7be60",
+          "jass_greatorequal": "#e7be60",
+          "jass_great": "#e7be60",
+          "jass_add": "#e7be60",
+          "jass_sub": "#e7be60",
+          "jass_mult": "#e7be60",
+          "jass_div": "#e7be60",
           "jass_idliteral": "#e760cc",
           "jass_real": "#e760cc",
           "jass_integer": "#e760cc",
@@ -260,8 +311,7 @@
           "jass_function_user": "#DCDCAA",
           "jass_function_native": "#C586C0",
           "jass_type_name": "#4EC9B0",
-          "jass_argument": "#9CDCDA",
-          "jass_operator": "#e7be60"
+          "jass_argument": "#9CDCDA"
         }
       }
     }

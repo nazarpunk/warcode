@@ -1,17 +1,26 @@
-function RMinBJ takes real a, real b returns real
-    if a < b then // 3
-        // 1
-        // 2
-        // 3
-        return 224
-    endif //dfdfdff
-    // ssscscsc
+function RMinBJ takes real a, real r returns real
 
-    if ((a < b)) then // 3
-        // 1
-        // 2
-        // 3
-    endif
+  loop //
+  //
+  //
+  exitwhen playerIndex == bj_MAX_PLAYERS
+            set indexPlayer = Player(playerIndex)
+            if bj_playerIsCrippled[playerIndex] then
+                // Uncripple the player
+                set bj_playerIsCrippled[playerIndex] = false
+                call PauseTimer(bj_crippledTimer[playerIndex])
 
-    return 33
+                if (GetLocalPlayer() == indexPlayer) then
+                    // Use only local code (no net traffic) within this block to avoid desyncs.
+
+                    // Hide the timer window.
+                    call TimerDialogDisplay(bj_crippledTimerWindows[playerIndex], false)
+                endif
+
+            endif
+            set playerIndex = playerIndex + 1
+            exitwhen playerIndex == bj_MAX_PLAYERS
+        endloop
+
+
 endfunction

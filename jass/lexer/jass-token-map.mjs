@@ -181,15 +181,15 @@ export default {
         label: ",",
         line_breaks: false,
     }),
-    equalsequals: createToken({
-        name: 'equalsequals',
+    equals: createToken({
+        name: 'equals',
         pattern: /==/,
         start_chars_hint: ["="],
         line_breaks: false,
         label: "==",
     }),
-    equals: createToken({
-        name: 'equals',
+    assign: createToken({
+        name: 'assign',
         pattern: /=/,
         start_chars_hint: ["="],
         line_breaks: false,

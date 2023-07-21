@@ -1,3 +1,5 @@
+// noinspection DuplicatedCode
+
 import {CstParser, EOF} from "chevrotain";
 import ParseRuleName from "./parse-rule-name.mjs";
 import JassLexer from "./lexer/jass-lexer.mjs";
@@ -58,65 +60,125 @@ export class JassParser extends CstParser {
 
         const $ = this;
 
-        $.RULE(ParseRuleName.jass, () => $.MANY(() => $.SUBRULE($[ParseRuleName.rootstatement])));
+        //region jass
+        $.RULE(ParseRuleName.jass, () => $.MANY(() => $.SUBRULE($[ParseRuleName.root])));
+        //endregion
 
-        $.RULE(ParseRuleName.rootstatement, () => {
+        //region root
+        $.RULE(ParseRuleName.root, () => {
             $.OR([
-                {ALT: () => $.SUBRULE($[ParseRuleName.commentdecl])},
+                {ALT: () => $.SUBRULE($[ParseRuleName.type_declare])},
+                {ALT: () => $.SUBRULE($[ParseRuleName.native_declare])},
+                {ALT: () => $.SUBRULE($[ParseRuleName.function_declare])},
+                {ALT: () => $.SUBRULE($[ParseRuleName.globals_declare])},
                 {ALT: () => $.CONSUME(JassTokenMap.linebreak)},
-                {ALT: () => $.SUBRULE($[ParseRuleName.typedecl])},
-                {ALT: () => $.SUBRULE($[ParseRuleName.nativedecl])},
-                {ALT: () => $.SUBRULE($[ParseRuleName.funcdecl])},
-                {ALT: () => $.SUBRULE($[ParseRuleName.globalsdecl])},
+                {ALT: () => $.CONSUME(JassTokenMap.comment)},
             ]);
         });
+        //endregion
 
-        $.RULE(ParseRuleName.globalsdecl, () => {
-            $.CONSUME(JassTokenMap.globals);
-            $.OPTION(() => $.SUBRULE($[ParseRuleName.commentdecl]));
-            $.CONSUME2(JassTokenMap.linebreak);
-            $.MANY(() => $.OR([
-                {ALT: () => $.SUBRULE2($[ParseRuleName.commentdecl])},
-                {ALT: () => $.CONSUME(JassTokenMap.linebreak)},
-                {ALT: () => $.SUBRULE($[ParseRuleName.vardecl])},
-            ]));
-            $.CONSUME3(JassTokenMap.endglobals);
-            $.SUBRULE($[ParseRuleName.terminator]);
-        });
-
-        $.RULE(ParseRuleName.commentdecl, () => $.CONSUME(JassTokenMap.comment));
-
-        $.RULE(ParseRuleName.typedecl, () => {
+        //region type
+        $.RULE(ParseRuleName.type_declare, () => {
             $.CONSUME(JassTokenMap.type);
             $.CONSUME(JassTokenMap.identifier);
             $.CONSUME(JassTokenMap.extends);
             $.CONSUME2(JassTokenMap.identifier);
-            $.OPTION(() => $.SUBRULE($[ParseRuleName.commentdecl]));
-            $.SUBRULE($[ParseRuleName.terminator]);
+            $.SUBRULE($[ParseRuleName.end]);
         });
+        //endregion
 
-        $.RULE(ParseRuleName.terminator, () => {
-            $.OR([
-                {ALT: () => $.CONSUME(EOF)},
-                {ALT: () => $.CONSUME2(JassTokenMap.linebreak)}
-            ]);
-        });
-
-        //region nativedecl
-        $.RULE(ParseRuleName.nativedecl, () => {
+        //region native
+        $.RULE(ParseRuleName.native_declare, () => {
             $.OPTION(() => $.CONSUME(JassTokenMap.constant));
             $.CONSUME(JassTokenMap.native);
             $.CONSUME2(JassTokenMap.identifier);
             $.CONSUME3(JassTokenMap.takes);
-            $.SUBRULE($[ParseRuleName.funcarglist]);
+            $.SUBRULE($[ParseRuleName.function_args]);
             $.CONSUME4(JassTokenMap.returns);
-            $.SUBRULE($[ParseRuleName.funcreturntype]);
-            $.OPTION2(() => $.SUBRULE($[ParseRuleName.commentdecl]));
-            $.SUBRULE($[ParseRuleName.terminator]);
+            $.SUBRULE($[ParseRuleName.function_returns]);
+            $.SUBRULE($[ParseRuleName.end]);
         });
         //endregion
 
-        $.RULE(ParseRuleName.funcarglist, () => {
+        //region function
+        $.RULE(ParseRuleName.function_declare, () => {
+            $.CONSUME(JassTokenMap.function);
+            $.CONSUME2(JassTokenMap.identifier);
+            $.CONSUME3(JassTokenMap.takes);
+            $.SUBRULE($[ParseRuleName.function_args]);
+            $.CONSUME4(JassTokenMap.returns);
+            $.SUBRULE($[ParseRuleName.function_returns]);
+            $.SUBRULE($[ParseRuleName.end]);
+            $.MANY1(() => $.SUBRULE($[ParseRuleName.function_locals]));
+            $.MANY2(() => $.SUBRULE($[ParseRuleName.statement]));
+            $.CONSUME(JassTokenMap.endfunction);
+            $.SUBRULE2($[ParseRuleName.end]);
+        });
+        //endregion
+
+        //region variable
+        $.RULE(ParseRuleName.variable_declare, () => {
+            $.OPTION(() => $.OR([
+                {ALT: () => $.CONSUME(JassTokenMap.constant)},
+                {ALT: () => $.CONSUME(JassTokenMap.local)},
+            ]));
+            $.SUBRULE($[ParseRuleName.typedname]);
+            $.OPTION2(() => {
+                $.CONSUME(JassTokenMap.assign)
+                $.SUBRULE($[ParseRuleName.expression])
+            });
+            $.SUBRULE($[ParseRuleName.end]);
+        });
+        //endregion
+
+        //region globals
+        $.RULE(ParseRuleName.globals_declare, () => {
+            $.CONSUME(JassTokenMap.globals);
+            $.SUBRULE($[ParseRuleName.end]);
+            $.MANY(() => $.OR([
+                {ALT: () => $.SUBRULE($[ParseRuleName.variable_declare])},
+                {ALT: () => $.CONSUME(JassTokenMap.linebreak)},
+                {ALT: () => $.CONSUME(JassTokenMap.comment)},
+            ]));
+            $.CONSUME3(JassTokenMap.endglobals);
+            $.SUBRULE2($[ParseRuleName.end]);
+        });
+        //endregion
+
+        //region if
+        $.RULE(ParseRuleName.if_statement, () => {
+            $.CONSUME(JassTokenMap.if)
+            $.SUBRULE($[ParseRuleName.expression])
+            $.CONSUME(JassTokenMap.then)
+            $.SUBRULE($[ParseRuleName.end]);
+            $.MANY(() => $.SUBRULE($[ParseRuleName.statement]))
+            $.MANY2(() => $.SUBRULE($[ParseRuleName.elseif_statement]))
+            $.OPTION(() => $.SUBRULE($[ParseRuleName.else_statement]))
+            $.CONSUME(JassTokenMap.endif)
+            $.SUBRULE2($[ParseRuleName.end]);
+        });
+        //endregion
+
+        //region elseif
+        $.RULE(ParseRuleName.elseif_statement, () => {
+            $.CONSUME(JassTokenMap.elseif);
+            $.SUBRULE($[ParseRuleName.expression]);
+            $.CONSUME(JassTokenMap.then);
+            $.SUBRULE($[ParseRuleName.end]);
+            $.MANY(() => $.SUBRULE($[ParseRuleName.statement]));
+        });
+        //endregion
+
+        //region else
+        $.RULE(ParseRuleName.else_statement, () => {
+            $.CONSUME(JassTokenMap.else);
+            $.SUBRULE($[ParseRuleName.end]);
+            $.MANY(() => $.SUBRULE($[ParseRuleName.statement]));
+        });
+        //endregion
+
+        //region args
+        $.RULE(ParseRuleName.function_args, () => {
             $.OR([
                 {ALT: () => $.CONSUME(JassTokenMap.nothing)},
                 {
@@ -130,6 +192,7 @@ export class JassParser extends CstParser {
                 },
             ]);
         });
+        //endregion
 
         //region typedname
         $.RULE(ParseRuleName.typedname, () => {
@@ -139,64 +202,26 @@ export class JassParser extends CstParser {
         });
         //endregion
 
-        $.RULE(ParseRuleName.funcreturntype, () => {
+        $.RULE(ParseRuleName.function_returns, () => {
             $.OR([
                 {ALT: () => $.CONSUME(JassTokenMap.nothing)},
                 {ALT: () => $.CONSUME(JassTokenMap.identifier)},
-            ])
-        });
-
-        //region funcdecl
-        $.RULE(ParseRuleName.funcdecl, () => {
-            $.CONSUME(JassTokenMap.function);
-            $.CONSUME2(JassTokenMap.identifier);
-            $.CONSUME3(JassTokenMap.takes);
-            $.SUBRULE($[ParseRuleName.funcarglist]);
-            $.CONSUME4(JassTokenMap.returns);
-            $.SUBRULE($[ParseRuleName.funcreturntype]);
-            $.OPTION(() => $.SUBRULE($[ParseRuleName.commentdecl]));
-            $.CONSUME5(JassTokenMap.linebreak);
-            $.MANY1(() => $.SUBRULE($[ParseRuleName.localgroup]));
-            $.MANY2(() => $.SUBRULE($[ParseRuleName.statement]));
-            $.CONSUME8(JassTokenMap.endfunction);
-            $.OPTION2(() => $.SUBRULE2($[ParseRuleName.commentdecl]));
-            $.SUBRULE($[ParseRuleName.terminator]);
-        });
-        //endregion
-
-        $.RULE(ParseRuleName.localgroup, () => {
-            $.OR([
-                {ALT: () => $.SUBRULE($[ParseRuleName.commentdecl])},
-                {ALT: () => $.CONSUME(JassTokenMap.linebreak)},
-                {ALT: () => $.SUBRULE($[ParseRuleName.localdecl])},
             ]);
         });
 
-        //region localdecl
-        $.RULE(ParseRuleName.localdecl, () => {
-            $.CONSUME(JassTokenMap.local)
-            $.SUBRULE($[ParseRuleName.vardecl])
+        $.RULE(ParseRuleName.function_locals, () => {
+            $.OR([
+                {ALT: () => $.CONSUME(JassTokenMap.comment)},
+                {ALT: () => $.CONSUME(JassTokenMap.linebreak)},
+                {ALT: () => $.SUBRULE($[ParseRuleName.variable_declare])},
+            ]);
         });
-        //endregion
 
-        //region vardecl
-        $.RULE(ParseRuleName.vardecl, () => {
-            $.OPTION(() => $.CONSUME(JassTokenMap.constant));
-            $.SUBRULE($[ParseRuleName.typedname]);
-            $.OPTION2(() => {
-                $.CONSUME(JassTokenMap.equals)
-                $.SUBRULE($[ParseRuleName.expression])
-            });
-            $.OPTION3(() => $.SUBRULE($[ParseRuleName.commentdecl]));
-            $.CONSUME(JassTokenMap.linebreak)
-        });
+        //region expression
+        $.RULE(ParseRuleName.expression, () => $.OR([{
+            ALT: () => $.SUBRULE($[ParseRuleName.comparator])
+        },]));
         //endregion
-
-        $.RULE(ParseRuleName.expression, () => {
-            $.OR([{
-                ALT: () => $.SUBRULE($[ParseRuleName.comparator])
-            },])
-        });
 
         //region comparator
         $.RULE(ParseRuleName.comparator, () => {
@@ -206,9 +231,9 @@ export class JassParser extends CstParser {
                         $.SUBRULE($[ParseRuleName.addition]);
                         $.MANY(() => {
                             $.OR2([
-                                {ALT: () => $.CONSUME(JassTokenMap.equalsequals)},
                                 {ALT: () => $.CONSUME(JassTokenMap.and)},
                                 {ALT: () => $.CONSUME(JassTokenMap.or)},
+                                {ALT: () => $.CONSUME(JassTokenMap.equals)},
                                 {ALT: () => $.CONSUME(JassTokenMap.notequals)},
                                 {ALT: () => $.CONSUME(JassTokenMap.less)},
                                 {ALT: () => $.CONSUME(JassTokenMap.lessorequal)},
@@ -272,7 +297,7 @@ export class JassParser extends CstParser {
                     }
                 },
                 {
-                    ALT: () => $.SUBRULE($[ParseRuleName.funccall])
+                    ALT: () => $.SUBRULE($[ParseRuleName.function_call])
                 },
                 {
                     ALT: () => {
@@ -283,8 +308,9 @@ export class JassParser extends CstParser {
                 },
                 {
                     ALT: () => {
+                        $.OPTION3(() => $.CONSUME5(JassTokenMap.sub));
                         $.CONSUME3(JassTokenMap.identifier)
-                        $.OPTION3(() => $.SUBRULE($[ParseRuleName.arrayaccess]))
+                        $.OPTION4(() => $.SUBRULE($[ParseRuleName.arrayaccess]))
                     }
                 },
                 {
@@ -314,7 +340,7 @@ export class JassParser extends CstParser {
             $.CONSUME(JassTokenMap.rsquareparen);
         })
 
-        $.RULE(ParseRuleName.funccall, () => {
+        $.RULE(ParseRuleName.function_call, () => {
             $.CONSUME(JassTokenMap.identifier);
             $.CONSUME2(JassTokenMap.lparen);
             $.OPTION(() => {
@@ -330,78 +356,74 @@ export class JassParser extends CstParser {
         //region statement
         $.RULE(ParseRuleName.statement, () => {
             $.OR4([
-                {ALT: () => $.SUBRULE($[ParseRuleName.commentdecl])},
+                {ALT: () => $.SUBRULE($[ParseRuleName.call_statement])},
+                {ALT: () => $.SUBRULE($[ParseRuleName.set_statement])},
+                {ALT: () => $.SUBRULE($[ParseRuleName.loop_statement])},
+                {ALT: () => $.SUBRULE($[ParseRuleName.exitwhen_statement])},
+                {ALT: () => $.SUBRULE($[ParseRuleName.if_statement])},
+                {ALT: () => $.SUBRULE($[ParseRuleName.return_statement])},
                 {ALT: () => $.CONSUME(JassTokenMap.linebreak)},
-                {ALT: () => $.SUBRULE($[ParseRuleName.callstatement])},
-                {ALT: () => $.SUBRULE($[ParseRuleName.setstatement])},
-                {ALT: () => $.SUBRULE($[ParseRuleName.loopstatement])},
-                {ALT: () => $.SUBRULE($[ParseRuleName.exitwhenstatement])},
-                {ALT: () => $.SUBRULE($[ParseRuleName.ifstatement])},
-                {ALT: () => $.SUBRULE($[ParseRuleName.returnstatement])},
+                {ALT: () => $.CONSUME(JassTokenMap.comment)},
             ]);
         });
         //endregion
 
-        $.RULE(ParseRuleName.callstatement, () => {
+        //region call
+        $.RULE(ParseRuleName.call_statement, () => {
             $.CONSUME(JassTokenMap.call)
-            $.SUBRULE($[ParseRuleName.funccall])
-        });
-
-        $.RULE(ParseRuleName.returnstatement, () => {
-            $.CONSUME(JassTokenMap.return);
-            $.OPTION(() => $.SUBRULE($[ParseRuleName.expression]));
-            $.OPTION2(() => $.SUBRULE2($[ParseRuleName.commentdecl]));
+            $.SUBRULE($[ParseRuleName.function_call])
+            $.OPTION(() => $.CONSUME(JassTokenMap.comment));
             $.CONSUME2(JassTokenMap.linebreak);
         });
+        //endregion
 
-        $.RULE(ParseRuleName.setstatement, () => {
+        //region return
+        $.RULE(ParseRuleName.return_statement, () => {
+            $.CONSUME(JassTokenMap.return);
+            $.OPTION(() => $.SUBRULE($[ParseRuleName.expression]));
+            $.OPTION2(() => $.CONSUME(JassTokenMap.comment));
+            $.CONSUME2(JassTokenMap.linebreak);
+        });
+        //endregion
+
+        //region set
+        $.RULE(ParseRuleName.set_statement, () => {
             $.CONSUME(JassTokenMap.set)
             $.CONSUME(JassTokenMap.identifier)
-            $.OPTION3(() => $.SUBRULE($[ParseRuleName.arrayaccess]))
-            $.CONSUME(JassTokenMap.equals)
+            $.OPTION(() => $.SUBRULE($[ParseRuleName.arrayaccess]))
+            $.CONSUME(JassTokenMap.assign)
             $.SUBRULE($[ParseRuleName.expression]);
+            $.OPTION2(() => $.CONSUME(JassTokenMap.comment));
+            $.CONSUME(JassTokenMap.linebreak);
         });
+        //endregion
 
-        $.RULE(ParseRuleName.loopstatement, () => {
+        //region loop
+        $.RULE(ParseRuleName.loop_statement, () => {
             $.CONSUME(JassTokenMap.loop);
+            $.SUBRULE($[ParseRuleName.end]);
             $.MANY(() => $.SUBRULE($[ParseRuleName.statement]));
             $.CONSUME(JassTokenMap.endloop);
+            $.SUBRULE2($[ParseRuleName.end]);
         });
+        //endregion
 
-        //region exitwhenstatement
-        $.RULE(ParseRuleName.exitwhenstatement, () => {
+        //region exitwhen
+        $.RULE(ParseRuleName.exitwhen_statement, () => {
             $.CONSUME(JassTokenMap.exitwhen);
             $.SUBRULE($[ParseRuleName.expression]);
         });
         //endregion
 
-        //region ifstatement
-        $.RULE(ParseRuleName.ifstatement, () => {
-            $.CONSUME(JassTokenMap.if)
-            $.SUBRULE9($[ParseRuleName.expression])
-            $.CONSUME(JassTokenMap.then)
-            $.OPTION(() => $.SUBRULE($[ParseRuleName.commentdecl]));
-            $.CONSUME2(JassTokenMap.linebreak);
-            $.MANY(() => $.SUBRULE($[ParseRuleName.statement]))
-            $.MANY2(() => $.SUBRULE($[ParseRuleName.optionalelseIf]))
-            $.OPTION2(() => $.SUBRULE($[ParseRuleName.optionalelse]))
-            $.CONSUME3(JassTokenMap.endif)
-            $.OPTION3(() => $.SUBRULE2($[ParseRuleName.commentdecl]));
-            $.CONSUME4(JassTokenMap.linebreak);
+        //region end
+        $.RULE(ParseRuleName.end, () => {
+            $.OPTION(() => $.CONSUME(JassTokenMap.comment));
+            $.OR([
+                {ALT: () => $.CONSUME(JassTokenMap.linebreak)},
+                {ALT: () => $.CONSUME2(EOF)}
+            ]);
         });
         //endregion
-
-        $.RULE(ParseRuleName.optionalelseIf, () => {
-            $.CONSUME(JassTokenMap.elseif);
-            $.SUBRULE3($[ParseRuleName.expression]);
-            $.CONSUME4(JassTokenMap.then);
-            $.MANY4(() => $.SUBRULE($[ParseRuleName.statement]));
-        });
-
-        $.RULE(ParseRuleName.optionalelse, () => {
-            $.CONSUME(JassTokenMap.else);
-            $.MANY(() => $.SUBRULE($[ParseRuleName.statement]));
-        });
 
         this.performSelfAnalysis();
     }
