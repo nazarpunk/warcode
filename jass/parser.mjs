@@ -33,11 +33,12 @@ export class JassParser extends CstParser {
         this.input = JassLexer.tokenize(text).tokens;
     }
 
-    constructor() {
+    constructor(debug = false) {
         super(JassTokenList, {
             recoveryEnabled: true,
             errorMessageProvider: {
                 buildMismatchTokenMessage: options => {
+                    if (debug) console.error(options);
                     this.errorlist.push(new JassParserError(JassParserErrorType.MismatchToken, options.actual));
                     return null;
                 },
@@ -343,10 +344,14 @@ export class JassParser extends CstParser {
                     }
                 },
                 {
-                    ALT: () => $.SUBRULE($[ParseRuleName.function_call])
+                    ALT: () => {
+                        $.OPTION5(() => $.CONSUME3(JassTokenMap.sub));
+                        $.SUBRULE($[ParseRuleName.function_call]);
+                    }
                 },
                 {
                     ALT: () => {
+                        $.OPTION6(() => $.CONSUME6(JassTokenMap.sub));
                         $.CONSUME(JassTokenMap.lparen)
                         $.SUBRULE2($[ParseRuleName.expression])
                         $.CONSUME(JassTokenMap.rparen)

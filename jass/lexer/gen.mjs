@@ -48,6 +48,7 @@ for (let [keyword, color] of Object.entries({
 
 const numberColor = '#e760cc';
 const operatorColor = '#e7be60';
+const parenColor = '#e1d132';
 
 /** @type {(import('chevrotain').ITokenConfig & {color:  string})[]} */
 const tokenList = [
@@ -162,17 +163,12 @@ const tokenList = [
         color: operatorColor,
     },
     {
-        name: 'stringliteral',
-        pattern: /".*"/,
-        start_chars_hint: ['"'],
-        line_breaks: false,
-    },
-    {
         name: 'lparen',
         pattern: /\(/,
         start_chars_hint: ['('],
         line_breaks: false,
         label: '(',
+        color: parenColor,
     },
     {
         name: 'rparen',
@@ -180,6 +176,7 @@ const tokenList = [
         start_chars_hint: [')'],
         line_breaks: false,
         label: ')',
+        color: parenColor,
     },
     {
         name: 'lsquareparen',
@@ -187,6 +184,7 @@ const tokenList = [
         start_chars_hint: ['['],
         line_breaks: false,
         label: '[',
+        color: parenColor,
     },
     {
         name: 'rsquareparen',
@@ -194,14 +192,9 @@ const tokenList = [
         start_chars_hint: [']'],
         line_breaks: false,
         label: ']',
+        color: parenColor,
     },
     // no start_chars_hint
-    {
-        name: 'idliteral',
-        pattern: /'.*'/,
-        line_breaks: false,
-        color: numberColor,
-    },
     {
         name: 'real',
         pattern: /[0-9]+\.[0-9]+/,
@@ -219,6 +212,19 @@ const tokenList = [
         pattern: /\n|\r\n/,
         label: '\\n',
         line_breaks: true,
+    },
+    {
+        name: 'idliteral',
+        pattern: /'[^']*'/,
+        line_breaks: true,
+        color: numberColor,
+    },
+    {
+        name: 'stringliteral',
+        pattern: /"[^"\\]*(?:\\.[^"\\]*)*"/,
+        start_chars_hint: ['"'],
+        line_breaks: true,
+        color: '#CE9178',
     },
     {
         name: 'identifier',

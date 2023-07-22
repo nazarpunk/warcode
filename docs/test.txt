@@ -1,28 +1,17 @@
-function RMinBJ takes real a, real r returns real
+function RMinBJ takes real a, real v returns real
+    local string totalTexe = "за
+    лупа" + text + '44334' + 1 + .02 + "залупа"
+//local string totalTexe = SetTextColor('scsccscsscsscsc', "пизда") + "залупа" + text
 
-  loop //
-  //
-  //
-  exitwhen playerIndex == bj_MAX_PLAYERS
-    debug call Trace("AttackMoveKillA\n")
+//  local string totalText=SetTextColor("Подсказка","hint")+" "+text
 
-            set indexPlayer = Player(playerIndex)
-            if bj_playerIsCrippled[playerIndex] then
-                // Uncripple the player
-                set bj_playerIsCrippled[playerIndex] = false
-                call PauseTimer(bj_crippledTimer[playerIndex])
+// set haslayout=LoadInteger(MemHackTable,StringHash("FrameTypeTable"),fid+0x1000)!=0 and f_name1!="CHeroBar" and f_name1!="CPeonBar" and f_name1!="CUpperButtonBar" and f_name1!="CResourceBar"
 
-                if (GetLocalPlayer() == indexPlayer) then
-                    // Use only local code (no net traffic) within this block to avoid desyncs.
+//if(GetPlayerTechCount(p,'R03L',true)==1 and Hero=='H00R')then
+//set Hero='H02L'
+//endif
 
-                    // Hide the timer window.
-                    call TimerDialogDisplay(bj_crippledTimerWindows[playerIndex], false)
-                endif
-
-            endif
-            set playerIndex = playerIndex + 1
-            exitwhen playerIndex == bj_MAX_PLAYERS
-        endloop
-
+//set s="Урон: "+I2S(R2I(dmg))+"
+//"+"Пиратов: "+I2S(max)
 
 endfunction

@@ -2,7 +2,7 @@ import {createSyntaxDiagramsCode} from 'chevrotain'
 import {JassParser} from "../jass/parser.mjs";
 import {JassVisitor} from "../jass/visitor.mjs";
 
-const parser = new JassParser()
+const parser = new JassParser(true)
 const iframe = document.createElement('iframe');
 iframe.src = 'data:text/html;charset=utf-8,' + encodeURI(createSyntaxDiagramsCode(parser.getSerializedGastProductions()));
 document.body.appendChild(iframe);

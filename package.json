@@ -238,7 +238,19 @@
         "description": ""
       },
       {
-        "id": "jass_idliteral",
+        "id": "jass_lparen",
+        "description": ""
+      },
+      {
+        "id": "jass_rparen",
+        "description": ""
+      },
+      {
+        "id": "jass_lsquareparen",
+        "description": ""
+      },
+      {
+        "id": "jass_rsquareparen",
         "description": ""
       },
       {
@@ -247,6 +259,14 @@
       },
       {
         "id": "jass_integer",
+        "description": ""
+      },
+      {
+        "id": "jass_idliteral",
+        "description": ""
+      },
+      {
+        "id": "jass_stringliteral",
         "description": ""
       },
       {
@@ -314,9 +334,14 @@
           "jass_sub": "#e7be60",
           "jass_mult": "#e7be60",
           "jass_div": "#e7be60",
-          "jass_idliteral": "#e760cc",
+          "jass_lparen": "#e1d132",
+          "jass_rparen": "#e1d132",
+          "jass_lsquareparen": "#e1d132",
+          "jass_rsquareparen": "#e1d132",
           "jass_real": "#e760cc",
           "jass_integer": "#e760cc",
+          "jass_idliteral": "#e760cc",
+          "jass_stringliteral": "#CE9178",
           "jass_variable": "#94d564",
           "jass_function_user": "#DCDCAA",
           "jass_function_native": "#C586C0",

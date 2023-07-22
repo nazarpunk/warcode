@@ -264,12 +264,6 @@ export default {
         line_breaks: false,
         label: "/",
     }),
-    stringliteral: createToken({
-        name: 'stringliteral',
-        pattern: /".*"/,
-        start_chars_hint: ["\""],
-        line_breaks: false,
-    }),
     lparen: createToken({
         name: 'lparen',
         pattern: /\(/,
@@ -298,11 +292,6 @@ export default {
         line_breaks: false,
         label: "]",
     }),
-    idliteral: createToken({
-        name: 'idliteral',
-        pattern: /'.*'/,
-        line_breaks: false,
-    }),
     real: createToken({
         name: 'real',
         pattern: /[0-9]+\.[0-9]+/,
@@ -317,6 +306,17 @@ export default {
         name: 'linebreak',
         pattern: /\n|\r\n/,
         label: "\\n",
+        line_breaks: true,
+    }),
+    idliteral: createToken({
+        name: 'idliteral',
+        pattern: /'[^']*'/,
+        line_breaks: true,
+    }),
+    stringliteral: createToken({
+        name: 'stringliteral',
+        pattern: /"[^"\\]*(?:\\.[^"\\]*)*"/,
+        start_chars_hint: ["\""],
         line_breaks: true,
     }),
     identifier: createToken({

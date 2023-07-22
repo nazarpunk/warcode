@@ -9541,12 +9541,6 @@ var jass_token_map_default = {
     line_breaks: false,
     label: "/"
   }),
-  stringliteral: createToken({
-    name: "stringliteral",
-    pattern: /".*"/,
-    start_chars_hint: ['"'],
-    line_breaks: false
-  }),
   lparen: createToken({
     name: "lparen",
     pattern: /\(/,
@@ -9575,11 +9569,6 @@ var jass_token_map_default = {
     line_breaks: false,
     label: "]"
   }),
-  idliteral: createToken({
-    name: "idliteral",
-    pattern: /'.*'/,
-    line_breaks: false
-  }),
   real: createToken({
     name: "real",
     pattern: /[0-9]+\.[0-9]+/,
@@ -9596,6 +9585,17 @@ var jass_token_map_default = {
     label: "\\n",
     line_breaks: true
   }),
+  idliteral: createToken({
+    name: "idliteral",
+    pattern: /'[^']*'/,
+    line_breaks: true
+  }),
+  stringliteral: createToken({
+    name: "stringliteral",
+    pattern: /"[^"\\]*(?:\\.[^"\\]*)*"/,
+    start_chars_hint: ['"'],
+    line_breaks: true
+  }),
   identifier: createToken({
     name: "identifier",
     pattern: /[a-zA-Z][a-zA-Z0-9_]*/,
@@ -9604,7 +9604,7 @@ var jass_token_map_default = {
 };
 
 // jass/lexer/jass-token-list.mjs
-var list = [jass_token_map_default.whitespace, jass_token_map_default.comment, jass_token_map_default.and, jass_token_map_default.array, jass_token_map_default.call, jass_token_map_default.constant, jass_token_map_default.debug, jass_token_map_default.else, jass_token_map_default.elseif, jass_token_map_default.endfunction, jass_token_map_default.endglobals, jass_token_map_default.endif, jass_token_map_default.endloop, jass_token_map_default.exitwhen, jass_token_map_default.extends, jass_token_map_default.function, jass_token_map_default.globals, jass_token_map_default.if, jass_token_map_default.local, jass_token_map_default.loop, jass_token_map_default.native, jass_token_map_default.not, jass_token_map_default.nothing, jass_token_map_default.or, jass_token_map_default.returns, jass_token_map_default.return, jass_token_map_default.set, jass_token_map_default.takes, jass_token_map_default.then, jass_token_map_default.type, jass_token_map_default.comma, jass_token_map_default.equals, jass_token_map_default.assign, jass_token_map_default.notequals, jass_token_map_default.lessorequal, jass_token_map_default.less, jass_token_map_default.greatorequal, jass_token_map_default.great, jass_token_map_default.add, jass_token_map_default.sub, jass_token_map_default.mult, jass_token_map_default.div, jass_token_map_default.stringliteral, jass_token_map_default.lparen, jass_token_map_default.rparen, jass_token_map_default.lsquareparen, jass_token_map_default.rsquareparen, jass_token_map_default.idliteral, jass_token_map_default.real, jass_token_map_default.integer, jass_token_map_default.linebreak, jass_token_map_default.identifier];
+var list = [jass_token_map_default.whitespace, jass_token_map_default.comment, jass_token_map_default.and, jass_token_map_default.array, jass_token_map_default.call, jass_token_map_default.constant, jass_token_map_default.debug, jass_token_map_default.else, jass_token_map_default.elseif, jass_token_map_default.endfunction, jass_token_map_default.endglobals, jass_token_map_default.endif, jass_token_map_default.endloop, jass_token_map_default.exitwhen, jass_token_map_default.extends, jass_token_map_default.function, jass_token_map_default.globals, jass_token_map_default.if, jass_token_map_default.local, jass_token_map_default.loop, jass_token_map_default.native, jass_token_map_default.not, jass_token_map_default.nothing, jass_token_map_default.or, jass_token_map_default.returns, jass_token_map_default.return, jass_token_map_default.set, jass_token_map_default.takes, jass_token_map_default.then, jass_token_map_default.type, jass_token_map_default.comma, jass_token_map_default.equals, jass_token_map_default.assign, jass_token_map_default.notequals, jass_token_map_default.lessorequal, jass_token_map_default.less, jass_token_map_default.greatorequal, jass_token_map_default.great, jass_token_map_default.add, jass_token_map_default.sub, jass_token_map_default.mult, jass_token_map_default.div, jass_token_map_default.lparen, jass_token_map_default.rparen, jass_token_map_default.lsquareparen, jass_token_map_default.rsquareparen, jass_token_map_default.real, jass_token_map_default.integer, jass_token_map_default.linebreak, jass_token_map_default.idliteral, jass_token_map_default.stringliteral, jass_token_map_default.identifier];
 var jass_token_list_default = list;
 
 // jass/lexer/jass-lexer.mjs
@@ -9629,11 +9629,13 @@ var JassParserError = class {
   }
 };
 var JassParser = class extends CstParser {
-  constructor() {
+  constructor(debug = false) {
     super(jass_token_list_default, {
       recoveryEnabled: true,
       errorMessageProvider: {
         buildMismatchTokenMessage: (options) => {
+          if (debug)
+            console.error(options);
           this.errorlist.push(new JassParserError(JassParserErrorType.MismatchToken, options.actual));
           return null;
         },
@@ -9878,10 +9880,14 @@ var JassParser = class extends CstParser {
           }
         },
         {
-          ALT: () => $.SUBRULE($[parse_rule_name_default.function_call])
+          ALT: () => {
+            $.OPTION5(() => $.CONSUME3(jass_token_map_default.sub));
+            $.SUBRULE($[parse_rule_name_default.function_call]);
+          }
         },
         {
           ALT: () => {
+            $.OPTION6(() => $.CONSUME6(jass_token_map_default.sub));
             $.CONSUME(jass_token_map_default.lparen);
             $.SUBRULE2($[parse_rule_name_default.expression]);
             $.CONSUME(jass_token_map_default.rparen);
@@ -10011,29 +10017,36 @@ var jass_token_legend_default = {
   jass_sub: 38,
   jass_mult: 39,
   jass_div: 40,
-  jass_idliteral: 41,
-  jass_real: 42,
-  jass_integer: 43,
-  jass_variable: 44,
-  jass_function_user: 45,
-  jass_function_native: 46,
-  jass_type_name: 47,
-  jass_argument: 48
+  jass_lparen: 41,
+  jass_rparen: 42,
+  jass_lsquareparen: 43,
+  jass_rsquareparen: 44,
+  jass_real: 45,
+  jass_integer: 46,
+  jass_idliteral: 47,
+  jass_stringliteral: 48,
+  jass_variable: 49,
+  jass_function_user: 50,
+  jass_function_native: 51,
+  jass_type_name: 52,
+  jass_argument: 53
 };
 
 // jass/visitor.mjs
 var parser = new JassParser();
 var ParserVisitor = parser.getBaseCstVisitorConstructor();
-var _mark, mark_fn, _comment, comment_fn;
+var _mark, mark_fn, _comment, comment_fn, _string, string_fn;
 var JassVisitor = class extends ParserVisitor {
   constructor() {
     super();
     /**
-     * @param {import('chevrotain').IToken} location
-     * @param  {import('vscode').JassTokenLegend} type
+     * @param {import('chevrotain').IToken} token
+     * @param {number} type
      */
     __privateAdd(this, _mark);
     __privateAdd(this, _comment);
+    /** @param {import('chevrotain').CstNode} ctx */
+    __privateAdd(this, _string);
     /** @type {import('vscode').Diagnostic[]} */
     __publicField(this, "diagnostics");
     /** @type {SemanticTokensBuilder} */
@@ -10070,7 +10083,7 @@ var JassVisitor = class extends ParserVisitor {
         const local = variable?.[jass_token_map_default.local.name];
         if (local)
           this.diagnostics?.push({
-            message: `Local variable not allowed in globals block`,
+            message: `Local variable not allowed in globals block.`,
             range: i_token_to_range_default(local),
             severity: import_vscode2.DiagnosticSeverity.Error
           });
@@ -10120,7 +10133,7 @@ var JassVisitor = class extends ParserVisitor {
         const array = arg[jass_token_map_default.array.name];
         if (array)
           this.diagnostics?.push({
-            message: `Array not allowed in function argument`,
+            message: `Array not allowed in function argument.`,
             range: i_token_to_range_default(array),
             severity: import_vscode2.DiagnosticSeverity.Error
           });
@@ -10176,7 +10189,7 @@ var JassVisitor = class extends ParserVisitor {
     const constant2 = variable?.[jass_token_map_default.constant.name];
     if (constant2)
       this.diagnostics?.push({
-        message: `Constant not allowed in function`,
+        message: `Constant not allowed in function.`,
         range: i_token_to_range_default(constant2),
         severity: import_vscode2.DiagnosticSeverity.Error
       });
@@ -10185,7 +10198,7 @@ var JassVisitor = class extends ParserVisitor {
       const { type } = variable?.[parse_rule_name_default.typedname];
       if (type)
         this.diagnostics?.push({
-          message: `Missing local keyword`,
+          message: `Missing local keyword.`,
           range: i_token_to_range_default(type),
           severity: import_vscode2.DiagnosticSeverity.Error
         });
@@ -10211,11 +10224,10 @@ var JassVisitor = class extends ParserVisitor {
   }
   [parse_rule_name_default.function_call](ctx) {
     __privateMethod(this, _mark, mark_fn).call(this, ctx[jass_token_map_default.identifier.name]?.[0], jass_token_legend_default.jass_function_user);
-    let token;
-    if (token = ctx[jass_token_map_default.comma.name])
-      for (const comma of token) {
-        __privateMethod(this, _mark, mark_fn).call(this, comma, jass_token_legend_default.jass_comma);
-      }
+    __privateMethod(this, _mark, mark_fn).call(this, ctx[jass_token_map_default.lparen.name]?.[0], jass_token_legend_default.jass_lparen);
+    __privateMethod(this, _mark, mark_fn).call(this, ctx[jass_token_map_default.rparen.name]?.[0], jass_token_legend_default.jass_rparen);
+    ctx[jass_token_map_default.comma.name]?.map((item) => __privateMethod(this, _mark, mark_fn).call(this, item, jass_token_legend_default.jass_comma));
+    ctx[parse_rule_name_default.expression]?.map((item) => this.visit(item));
     return ctx;
   }
   [parse_rule_name_default.function_args](ctx) {
@@ -10275,7 +10287,7 @@ var JassVisitor = class extends ParserVisitor {
     const array = typedname[jass_token_map_default.array.name];
     if (equals && array)
       this.diagnostics?.push({
-        message: `Array varriables can't be initialised`,
+        message: `Array varriables can't be initialised.`,
         range: i_token_to_range_default(array),
         severity: import_vscode2.DiagnosticSeverity.Error
       });
@@ -10286,7 +10298,7 @@ var JassVisitor = class extends ParserVisitor {
     if (constant2)
       __privateMethod(this, _mark, mark_fn).call(this, constant2, jass_token_legend_default.jass_constant);
     __privateMethod(this, _mark, mark_fn).call(this, ctx[jass_token_map_default.assign.name]?.[0], jass_token_legend_default.jass_equals);
-    this.visit(ctx[parse_rule_name_default.expression]);
+    this.visit(ctx[parse_rule_name_default.expression]?.[0]);
     return {
       [parse_rule_name_default.typedname]: typedname,
       [jass_token_map_default.local.name]: local,
@@ -10376,7 +10388,7 @@ var JassVisitor = class extends ParserVisitor {
   [parse_rule_name_default.addition](ctx) {
     ctx[jass_token_map_default.add.name]?.map((item) => __privateMethod(this, _mark, mark_fn).call(this, item, jass_token_legend_default.jass_add));
     ctx[jass_token_map_default.sub.name]?.map((item) => __privateMethod(this, _mark, mark_fn).call(this, item, jass_token_legend_default.jass_sub));
-    this.visit(ctx[parse_rule_name_default.multiplication]);
+    ctx[parse_rule_name_default.multiplication]?.map((item) => this.visit(item));
     return ctx;
   }
   [parse_rule_name_default.multiplication](ctx) {
@@ -10386,6 +10398,12 @@ var JassVisitor = class extends ParserVisitor {
     return ctx;
   }
   [parse_rule_name_default.primary](ctx) {
+    __privateMethod(this, _string, string_fn).call(this, ctx);
+    __privateMethod(this, _mark, mark_fn).call(this, ctx[jass_token_map_default.sub.name]?.[0], jass_token_legend_default.jass_sub);
+    __privateMethod(this, _mark, mark_fn).call(this, ctx[jass_token_map_default.integer.name]?.[0], jass_token_legend_default.jass_integer);
+    __privateMethod(this, _mark, mark_fn).call(this, ctx[jass_token_map_default.idliteral.name]?.[0], jass_token_legend_default.jass_idliteral);
+    __privateMethod(this, _mark, mark_fn).call(this, ctx[jass_token_map_default.identifier.name]?.[0], jass_token_legend_default.jass_variable);
+    this.visit(ctx[parse_rule_name_default.function_call]);
     return ctx;
   }
   [parse_rule_name_default.arrayaccess](ctx) {
@@ -10393,15 +10411,15 @@ var JassVisitor = class extends ParserVisitor {
   }
 };
 _mark = new WeakSet();
-mark_fn = function(location, type) {
+mark_fn = function(token, type) {
   if (this.builder === null)
     return;
-  if (!location)
+  if (!token)
     return;
   this.builder?.push(
-    location.startLine - 1,
-    location.startColumn - 1,
-    location.endColumn - location.startColumn + 1,
+    token.startLine - 1,
+    token.startColumn - 1,
+    token.endColumn - token.startColumn + 1,
     type
   );
 };
@@ -10410,9 +10428,27 @@ comment_fn = function(ctx) {
   ctx[parse_rule_name_default.end]?.map((item) => this.visit(item));
   ctx[jass_token_map_default.comment.name]?.map((item) => __privateMethod(this, _mark, mark_fn).call(this, item, jass_token_legend_default.jass_comment));
 };
+_string = new WeakSet();
+string_fn = function(ctx) {
+  const strings = ctx[jass_token_map_default.stringliteral.name];
+  if (!strings)
+    return;
+  for (const string of strings) {
+    if (string.startLine === string.endLine) {
+      __privateMethod(this, _mark, mark_fn).call(this, string, jass_token_legend_default.jass_stringliteral);
+      continue;
+    }
+    if (string)
+      this.diagnostics?.push({
+        message: `Avoid multiline strings. Use |n to linebreak.`,
+        range: i_token_to_range_default(string),
+        severity: import_vscode2.DiagnosticSeverity.Warning
+      });
+  }
+};
 
 // docs/main.mjs
-var parser2 = new JassParser();
+var parser2 = new JassParser(true);
 var iframe = document.createElement("iframe");
 iframe.src = "data:text/html;charset=utf-8," + encodeURI(createSyntaxDiagramsCode(parser2.getSerializedGastProductions()));
 document.body.appendChild(iframe);
