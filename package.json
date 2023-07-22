@@ -8,7 +8,7 @@
   "contributors": [],
   "description": "Vanilla JASS syntax.",
   "private": false,
-  "icon": "imagas/logo.png",
+  "icon": "images/logo.png",
   "keywords": [
     "jass",
     "warcraft"
