@@ -1,6 +1,6 @@
 # jass-vanilla
 
-Extension for [VSCode](https://code.visualstudio.com) for vanilla jass syntax highlight.
+[Extension](https://marketplace.visualstudio.com/items?itemName=nazarpunk.jass-vanilla) for [VSCode](https://code.visualstudio.com) for vanilla jass syntax highlight.
 
 Based on [Chevrotain](https://chevrotain.io/playground) library. [Playground](https://chevrotain.io/playground).
 
