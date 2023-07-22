@@ -4,6 +4,8 @@ function RMinBJ takes real a, real r returns real
   //
   //
   exitwhen playerIndex == bj_MAX_PLAYERS
+    debug call Trace("AttackMoveKillA\n")
+
             set indexPlayer = Player(playerIndex)
             if bj_playerIsCrippled[playerIndex] then
                 // Uncripple the player

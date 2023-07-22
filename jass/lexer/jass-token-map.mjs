@@ -36,6 +36,12 @@ export default {
         start_chars_hint: ["c"],
         line_breaks: false,
     }),
+    debug: createToken({
+        name: 'debug',
+        pattern: /\bdebug\b/,
+        start_chars_hint: ["d"],
+        line_breaks: false,
+    }),
     else: createToken({
         name: 'else',
         pattern: /\belse\b/,

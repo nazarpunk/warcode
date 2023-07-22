@@ -14,6 +14,7 @@ for (let [keyword, color] of Object.entries({
     array: null,
     call: null,
     constant: null,
+    debug: null,
     else: null,
     elseif: null,
     endfunction: null,

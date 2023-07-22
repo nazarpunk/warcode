@@ -339,37 +339,6 @@ export class JassVisitor extends ParserVisitor {
         };
     }
 
-    [ParseRuleName.expression](ctx) {
-        return this.visit(ctx[ParseRuleName.comparator]);
-    }
-
-    [ParseRuleName.comparator](ctx) {
-        this.visit(ctx[ParseRuleName.addition]);
-        return ctx;
-    }
-
-    [ParseRuleName.addition](ctx) {
-        ctx[JassTokenMap.add.name]?.map(item => this.#mark(item, JassTokenLegend.jass_add));
-        ctx[JassTokenMap.sub.name]?.map(item => this.#mark(item, JassTokenLegend.jass_sub));
-        this.visit(ctx[ParseRuleName.multiplication]);
-        return ctx;
-    }
-
-    [ParseRuleName.multiplication](ctx) {
-        ctx[JassTokenMap.mult.name]?.map(item => this.#mark(item, JassTokenLegend.jass_mult));
-        ctx[JassTokenMap.div.name]?.map(item => this.#mark(item, JassTokenLegend.jass_div));
-        this.visit(ctx[ParseRuleName.primary]);
-        return ctx;
-    }
-
-    [ParseRuleName.primary](ctx) {
-        return ctx;
-    }
-
-    [ParseRuleName.arrayaccess](ctx) {
-        return ctx;
-    }
-
     [ParseRuleName.statement](ctx) {
         this.#comment(ctx);
         let node;
@@ -384,6 +353,7 @@ export class JassVisitor extends ParserVisitor {
 
     [ParseRuleName.call_statement](ctx) {
         this.#comment(ctx);
+        this.#mark(ctx[JassTokenMap.debug.name]?.[0], JassTokenLegend.jass_debug);
         this.#mark(ctx[JassTokenMap.call.name]?.[0], JassTokenLegend.jass_call);
         this.visit(ctx[ParseRuleName.function_call]);
         return null;
@@ -406,6 +376,7 @@ export class JassVisitor extends ParserVisitor {
     }
 
     [ParseRuleName.exitwhen_statement](ctx) {
+        this.#comment(ctx);
         this.#mark(ctx[JassTokenMap.exitwhen.name]?.[0], JassTokenLegend.jass_loop);
         return ctx;
     }
@@ -444,6 +415,37 @@ export class JassVisitor extends ParserVisitor {
         this.#comment(ctx);
         this.#mark(ctx[JassTokenMap.else.name]?.[0], JassTokenLegend.jass_else);
         ctx[ParseRuleName.statement]?.map(item => this.visit(item));
+        return ctx;
+    }
+
+    [ParseRuleName.expression](ctx) {
+        return this.visit(ctx[ParseRuleName.comparator]);
+    }
+
+    [ParseRuleName.comparator](ctx) {
+        this.visit(ctx[ParseRuleName.addition]);
+        return ctx;
+    }
+
+    [ParseRuleName.addition](ctx) {
+        ctx[JassTokenMap.add.name]?.map(item => this.#mark(item, JassTokenLegend.jass_add));
+        ctx[JassTokenMap.sub.name]?.map(item => this.#mark(item, JassTokenLegend.jass_sub));
+        this.visit(ctx[ParseRuleName.multiplication]);
+        return ctx;
+    }
+
+    [ParseRuleName.multiplication](ctx) {
+        ctx[JassTokenMap.mult.name]?.map(item => this.#mark(item, JassTokenLegend.jass_mult));
+        ctx[JassTokenMap.div.name]?.map(item => this.#mark(item, JassTokenLegend.jass_div));
+        this.visit(ctx[ParseRuleName.primary]);
+        return ctx;
+    }
+
+    [ParseRuleName.primary](ctx) {
+        return ctx;
+    }
+
+    [ParseRuleName.arrayaccess](ctx) {
         return ctx;
     }
 }

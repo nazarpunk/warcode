@@ -10,8 +10,9 @@ export class JassDocumentSemanticTokensProvider {
     #parser = new JassParser();
     #visitor = new JassVisitor();
 
+    // noinspection JSUnusedGlobalSymbols
     onDidChangeSemanticTokens = () => {
-        console.log('onDidChangeSemanticTokens');
+        //console.log('onDidChangeSemanticTokens');
         return null;
     }
 
@@ -22,7 +23,7 @@ export class JassDocumentSemanticTokensProvider {
      * @param {import("vscode.CancellationToken")} token
      */
     provideDocumentSemanticTokensEdits(document, previousResultId, token) {
-        console.log('provideDocumentSemanticTokensEdits', document, previousResultId, token);
+        //console.log('provideDocumentSemanticTokensEdits', document, previousResultId, token);
     }
 
     // noinspection JSUnusedGlobalSymbols
@@ -31,7 +32,7 @@ export class JassDocumentSemanticTokensProvider {
      * @return {Promise<import("vscode.CancellationToken").SemanticTokens>}
      */
     async provideDocumentSemanticTokens(document) {
-        console.log('provideDocumentSemanticTokens');
+        //console.log('provideDocumentSemanticTokens');
         const text = document.getText();
 
         this.#collection.clear();

@@ -8,9 +8,14 @@
   "contributors": [],
   "description": "Vanilla JASS syntax.",
   "private": false,
+  "icon": "imagas/logo.png",
   "keywords": [
-    "jass"
+    "jass",
+    "warcraft"
   ],
+  "engines": {
+    "vscode": "^1.80.0"
+  },
   "categories": [
     "Programming Languages",
     "Snippets",
@@ -21,10 +26,13 @@
     "type": "git",
     "url": "https://github.com/nazarpunk/vscode-jass-vanilla"
   },
+  "bugs": {
+    "url": "https://github.com/nazarpunk/vscode-jass-vanilla/issues"
+  },
   "main": "./out/extension.js",
   "scripts": {
-    "esbuild-chevrotain-calculator": "esbuild docs/calculator/main.mjs --outfile=docs/calculator/out/main.mjs --target=es2020 --bundle --external:vscode --format=cjs --platform=browser --tree-shaking=true --sourcemap --watch",
-    "esbuild-chevrotain": "esbuild docs/main.mjs --outfile=docs/out/main.mjs --target=es2020 --bundle --external:vscode --format=cjs --platform=browser --tree-shaking=true --sourcemap --watch",
+    "esbuild-diagram-calculator": "esbuild docs/calculator/main.mjs --outfile=docs/calculator/out/main.mjs --target=es2020 --bundle --external:vscode --format=cjs --platform=browser --tree-shaking=true --sourcemap --watch",
+    "esbuild-diagram-jass": "esbuild docs/main.mjs --outfile=docs/out/main.mjs --target=es2020 --bundle --external:vscode --format=cjs --platform=browser --tree-shaking=true --sourcemap --watch",
     "vscode:prepublish": "npm run esbuild-base",
     "build": "vsce package",
     "publish": "vsce publish patch",
@@ -32,19 +40,16 @@
     "esbuild": "npm run esbuild-base",
     "esbuild-watch": "npm run esbuild-base -- --watch"
   },
-  "configurationDefaults": {
-    "jass": {
-      "editor.semanticHighlighting.enabled": true
-    }
-  },
   "devDependencies": {
     "chevrotain": "^11.0.1",
     "esbuild": "^0.18.14",
     "@vscode/vsce": "^2.15.0",
     "@types/vscode": "^1.80.0"
   },
-  "engines": {
-    "vscode": "^1.80.0"
+  "configurationDefaults": {
+    "jass": {
+      "editor.semanticHighlighting.enabled": true
+    }
   },
   "contributes": {
     "languages": [
@@ -86,6 +91,10 @@
       },
       {
         "id": "jass_constant",
+        "description": ""
+      },
+      {
+        "id": "jass_debug",
         "description": ""
       },
       {
@@ -269,6 +278,7 @@
           "jass_array": "#2C7AD6",
           "jass_call": "#2C7AD6",
           "jass_constant": "#2C7AD6",
+          "jass_debug": "#2C7AD6",
           "jass_else": "#2C7AD6",
           "jass_elseif": "#2C7AD6",
           "jass_endfunction": "#2C7AD6",

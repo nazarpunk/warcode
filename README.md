@@ -1,8 +1,7 @@
-# vscode-jass-vanilla
+# jass-vanilla
 
-[jass-lex-rule](https://nazarpunk.github.io/vscode-jass-vanilla)
+Extension for [VSCode](https://code.visualstudio.com) for vanilla jass syntax highlight.
 
-[playground](https://chevrotain.io/playground/)
-[tinyc](https://github.com/Chevrotain/chevrotain/blob/master/examples/grammars/tinyc/tinyc.js)
+Based on [Chevrotain](https://chevrotain.io/playground) library. [Playground](https://chevrotain.io/playground).
 
-[jassjs](https://github.com/PBug90/jassjs)
+[Lexing rules](https://nazarpunk.github.io/vscode-jass-vanilla) based in [jassjs](https://github.com/PBug90/jassjs) but much improved. 
