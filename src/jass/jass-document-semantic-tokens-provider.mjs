@@ -3,7 +3,6 @@ import {JassVisitor} from "../../jass/visitor.mjs";
 // noinspection NpmUsedModulesInstalled
 import {DiagnosticSeverity, languages, SemanticTokensBuilder} from "vscode";
 import ITokenToRange from "../utils/i-token-to-range.mjs";
-import JassSemanticTokensLegend from "../../jass/lexer/jass-semantic-tokens-legend.mjs";
 
 /** @implements {DocumentSemanticTokensProvider} */
 export class JassDocumentSemanticTokensProvider {
@@ -38,7 +37,7 @@ export class JassDocumentSemanticTokensProvider {
 
         this.#collection.clear();
 
-        this.#visitor.builder = new SemanticTokensBuilder(JassSemanticTokensLegend);
+        this.#visitor.builder = new SemanticTokensBuilder();
         this.#visitor.diagnostics = [];
 
         this.#parser.inputText = text;

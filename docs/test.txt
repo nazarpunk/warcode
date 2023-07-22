@@ -1,17 +1,8 @@
 function RMinBJ takes real a, real v returns real
-    local string totalTexe = "за
-    лупа" + text + '44334' + 1 + .02 + "залупа"
-//local string totalTexe = SetTextColor('scsccscsscsscsc', "пизда") + "залупа" + text
 
-//  local string totalText=SetTextColor("Подсказка","hint")+" "+text
+  if (GetPlayerTechCount(p,'R03L',true)==1 and Hero=='H00R' and true or false and 2 != 1) then
+    set Hero='H02L'
+  endif
 
-// set haslayout=LoadInteger(MemHackTable,StringHash("FrameTypeTable"),fid+0x1000)!=0 and f_name1!="CHeroBar" and f_name1!="CPeonBar" and f_name1!="CUpperButtonBar" and f_name1!="CResourceBar"
-
-//if(GetPlayerTechCount(p,'R03L',true)==1 and Hero=='H00R')then
-//set Hero='H02L'
-//endif
-
-//set s="Урон: "+I2S(R2I(dmg))+"
-//"+"Пиратов: "+I2S(max)
 
 endfunction

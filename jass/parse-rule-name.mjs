@@ -18,7 +18,6 @@ const names = {
     addition: '',
     arrayaccess: '',
     call_statement: '',
-    comparator: '',
     exitwhen_statement: '',
     expression: '',
     typedname: '',

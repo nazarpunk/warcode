@@ -9260,7 +9260,6 @@ var names = {
   addition: "",
   arrayaccess: "",
   call_statement: "",
-  comparator: "",
   exitwhen_statement: "",
   expression: "",
   typedname: "",
@@ -9808,10 +9807,7 @@ var JassParser = class extends CstParser {
         { ALT: () => $.SUBRULE($[parse_rule_name_default.variable_declare]) }
       ]);
     });
-    $.RULE(parse_rule_name_default.expression, () => $.OR([{
-      ALT: () => $.SUBRULE($[parse_rule_name_default.comparator])
-    }]));
-    $.RULE(parse_rule_name_default.comparator, () => {
+    $.RULE(parse_rule_name_default.expression, () => {
       $.OR([
         {
           ALT: () => {
@@ -10334,6 +10330,7 @@ var JassVisitor = class extends ParserVisitor {
     __privateMethod(this, _mark, mark_fn).call(this, ctx[jass_token_map_default.set.name]?.[0], jass_token_legend_default.jass_set);
     __privateMethod(this, _mark, mark_fn).call(this, ctx[jass_token_map_default.identifier.name]?.[0], jass_token_legend_default.jass_variable);
     __privateMethod(this, _mark, mark_fn).call(this, ctx[jass_token_map_default.assign.name]?.[0], jass_token_legend_default.jass_assign);
+    this.visit(ctx[parse_rule_name_default.expression]);
     return null;
   }
   [parse_rule_name_default.loop_statement](ctx) {
@@ -10346,11 +10343,13 @@ var JassVisitor = class extends ParserVisitor {
   [parse_rule_name_default.exitwhen_statement](ctx) {
     __privateMethod(this, _comment, comment_fn).call(this, ctx);
     __privateMethod(this, _mark, mark_fn).call(this, ctx[jass_token_map_default.exitwhen.name]?.[0], jass_token_legend_default.jass_loop);
+    this.visit(ctx[parse_rule_name_default.expression]);
     return ctx;
   }
   [parse_rule_name_default.return_statement](ctx) {
     __privateMethod(this, _comment, comment_fn).call(this, ctx);
     __privateMethod(this, _mark, mark_fn).call(this, ctx[jass_token_map_default.return.name]?.[0], jass_token_legend_default.jass_return);
+    this.visit(ctx[parse_rule_name_default.expression]);
     return null;
   }
   [parse_rule_name_default.if_statement](ctx) {
@@ -10379,10 +10378,17 @@ var JassVisitor = class extends ParserVisitor {
     return ctx;
   }
   [parse_rule_name_default.expression](ctx) {
-    return this.visit(ctx[parse_rule_name_default.comparator]);
+    return this.visit(ctx[parse_rule_name_default.expression]);
   }
-  [parse_rule_name_default.comparator](ctx) {
-    this.visit(ctx[parse_rule_name_default.addition]);
+  [parse_rule_name_default.expression](ctx) {
+    ctx[jass_token_map_default.and.name]?.map((item) => __privateMethod(this, _mark, mark_fn).call(this, item, jass_token_legend_default.jass_and));
+    ctx[jass_token_map_default.or.name]?.map((item) => __privateMethod(this, _mark, mark_fn).call(this, item, jass_token_legend_default.jass_or));
+    ctx[jass_token_map_default.equals.name]?.map((item) => __privateMethod(this, _mark, mark_fn).call(this, item, jass_token_legend_default.jass_equals));
+    ctx[jass_token_map_default.notequals.name]?.map((item) => __privateMethod(this, _mark, mark_fn).call(this, item, jass_token_legend_default.jass_notequals));
+    ctx[jass_token_map_default.lessorequal.name]?.map((item) => __privateMethod(this, _mark, mark_fn).call(this, item, jass_token_legend_default.jass_lessorequal));
+    ctx[jass_token_map_default.great.name]?.map((item) => __privateMethod(this, _mark, mark_fn).call(this, item, jass_token_legend_default.jass_great));
+    ctx[jass_token_map_default.greatorequal.name]?.map((item) => __privateMethod(this, _mark, mark_fn).call(this, item, jass_token_legend_default.jass_greatorequal));
+    ctx[parse_rule_name_default.addition]?.map((item) => this.visit(item));
     return ctx;
   }
   [parse_rule_name_default.addition](ctx) {
@@ -10404,9 +10410,11 @@ var JassVisitor = class extends ParserVisitor {
     __privateMethod(this, _mark, mark_fn).call(this, ctx[jass_token_map_default.idliteral.name]?.[0], jass_token_legend_default.jass_idliteral);
     __privateMethod(this, _mark, mark_fn).call(this, ctx[jass_token_map_default.identifier.name]?.[0], jass_token_legend_default.jass_variable);
     this.visit(ctx[parse_rule_name_default.function_call]);
+    this.visit(ctx[parse_rule_name_default.expression]);
     return ctx;
   }
   [parse_rule_name_default.arrayaccess](ctx) {
+    this.visit(ctx[parse_rule_name_default.expression]);
     return ctx;
   }
 };
@@ -10440,7 +10448,7 @@ string_fn = function(ctx) {
     }
     if (string)
       this.diagnostics?.push({
-        message: `Avoid multiline strings. Use |n to linebreak.`,
+        message: "Avoid multiline strings. Use |n or \\n to linebreak.",
         range: i_token_to_range_default(string),
         severity: import_vscode2.DiagnosticSeverity.Warning
       });

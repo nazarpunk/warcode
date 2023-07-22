@@ -51,7 +51,7 @@ export class JassVisitor extends ParserVisitor {
                 continue;
             }
             if (string) this.diagnostics?.push({
-                message: `Avoid multiline strings. Use |n to linebreak.`,
+                message: 'Avoid multiline strings. Use |n or \\n to linebreak.',
                 range: ITokenToRange(string),
                 severity: DiagnosticSeverity.Warning,
             });
@@ -383,6 +383,8 @@ export class JassVisitor extends ParserVisitor {
         this.#mark(ctx[JassTokenMap.set.name]?.[0], JassTokenLegend.jass_set);
         this.#mark(ctx[JassTokenMap.identifier.name]?.[0], JassTokenLegend.jass_variable);
         this.#mark(ctx[JassTokenMap.assign.name]?.[0], JassTokenLegend.jass_assign);
+
+        this.visit(ctx[ParseRuleName.expression]);
         return null;
     }
 
@@ -397,16 +399,21 @@ export class JassVisitor extends ParserVisitor {
     [ParseRuleName.exitwhen_statement](ctx) {
         this.#comment(ctx);
         this.#mark(ctx[JassTokenMap.exitwhen.name]?.[0], JassTokenLegend.jass_loop);
+
+        this.visit(ctx[ParseRuleName.expression]);
         return ctx;
     }
 
     [ParseRuleName.return_statement](ctx) {
         this.#comment(ctx);
         this.#mark(ctx[JassTokenMap.return.name]?.[0], JassTokenLegend.jass_return);
+
+        this.visit(ctx[ParseRuleName.expression]);
         return null;
     }
 
     [ParseRuleName.if_statement](ctx) {
+        //console.log('if_statement', ctx);
         this.#comment(ctx);
 
         this.#mark(ctx[JassTokenMap.if.name]?.[0], JassTokenLegend.jass_if);
@@ -438,16 +445,26 @@ export class JassVisitor extends ParserVisitor {
     }
 
     [ParseRuleName.expression](ctx) {
-        return this.visit(ctx[ParseRuleName.comparator]);
+        return this.visit(ctx[ParseRuleName.expression]);
     }
 
-    [ParseRuleName.comparator](ctx) {
-        //console.log('comparator', ctx);
-        this.visit(ctx[ParseRuleName.addition]);
+    [ParseRuleName.expression](ctx) {
+        //console.log('expression', ctx);
+
+        ctx[JassTokenMap.and.name]?.map(item => this.#mark(item, JassTokenLegend.jass_and));
+        ctx[JassTokenMap.or.name]?.map(item => this.#mark(item, JassTokenLegend.jass_or));
+        ctx[JassTokenMap.equals.name]?.map(item => this.#mark(item, JassTokenLegend.jass_equals));
+        ctx[JassTokenMap.notequals.name]?.map(item => this.#mark(item, JassTokenLegend.jass_notequals));
+        ctx[JassTokenMap.lessorequal.name]?.map(item => this.#mark(item, JassTokenLegend.jass_lessorequal));
+        ctx[JassTokenMap.great.name]?.map(item => this.#mark(item, JassTokenLegend.jass_great));
+        ctx[JassTokenMap.greatorequal.name]?.map(item => this.#mark(item, JassTokenLegend.jass_greatorequal));
+
+        ctx[ParseRuleName.addition]?.map(item => this.visit(item));
         return ctx;
     }
 
     [ParseRuleName.addition](ctx) {
+        //console.log('addition', ctx);
         ctx[JassTokenMap.add.name]?.map(item => this.#mark(item, JassTokenLegend.jass_add));
         ctx[JassTokenMap.sub.name]?.map(item => this.#mark(item, JassTokenLegend.jass_sub));
         ctx[ParseRuleName.multiplication]?.map(item => this.visit(item));
@@ -470,10 +487,12 @@ export class JassVisitor extends ParserVisitor {
         this.#mark(ctx[JassTokenMap.idliteral.name]?.[0], JassTokenLegend.jass_idliteral);
         this.#mark(ctx[JassTokenMap.identifier.name]?.[0], JassTokenLegend.jass_variable);
         this.visit(ctx[ParseRuleName.function_call]);
+        this.visit(ctx[ParseRuleName.expression]);
         return ctx;
     }
 
     [ParseRuleName.arrayaccess](ctx) {
+        this.visit(ctx[ParseRuleName.expression]);
         return ctx;
     }
 }

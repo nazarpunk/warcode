@@ -265,13 +265,7 @@ export class JassParser extends CstParser {
         });
 
         //region expression
-        $.RULE(ParseRuleName.expression, () => $.OR([{
-            ALT: () => $.SUBRULE($[ParseRuleName.comparator])
-        },]));
-        //endregion
-
-        //region comparator
-        $.RULE(ParseRuleName.comparator, () => {
+        $.RULE(ParseRuleName.expression, () => {
             $.OR([
                 {
                     ALT: () => {
@@ -329,6 +323,7 @@ export class JassParser extends CstParser {
             ])
         });
 
+        //region primary
         $.RULE(ParseRuleName.primary, () => {
             $.OR([
                 {
@@ -384,6 +379,7 @@ export class JassParser extends CstParser {
                 }
             ]);
         });
+        //endregion
 
         $.RULE(ParseRuleName.arrayaccess, () => {
             $.CONSUME(JassTokenMap.lsquareparen);
