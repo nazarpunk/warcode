@@ -299,7 +299,7 @@ export default {
     }),
     integer: createToken({
         name: 'integer',
-        pattern: /\b(?:0x[0-9a-z]+|\$[0-9a-z]+|\d+)\b/i,
+        pattern: /\b(?:0x[0-9a-z]+|\$[0-9a-z]+|\d+)\b/,
         line_breaks: false,
     }),
     linebreak: createToken({
@@ -321,7 +321,7 @@ export default {
     }),
     identifier: createToken({
         name: 'identifier',
-        pattern: /[a-zA-Z][a-zA-Z0-9_]*/,
+        pattern: /\b[a-zA-Z][a-zA-Z0-9_]*\b/,
         line_breaks: false,
     }),
 }

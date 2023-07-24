@@ -11,7 +11,8 @@
   "icon": "images/logo.png",
   "keywords": [
     "jass",
-    "warcraft"
+    "warcraft",
+    ".wts"
   ],
   "engines": {
     "vscode": "^1.80.0"
@@ -32,6 +33,7 @@
   "main": "./out/extension.js",
   "scripts": {
     "esbuild-docs-calculator": "esbuild docs/calculator/main.mjs --outfile=docs/calculator/out/main.mjs --target=es2020 --bundle --external:vscode --format=cjs --platform=browser --tree-shaking=true --sourcemap --watch",
+    "esbuild-docs-wts": "esbuild docs/wts/main.mjs --outfile=docs/wts/out/main.mjs --target=es2020 --bundle --external:vscode --format=cjs --platform=browser --tree-shaking=true --sourcemap --watch",
     "esbuild-docs-jass": "esbuild docs/main.mjs --outfile=docs/out/main.mjs --target=es2020 --bundle --external:vscode --format=cjs --platform=browser --tree-shaking=true --sourcemap --watch",
     "esbuild-base": "esbuild src/extension.mjs --outfile=out/extension.js --target=es2020 --bundle --external:vscode --format=cjs --platform=node --tree-shaking=true --sourcemap",
     "esbuild": "npm run esbuild-base",
@@ -61,14 +63,27 @@
         "extensions": [
           "j"
         ],
-        "configuration": "./syntaxes/jass.language-configuration.json"
+        "configuration": "./src/jass/syntaxes/language-configuration.json"
+      },
+      {
+        "id": "wts",
+        "aliases": [],
+        "extensions": [
+          "wts"
+        ],
+        "configuration": "./src/wts/syntaxes/language-configuration.json"
       }
     ],
     "grammars": [
       {
         "language": "jass",
         "scopeName": "source.jass",
-        "path": "./syntaxes/jass.tmLanguage.json"
+        "path": "./src/jass/syntaxes/tmLanguage.json"
+      },
+      {
+        "language": "wts",
+        "scopeName": "source.wts",
+        "path": "./src/wts/syntaxes/tmLanguage.json"
       }
     ],
     "semanticTokenTypes": [
@@ -287,6 +302,26 @@
       {
         "id": "jass_argument",
         "description": ""
+      },
+      {
+        "id": "wts_string",
+        "description": ""
+      },
+      {
+        "id": "wts_index",
+        "description": ""
+      },
+      {
+        "id": "wts_comment",
+        "description": ""
+      },
+      {
+        "id": "wts_paren",
+        "description": ""
+      },
+      {
+        "id": "wts_text",
+        "description": ""
       }
     ],
     "configurationDefaults": {
@@ -344,8 +379,13 @@
           "jass_variable": "#94d564",
           "jass_function_user": "#DCDCAA",
           "jass_function_native": "#C586C0",
-          "jass_type_name": "#569CD6",
-          "jass_argument": "#9CDCFE"
+          "jass_type_name": "#4EC9B0",
+          "jass_argument": "#9CDCDA",
+          "wts_string": "#5974c0",
+          "wts_index": "#d828dc",
+          "wts_comment": "#9b9b9b",
+          "wts_paren": "#7fc036",
+          "wts_text": "#66c9a2"
         }
       }
     }

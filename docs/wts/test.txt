@@ -1,0 +1,8 @@
+STRING 1
+{ text }
+
+STRING 2
+{ text }
+
+STRING 1
+{ text }

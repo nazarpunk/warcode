@@ -1,10 +1,10 @@
 // noinspection JSAssignmentUsedAsCondition
 
-import {JassParser} from "./parser.mjs";
-import ParseRuleName from "./parse-rule-name.mjs";
-import ITokenToRange from "../src/utils/i-token-to-range.mjs";
 // noinspection NpmUsedModulesInstalled
 import {DiagnosticSeverity} from "vscode";
+import {JassParser} from "./jass-parser.mjs";
+import ParseRuleName from "./jass-parser-rule-name.mjs";
+import ITokenToRange from "../utils/i-token-to-range.mjs";
 import JassTokenMap from "./lexer/jass-token-map.mjs";
 import JassTokenLegend from "./lexer/jass-token-legend.mjs";
 
@@ -17,27 +17,11 @@ export class JassVisitor extends ParserVisitor {
         this.validateVisitor()
     }
 
-    /** @type {import('vscode').Diagnostic[]} */ diagnostics;
-    /** @type {SemanticTokensBuilder} */ builder;
-
-    /**
-     * @param {import('chevrotain').IToken} token
-     * @param {number} type
-     */
-    #mark(token, type) {
-        if (this.builder === null) return;
-        if (!token) return;
-        this.builder?.push(
-            token.startLine - 1,
-            token.startColumn - 1,
-            token.endColumn - token.startColumn + 1,
-            type
-        );
-    }
+    /** @type {import('../utils/visitor-vscode-bridge.mjs').default} */ bridge;
 
     #comment(ctx) {
         ctx[ParseRuleName.end]?.map(item => this.visit(item));
-        ctx[JassTokenMap.comment.name]?.map(item => this.#mark(item, JassTokenLegend.jass_comment));
+        ctx[JassTokenMap.comment.name]?.map(item => this?.bridge?.mark(item, JassTokenLegend.jass_comment));
     }
 
     /** @param {import('chevrotain').CstNode} ctx */
@@ -47,10 +31,10 @@ export class JassVisitor extends ParserVisitor {
         if (!strings) return;
         for (const string of strings) {
             if (string.startLine === string.endLine) {
-                this.#mark(string, JassTokenLegend.jass_stringliteral);
+                this?.bridge?.mark(string, JassTokenLegend.jass_stringliteral);
                 continue;
             }
-            if (string) this.diagnostics?.push({
+            if (string) this.bridge?.diagnostics.push({
                 message: 'Avoid multiline strings. Use |n or \\n to linebreak.',
                 range: ITokenToRange(string),
                 severity: DiagnosticSeverity.Warning,
@@ -72,14 +56,14 @@ export class JassVisitor extends ParserVisitor {
     }
 
     [ParseRuleName.end](ctx) {
-        this.#mark(ctx[JassTokenMap.comment.name]?.[0], JassTokenLegend.jass_comment);
+        this?.bridge?.mark(ctx[JassTokenMap.comment.name]?.[0], JassTokenLegend.jass_comment);
     }
 
     [ParseRuleName.globals_declare](ctx) {
         this.#comment(ctx);
 
-        this.#mark(ctx[JassTokenMap.globals.name]?.[0], JassTokenLegend.jass_globals);
-        this.#mark(ctx[JassTokenMap.endglobals.name]?.[0], JassTokenLegend.jass_endglobals);
+        this?.bridge?.mark(ctx[JassTokenMap.globals.name]?.[0], JassTokenLegend.jass_globals);
+        this?.bridge?.mark(ctx[JassTokenMap.endglobals.name]?.[0], JassTokenLegend.jass_endglobals);
 
         const vardecl = ctx[ParseRuleName.variable_declare];
 
@@ -88,7 +72,7 @@ export class JassVisitor extends ParserVisitor {
             const typedname = variable?.[ParseRuleName.typedname];
             const local = variable?.[JassTokenMap.local.name];
 
-            if (local) this.diagnostics?.push({
+            if (local) this.bridge?.diagnostics.push({
                 message: `Local variable not allowed in globals block.`,
                 range: ITokenToRange(local),
                 severity: DiagnosticSeverity.Error,
@@ -96,8 +80,8 @@ export class JassVisitor extends ParserVisitor {
 
             if (typedname) {
                 const {type, name} = typedname;
-                this.#mark(type, JassTokenLegend.jass_type_name);
-                this.#mark(name, JassTokenLegend.jass_variable);
+                this?.bridge?.mark(type, JassTokenLegend.jass_type_name);
+                this?.bridge?.mark(name, JassTokenLegend.jass_variable);
             }
         }
 
@@ -110,11 +94,11 @@ export class JassVisitor extends ParserVisitor {
         const name = ctx[JassTokenMap.identifier.name]?.[0];
         const base = ctx[JassTokenMap.identifier.name]?.[1];
 
-        this.#mark(name, JassTokenLegend.jass_type_name);
-        this.#mark(base, JassTokenLegend.jass_type_name);
+        this?.bridge?.mark(name, JassTokenLegend.jass_type_name);
+        this?.bridge?.mark(base, JassTokenLegend.jass_type_name);
 
-        this.#mark(ctx[JassTokenMap.type.name]?.[0], JassTokenLegend.jass_type);
-        this.#mark(ctx[JassTokenMap.extends.name]?.[0], JassTokenLegend.jass_extends);
+        this?.bridge?.mark(ctx[JassTokenMap.type.name]?.[0], JassTokenLegend.jass_type);
+        this?.bridge?.mark(ctx[JassTokenMap.extends.name]?.[0], JassTokenLegend.jass_extends);
 
         return {
             name: name?.image,
@@ -125,11 +109,11 @@ export class JassVisitor extends ParserVisitor {
     [ParseRuleName.native_declare](ctx) {
         this.#comment(ctx);
 
-        this.#mark(ctx[JassTokenMap.constant.name]?.[0], JassTokenLegend.jass_constant);
-        this.#mark(ctx[JassTokenMap.identifier.name]?.[0], JassTokenLegend.jass_function_native);
-        this.#mark(ctx[JassTokenMap.native.name]?.[0], JassTokenLegend.jass_native);
-        this.#mark(ctx[JassTokenMap.takes.name]?.[0], JassTokenLegend.jass_takes);
-        this.#mark(ctx[JassTokenMap.returns.name]?.[0], JassTokenLegend.jass_returns);
+        this?.bridge?.mark(ctx[JassTokenMap.constant.name]?.[0], JassTokenLegend.jass_constant);
+        this?.bridge?.mark(ctx[JassTokenMap.identifier.name]?.[0], JassTokenLegend.jass_function_native);
+        this?.bridge?.mark(ctx[JassTokenMap.native.name]?.[0], JassTokenLegend.jass_native);
+        this?.bridge?.mark(ctx[JassTokenMap.takes.name]?.[0], JassTokenLegend.jass_takes);
+        this?.bridge?.mark(ctx[JassTokenMap.returns.name]?.[0], JassTokenLegend.jass_returns);
 
         this.visit(ctx[ParseRuleName.function_args]);
         this.visit(ctx[ParseRuleName.function_returns]);
@@ -138,11 +122,11 @@ export class JassVisitor extends ParserVisitor {
     [ParseRuleName.function_declare](ctx) {
         this.#comment(ctx);
 
-        this.#mark(ctx[JassTokenMap.function.name]?.[0], JassTokenLegend.jass_function);
-        this.#mark(ctx[JassTokenMap.identifier.name]?.[0], JassTokenLegend.jass_function_user);
-        this.#mark(ctx[JassTokenMap.takes.name]?.[0], JassTokenLegend.jass_takes);
-        this.#mark(ctx[JassTokenMap.returns.name]?.[0], JassTokenLegend.jass_returns);
-        this.#mark(ctx[JassTokenMap.endfunction.name]?.[0], JassTokenLegend.jass_endfunction);
+        this?.bridge?.mark(ctx[JassTokenMap.function.name]?.[0], JassTokenLegend.jass_function);
+        this?.bridge?.mark(ctx[JassTokenMap.identifier.name]?.[0], JassTokenLegend.jass_function_user);
+        this?.bridge?.mark(ctx[JassTokenMap.takes.name]?.[0], JassTokenLegend.jass_takes);
+        this?.bridge?.mark(ctx[JassTokenMap.returns.name]?.[0], JassTokenLegend.jass_returns);
+        this?.bridge?.mark(ctx[JassTokenMap.endfunction.name]?.[0], JassTokenLegend.jass_endfunction);
 
         const locals = ctx?.[ParseRuleName.function_locals];
 
@@ -153,7 +137,7 @@ export class JassVisitor extends ParserVisitor {
         // check array in argument
         if (args?.list) for (const arg of args.list) {
             const array = arg[JassTokenMap.array.name];
-            if (array) this.diagnostics?.push({
+            if (array) this.bridge?.diagnostics.push({
                 message: `Array not allowed in function argument.`,
                 range: ITokenToRange(array),
                 severity: DiagnosticSeverity.Error,
@@ -169,13 +153,13 @@ export class JassVisitor extends ParserVisitor {
                 const typedname = this.visit(local)?.[ParseRuleName.typedname];
                 if (!typedname) continue;
                 const {type, name} = typedname;
-                this.#mark(type, JassTokenLegend.jass_type_name);
-                this.#mark(name, JassTokenLegend.jass_variable);
+                this?.bridge?.mark(type, JassTokenLegend.jass_type_name);
+                this?.bridge?.mark(name, JassTokenLegend.jass_variable);
                 if (name) {
                     (localMap[name.image] ??= []).push(name);
                     const argList = args.map[name.image];
                     if (argList) for (const t of [name, ...argList]) {
-                        this.diagnostics?.push({
+                        this.bridge?.diagnostics.push({
                             message: `Local variable redeclare argument: ${t.image}`,
                             range: ITokenToRange(t),
                             severity: DiagnosticSeverity.Warning,
@@ -187,7 +171,7 @@ export class JassVisitor extends ParserVisitor {
             for (const v of Object.values(localMap)) {
                 if (v.length < 2) continue;
                 for (const t of v) {
-                    this.diagnostics?.push({
+                    this.bridge?.diagnostics.push({
                         message: `Local variable with same name: ${t.image}`,
                         range: ITokenToRange(t),
                         severity: DiagnosticSeverity.Warning,
@@ -217,7 +201,7 @@ export class JassVisitor extends ParserVisitor {
         const variable = this.visit(variableDeclare);
 
         const constant = variable?.[JassTokenMap.constant.name];
-        if (constant) this.diagnostics?.push({
+        if (constant) this.bridge?.diagnostics.push({
             message: `Constant not allowed in function.`,
             range: ITokenToRange(constant),
             severity: DiagnosticSeverity.Error,
@@ -226,7 +210,7 @@ export class JassVisitor extends ParserVisitor {
         const local = variable?.[JassTokenMap.local.name];
         if (!local) {
             const {type} = variable?.[ParseRuleName.typedname];
-            if (type) this.diagnostics?.push({
+            if (type) this.bridge?.diagnostics.push({
                 message: `Missing local keyword.`,
                 range: ITokenToRange(type),
                 severity: DiagnosticSeverity.Error,
@@ -238,7 +222,7 @@ export class JassVisitor extends ParserVisitor {
 
     [ParseRuleName.typedname](ctx) {
         const array = ctx[JassTokenMap.array.name]?.[0];
-        this.#mark(array, JassTokenLegend.jass_array);
+        this?.bridge?.mark(array, JassTokenLegend.jass_array);
 
         const list = ctx[JassTokenMap.identifier.name];
         if (!list) return {};
@@ -255,10 +239,10 @@ export class JassVisitor extends ParserVisitor {
 
     [ParseRuleName.function_call](ctx) {
         //console.log('function_call', ctx);
-        this.#mark(ctx[JassTokenMap.identifier.name]?.[0], JassTokenLegend.jass_function_user);
-        this.#mark(ctx[JassTokenMap.lparen.name]?.[0], JassTokenLegend.jass_lparen);
-        this.#mark(ctx[JassTokenMap.rparen.name]?.[0], JassTokenLegend.jass_rparen);
-        ctx[JassTokenMap.comma.name]?.map(item => this.#mark(item, JassTokenLegend.jass_comma));
+        this?.bridge?.mark(ctx[JassTokenMap.identifier.name]?.[0], JassTokenLegend.jass_function_user);
+        this?.bridge?.mark(ctx[JassTokenMap.lparen.name]?.[0], JassTokenLegend.jass_lparen);
+        this?.bridge?.mark(ctx[JassTokenMap.rparen.name]?.[0], JassTokenLegend.jass_rparen);
+        ctx[JassTokenMap.comma.name]?.map(item => this?.bridge?.mark(item, JassTokenLegend.jass_comma));
         ctx[ParseRuleName.expression]?.map(item => this.visit(item));
         return ctx;
     }
@@ -268,13 +252,13 @@ export class JassVisitor extends ParserVisitor {
 
         // nothing
         if (token = ctx?.[JassTokenMap.nothing.name]?.[0]) {
-            this.#mark(token, JassTokenLegend.jass_type_name);
+            this?.bridge?.mark(token, JassTokenLegend.jass_type_name);
             return {map: {}, list: []};
         }
 
         // commas
         if (token = ctx[JassTokenMap.comma.name]) for (const comma of token) {
-            this.#mark(comma, JassTokenLegend.jass_comma);
+            this?.bridge?.mark(comma, JassTokenLegend.jass_comma);
         }
 
         // args
@@ -288,15 +272,15 @@ export class JassVisitor extends ParserVisitor {
         if (args) {
             for (const arg of args) {
                 const {type, name} = arg;
-                this.#mark(type, JassTokenLegend.jass_type_name);
-                this.#mark(name, JassTokenLegend.jass_argument);
+                this?.bridge?.mark(type, JassTokenLegend.jass_type_name);
+                this?.bridge?.mark(name, JassTokenLegend.jass_argument);
                 if (name) (argMap[name.image] ??= []).push(name);
             }
 
             for (const v of Object.values(argMap)) {
                 if (v.length < 2) continue;
                 for (const t of v) {
-                    this.diagnostics?.push({
+                    this.bridge?.diagnostics.push({
                         message: `Arguments with same name: ${t.image}`,
                         range: ITokenToRange(t),
                         severity: DiagnosticSeverity.Warning,
@@ -316,12 +300,12 @@ export class JassVisitor extends ParserVisitor {
         let token;
 
         if (token = ctx[JassTokenMap.nothing.name]?.[0]) {
-            this.#mark(token, JassTokenLegend.jass_type_name);
+            this?.bridge?.mark(token, JassTokenLegend.jass_type_name);
             return token.image;
         }
 
         if (token = ctx[JassTokenMap.identifier.name]?.[0]) {
-            this.#mark(token, JassTokenLegend.jass_type_name);
+            this?.bridge?.mark(token, JassTokenLegend.jass_type_name);
             return token.image;
         }
 
@@ -337,19 +321,19 @@ export class JassVisitor extends ParserVisitor {
         const array = typedname[JassTokenMap.array.name];
 
         // check array assing
-        if (equals && array) this.diagnostics?.push({
+        if (equals && array) this.bridge?.diagnostics.push({
             message: `Array varriables can't be initialised.`,
             range: ITokenToRange(array),
             severity: DiagnosticSeverity.Error,
         });
 
         const local = ctx[JassTokenMap.local.name]?.[0];
-        if (local) this.#mark(local, JassTokenLegend.jass_local);
+        if (local) this?.bridge?.mark(local, JassTokenLegend.jass_local);
 
         const constant = ctx[JassTokenMap.constant.name]?.[0];
-        if (constant) this.#mark(constant, JassTokenLegend.jass_constant);
+        if (constant) this?.bridge?.mark(constant, JassTokenLegend.jass_constant);
 
-        this.#mark(ctx[JassTokenMap.assign.name]?.[0], JassTokenLegend.jass_equals);
+        this?.bridge?.mark(ctx[JassTokenMap.assign.name]?.[0], JassTokenLegend.jass_equals);
         this.visit(ctx[ParseRuleName.expression]?.[0]);
         return {
             [ParseRuleName.typedname]: typedname,
@@ -372,8 +356,8 @@ export class JassVisitor extends ParserVisitor {
 
     [ParseRuleName.call_statement](ctx) {
         this.#comment(ctx);
-        this.#mark(ctx[JassTokenMap.debug.name]?.[0], JassTokenLegend.jass_debug);
-        this.#mark(ctx[JassTokenMap.call.name]?.[0], JassTokenLegend.jass_call);
+        this?.bridge?.mark(ctx[JassTokenMap.debug.name]?.[0], JassTokenLegend.jass_debug);
+        this?.bridge?.mark(ctx[JassTokenMap.call.name]?.[0], JassTokenLegend.jass_call);
         this.visit(ctx[ParseRuleName.function_call]);
         return null;
     }
@@ -382,9 +366,9 @@ export class JassVisitor extends ParserVisitor {
         //console.log(ParseRuleName.set_statement, ctx);
 
         this.#comment(ctx);
-        this.#mark(ctx[JassTokenMap.set.name]?.[0], JassTokenLegend.jass_set);
-        this.#mark(ctx[JassTokenMap.identifier.name]?.[0], JassTokenLegend.jass_variable);
-        this.#mark(ctx[JassTokenMap.assign.name]?.[0], JassTokenLegend.jass_assign);
+        this?.bridge?.mark(ctx[JassTokenMap.set.name]?.[0], JassTokenLegend.jass_set);
+        this?.bridge?.mark(ctx[JassTokenMap.identifier.name]?.[0], JassTokenLegend.jass_variable);
+        this?.bridge?.mark(ctx[JassTokenMap.assign.name]?.[0], JassTokenLegend.jass_assign);
 
         this.visit(ctx[ParseRuleName.expression]);
         this.visit(ctx[ParseRuleName.arrayaccess]);
@@ -393,15 +377,15 @@ export class JassVisitor extends ParserVisitor {
 
     [ParseRuleName.loop_statement](ctx) {
         this.#comment(ctx);
-        this.#mark(ctx[JassTokenMap.loop.name]?.[0], JassTokenLegend.jass_loop);
-        this.#mark(ctx[JassTokenMap.endloop.name]?.[0], JassTokenLegend.jass_endloop);
+        this?.bridge?.mark(ctx[JassTokenMap.loop.name]?.[0], JassTokenLegend.jass_loop);
+        this?.bridge?.mark(ctx[JassTokenMap.endloop.name]?.[0], JassTokenLegend.jass_endloop);
         ctx[ParseRuleName.statement]?.map(item => this.visit(item));
         return ctx;
     }
 
     [ParseRuleName.exitwhen_statement](ctx) {
         this.#comment(ctx);
-        this.#mark(ctx[JassTokenMap.exitwhen.name]?.[0], JassTokenLegend.jass_loop);
+        this?.bridge?.mark(ctx[JassTokenMap.exitwhen.name]?.[0], JassTokenLegend.jass_loop);
 
         this.visit(ctx[ParseRuleName.expression]);
         return ctx;
@@ -409,7 +393,7 @@ export class JassVisitor extends ParserVisitor {
 
     [ParseRuleName.return_statement](ctx) {
         this.#comment(ctx);
-        this.#mark(ctx[JassTokenMap.return.name]?.[0], JassTokenLegend.jass_return);
+        this?.bridge?.mark(ctx[JassTokenMap.return.name]?.[0], JassTokenLegend.jass_return);
 
         this.visit(ctx[ParseRuleName.expression]);
         return null;
@@ -419,9 +403,9 @@ export class JassVisitor extends ParserVisitor {
         //console.log('if_statement', ctx);
         this.#comment(ctx);
 
-        this.#mark(ctx[JassTokenMap.if.name]?.[0], JassTokenLegend.jass_if);
-        this.#mark(ctx[JassTokenMap.then.name]?.[0], JassTokenLegend.jass_then);
-        this.#mark(ctx[JassTokenMap.endif.name]?.[0], JassTokenLegend.jass_endif);
+        this?.bridge?.mark(ctx[JassTokenMap.if.name]?.[0], JassTokenLegend.jass_if);
+        this?.bridge?.mark(ctx[JassTokenMap.then.name]?.[0], JassTokenLegend.jass_then);
+        this?.bridge?.mark(ctx[JassTokenMap.endif.name]?.[0], JassTokenLegend.jass_endif);
 
         this.visit(ctx[ParseRuleName.expression]);
         ctx[ParseRuleName.statement]?.map(item => this.visit(item));
@@ -434,28 +418,28 @@ export class JassVisitor extends ParserVisitor {
         this.#comment(ctx);
 
         this.visit(ctx[ParseRuleName.expression]);
-        this.#mark(ctx[JassTokenMap.elseif.name]?.[0], JassTokenLegend.jass_elseif);
-        this.#mark(ctx[JassTokenMap.then.name]?.[0], JassTokenLegend.jass_then);
+        this?.bridge?.mark(ctx[JassTokenMap.elseif.name]?.[0], JassTokenLegend.jass_elseif);
+        this?.bridge?.mark(ctx[JassTokenMap.then.name]?.[0], JassTokenLegend.jass_then);
         ctx[ParseRuleName.statement]?.map(item => this.visit(item));
         return null;
     }
 
     [ParseRuleName.else_statement](ctx) {
         this.#comment(ctx);
-        this.#mark(ctx[JassTokenMap.else.name]?.[0], JassTokenLegend.jass_else);
+        this?.bridge?.mark(ctx[JassTokenMap.else.name]?.[0], JassTokenLegend.jass_else);
         ctx[ParseRuleName.statement]?.map(item => this.visit(item));
         return null;
     }
 
     [ParseRuleName.expression](ctx) {
         //console.log(ParseRuleName.expression, ctx);
-        ctx[JassTokenMap.and.name]?.map(item => this.#mark(item, JassTokenLegend.jass_and));
-        ctx[JassTokenMap.or.name]?.map(item => this.#mark(item, JassTokenLegend.jass_or));
-        ctx[JassTokenMap.equals.name]?.map(item => this.#mark(item, JassTokenLegend.jass_equals));
-        ctx[JassTokenMap.notequals.name]?.map(item => this.#mark(item, JassTokenLegend.jass_notequals));
-        ctx[JassTokenMap.lessorequal.name]?.map(item => this.#mark(item, JassTokenLegend.jass_lessorequal));
-        ctx[JassTokenMap.great.name]?.map(item => this.#mark(item, JassTokenLegend.jass_great));
-        ctx[JassTokenMap.greatorequal.name]?.map(item => this.#mark(item, JassTokenLegend.jass_greatorequal));
+        ctx[JassTokenMap.and.name]?.map(item => this?.bridge?.mark(item, JassTokenLegend.jass_and));
+        ctx[JassTokenMap.or.name]?.map(item => this?.bridge?.mark(item, JassTokenLegend.jass_or));
+        ctx[JassTokenMap.equals.name]?.map(item => this?.bridge?.mark(item, JassTokenLegend.jass_equals));
+        ctx[JassTokenMap.notequals.name]?.map(item => this?.bridge?.mark(item, JassTokenLegend.jass_notequals));
+        ctx[JassTokenMap.lessorequal.name]?.map(item => this?.bridge?.mark(item, JassTokenLegend.jass_lessorequal));
+        ctx[JassTokenMap.great.name]?.map(item => this?.bridge?.mark(item, JassTokenLegend.jass_great));
+        ctx[JassTokenMap.greatorequal.name]?.map(item => this?.bridge?.mark(item, JassTokenLegend.jass_greatorequal));
 
         ctx[ParseRuleName.addition]?.map(item => this.visit(item));
         return null;
@@ -464,11 +448,11 @@ export class JassVisitor extends ParserVisitor {
     [ParseRuleName.primary](ctx) {
         //console.log(ParseRuleName.primary, ctx);
         this.#string(ctx);
-        this.#mark(ctx[JassTokenMap.sub.name]?.[0], JassTokenLegend.jass_sub);
-        this.#mark(ctx[JassTokenMap.integer.name]?.[0], JassTokenLegend.jass_integer);
-        this.#mark(ctx[JassTokenMap.real.name]?.[0], JassTokenLegend.jass_real);
-        this.#mark(ctx[JassTokenMap.idliteral.name]?.[0], JassTokenLegend.jass_idliteral);
-        this.#mark(ctx[JassTokenMap.identifier.name]?.[0], JassTokenLegend.jass_variable);
+        this?.bridge?.mark(ctx[JassTokenMap.sub.name]?.[0], JassTokenLegend.jass_sub);
+        this?.bridge?.mark(ctx[JassTokenMap.integer.name]?.[0], JassTokenLegend.jass_integer);
+        this?.bridge?.mark(ctx[JassTokenMap.real.name]?.[0], JassTokenLegend.jass_real);
+        this?.bridge?.mark(ctx[JassTokenMap.idliteral.name]?.[0], JassTokenLegend.jass_idliteral);
+        this?.bridge?.mark(ctx[JassTokenMap.identifier.name]?.[0], JassTokenLegend.jass_variable);
         this.visit(ctx[ParseRuleName.arrayaccess]);
         this.visit(ctx[ParseRuleName.function_call]);
         this.visit(ctx[ParseRuleName.expression]);
@@ -477,8 +461,8 @@ export class JassVisitor extends ParserVisitor {
 
     [ParseRuleName.addition](ctx) {
         //console.log('addition', ctx);
-        ctx[JassTokenMap.add.name]?.map(item => this.#mark(item, JassTokenLegend.jass_add));
-        ctx[JassTokenMap.sub.name]?.map(item => this.#mark(item, JassTokenLegend.jass_sub));
+        ctx[JassTokenMap.add.name]?.map(item => this?.bridge?.mark(item, JassTokenLegend.jass_add));
+        ctx[JassTokenMap.sub.name]?.map(item => this?.bridge?.mark(item, JassTokenLegend.jass_sub));
 
         ctx[ParseRuleName.multiplication]?.map(item => this.visit(item));
         return null;
@@ -486,8 +470,8 @@ export class JassVisitor extends ParserVisitor {
 
     [ParseRuleName.multiplication](ctx) {
         //console.log('multiplication', ctx);
-        ctx[JassTokenMap.mult.name]?.map(item => this.#mark(item, JassTokenLegend.jass_mult));
-        ctx[JassTokenMap.div.name]?.map(item => this.#mark(item, JassTokenLegend.jass_div));
+        ctx[JassTokenMap.mult.name]?.map(item => this?.bridge?.mark(item, JassTokenLegend.jass_mult));
+        ctx[JassTokenMap.div.name]?.map(item => this?.bridge?.mark(item, JassTokenLegend.jass_div));
 
         ctx[ParseRuleName.primary]?.map(item => this.visit(item));
         return null;
@@ -495,8 +479,8 @@ export class JassVisitor extends ParserVisitor {
 
     [ParseRuleName.arrayaccess](ctx) {
         //console.log(ParseRuleName.arrayaccess, ctx);
-        this.#mark(ctx[JassTokenMap.lsquareparen.name]?.[0], JassTokenLegend.jass_lsquareparen);
-        this.#mark(ctx[JassTokenMap.rsquareparen.name]?.[0], JassTokenLegend.jass_rsquareparen);
+        this?.bridge?.mark(ctx[JassTokenMap.lsquareparen.name]?.[0], JassTokenLegend.jass_lsquareparen);
+        this?.bridge?.mark(ctx[JassTokenMap.rsquareparen.name]?.[0], JassTokenLegend.jass_rsquareparen);
 
         this.visit(ctx[ParseRuleName.expression]?.[0]);
         return null;

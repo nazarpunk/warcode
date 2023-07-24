@@ -1,11 +1,13 @@
 import {Lexer} from "chevrotain";
 import fs from "fs";
 
+const packagePath = '../package.json';
+const writeTokenMap = (text, flag = 'a+') => fs.writeFileSync('jass/lexer/jass-token-map.mjs', text, {flag: flag});
+const writeTokenList = (text, flag = 'a+') => fs.writeFileSync('jass/lexer/jass-token-list.mjs', text, {flag: flag});
+const writeLegendMap = (text, flag = 'a+') => fs.writeFileSync('jass/lexer/jass-token-legend.mjs', text, {flag: flag});
+const writeLegendList = (text, flag = 'a+') => fs.writeFileSync('jass/lexer/jass-semantic-tokens-legend.mjs', text, {flag: flag});
+
 const tab = ' '.repeat(4);
-const writeTokenMap = (text, flag = 'a+') => fs.writeFileSync('jass-token-map.mjs', text, {flag: flag});
-const writeTokenList = (text, flag = 'a+') => fs.writeFileSync('jass-token-list.mjs', text, {flag: flag});
-const writeLegendMap = (text, flag = 'a+') => fs.writeFileSync('jass-token-legend.mjs', text, {flag: flag});
-const writeLegendList = (text, flag = 'a+') => fs.writeFileSync('jass-semantic-tokens-legend.mjs', text, {flag: flag});
 
 /** @type {(import('chevrotain').ITokenConfig & {color:  string})[]} */
 const keywordList = [];
@@ -203,7 +205,7 @@ const tokenList = [
     },
     {
         name: 'integer',
-        pattern: /\b(?:0x[0-9a-z]+|\$[0-9a-z]+|\d+)\b/i,
+        pattern: /\b(?:0x[0-9a-z]+|\$[0-9a-z]+|\d+)\b/,
         line_breaks: false,
         color: numberColor,
     },
@@ -228,7 +230,7 @@ const tokenList = [
     },
     {
         name: 'identifier',
-        pattern: /[a-zA-Z][a-zA-Z0-9_]*/,
+        pattern: /\b[a-zA-Z][a-zA-Z0-9_]*\b/,
         line_breaks: false,
     },
 ]
@@ -274,9 +276,7 @@ writeTokenList(`import JassTokenMap from "./jass-token-map.mjs";
 
 export default [${nameList.map(s => `JassTokenMap.${s}`).join(', ')}];`, 'w+');
 
-// =======  legend
-const packagePath = '../../package.json';
-
+//region legend
 /** @type {{}} */
 const json = JSON.parse(fs.readFileSync(packagePath, {encoding: 'utf8'}));
 
@@ -296,6 +296,12 @@ legendMap = {
         jass_function_native: '#C586C0',
         jass_type_name: '#4EC9B0',
         jass_argument: '#9CDCDA',
+        // wts
+        wts_string: '#5974c0',
+        wts_index: '#d828dc',
+        wts_comment: '#9b9b9b',
+        wts_paren: '#7fc036',
+        wts_text: '#66c9a2',
     }
 }
 
@@ -316,3 +322,4 @@ import {SemanticTokensLegend} from "vscode";
 export default new SemanticTokensLegend([${legendList.map(s => `'${s}'`).join(', ')}], []);`, 'w+');
 
 fs.writeFileSync(packagePath, JSON.stringify(json, null, 2), {flag: 'w+'});
+//endregion

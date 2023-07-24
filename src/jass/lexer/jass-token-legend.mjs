@@ -53,4 +53,9 @@ export default {
     jass_function_native: 51,
     jass_type_name: 52,
     jass_argument: 53,
+    wts_string: 54,
+    wts_index: 55,
+    wts_comment: 56,
+    wts_paren: 57,
+    wts_text: 58,
 }
