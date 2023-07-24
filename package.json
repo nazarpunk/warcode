@@ -31,14 +31,13 @@
   },
   "main": "./out/extension.js",
   "scripts": {
-    "esbuild-diagram-calculator": "esbuild docs/calculator/main.mjs --outfile=docs/calculator/out/main.mjs --target=es2020 --bundle --external:vscode --format=cjs --platform=browser --tree-shaking=true --sourcemap --watch",
-    "esbuild-diagram-jass": "esbuild docs/main.mjs --outfile=docs/out/main.mjs --target=es2020 --bundle --external:vscode --format=cjs --platform=browser --tree-shaking=true --sourcemap --watch",
-    "vscode:prepublish": "npm run esbuild-base",
-    "build": "vsce package",
-    "publish": "vsce publish patch",
+    "esbuild-docs-calculator": "esbuild docs/calculator/main.mjs --outfile=docs/calculator/out/main.mjs --target=es2020 --bundle --external:vscode --format=cjs --platform=browser --tree-shaking=true --sourcemap --watch",
+    "esbuild-docs-jass": "esbuild docs/main.mjs --outfile=docs/out/main.mjs --target=es2020 --bundle --external:vscode --format=cjs --platform=browser --tree-shaking=true --sourcemap --watch",
     "esbuild-base": "esbuild src/extension.mjs --outfile=out/extension.js --target=es2020 --bundle --external:vscode --format=cjs --platform=node --tree-shaking=true --sourcemap",
     "esbuild": "npm run esbuild-base",
-    "esbuild-watch": "npm run esbuild-base -- --watch"
+    "vscode:prepublish": "npm run esbuild-base",
+    "build": "vsce package",
+    "publish": "vsce publish patch"
   },
   "devDependencies": {
     "chevrotain": "^11.0.1",
@@ -345,8 +344,8 @@
           "jass_variable": "#94d564",
           "jass_function_user": "#DCDCAA",
           "jass_function_native": "#C586C0",
-          "jass_type_name": "#4EC9B0",
-          "jass_argument": "#9CDCDA"
+          "jass_type_name": "#569CD6",
+          "jass_argument": "#9CDCFE"
         }
       }
     }

@@ -5,7 +5,7 @@ const tab = ' '.repeat(4);
 const writeTokenMap = (text, flag = 'a+') => fs.writeFileSync('jass-token-map.mjs', text, {flag: flag});
 const writeTokenList = (text, flag = 'a+') => fs.writeFileSync('jass-token-list.mjs', text, {flag: flag});
 const writeLegendMap = (text, flag = 'a+') => fs.writeFileSync('jass-token-legend.mjs', text, {flag: flag});
-const writeLegendList = (text, flag = 'a+') => fs.writeFileSync('jass-token-legend-list.mjs', text, {flag: flag});
+const writeLegendList = (text, flag = 'a+') => fs.writeFileSync('jass-semantic-tokens-legend.mjs', text, {flag: flag});
 
 /** @type {(import('chevrotain').ITokenConfig & {color:  string})[]} */
 const keywordList = [];
@@ -197,13 +197,13 @@ const tokenList = [
     // no start_chars_hint
     {
         name: 'real',
-        pattern: /[0-9]+\.[0-9]+/,
+        pattern: /\d+\.\d*|\.\d+/,
         line_breaks: false,
         color: numberColor,
     },
     {
         name: 'integer',
-        pattern: /0x[0-9a-z]+|\$[0-9a-z]+|\d+/i,
+        pattern: /\b(?:0x[0-9a-z]+|\$[0-9a-z]+|\d+)\b/i,
         line_breaks: false,
         color: numberColor,
     },
@@ -272,10 +272,7 @@ writeTokenMap(`}\n`);
 
 writeTokenList(`import JassTokenMap from "./jass-token-map.mjs";
 
-/** @type {import('chevrotain').TokenType[]} */
-const list = [${nameList.map(s => `JassTokenMap.${s}`).join(', ')}];
-
-export default list;`, 'w+');
+export default [${nameList.map(s => `JassTokenMap.${s}`).join(', ')}];`, 'w+');
 
 // =======  legend
 const packagePath = '../../package.json';
@@ -312,6 +309,10 @@ for (const [name, color] of Object.entries(legendMap)) {
     legendList.push(name);
 }
 writeLegendMap('}');
-writeLegendList(`export default [${legendList.map(s => `'${s}'`).join(', ')}]`, 'w+');
+
+writeLegendList(`// noinspection NpmUsedModulesInstalled
+import {SemanticTokensLegend} from "vscode";
+
+export default new SemanticTokensLegend([${legendList.map(s => `'${s}'`).join(', ')}], []);`, 'w+');
 
 fs.writeFileSync(packagePath, JSON.stringify(json, null, 2), {flag: 'w+'});

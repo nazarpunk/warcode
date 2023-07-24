@@ -294,12 +294,12 @@ export default {
     }),
     real: createToken({
         name: 'real',
-        pattern: /[0-9]+\.[0-9]+/,
+        pattern: /\d+\.\d*|\.\d+/,
         line_breaks: false,
     }),
     integer: createToken({
         name: 'integer',
-        pattern: /0x[0-9a-z]+|\$[0-9a-z]+|\d+/i,
+        pattern: /\b(?:0x[0-9a-z]+|\$[0-9a-z]+|\d+)\b/i,
         line_breaks: false,
     }),
     linebreak: createToken({

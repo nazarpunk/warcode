@@ -1,8 +1,5 @@
-function RMinBJ takes real a, real v returns real
+function ModuloInteger takes integer dividend, integer divisor returns integer
 
-  if (GetPlayerTechCount(p,'R03L',true)==1 and Hero=='H00R' and true or false and 2 != 1) then
-    set Hero='H02L'
-  endif
-
+    set s[d[portals]+1 - 22] = 2323
 
 endfunction
