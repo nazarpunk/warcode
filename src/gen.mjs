@@ -4,8 +4,8 @@ import fs from "fs";
 const packagePath = '../package.json';
 const writeTokenMap = (text, flag = 'a+') => fs.writeFileSync('jass/lexer/jass-token-map.mjs', text, {flag: flag});
 const writeTokenList = (text, flag = 'a+') => fs.writeFileSync('jass/lexer/jass-token-list.mjs', text, {flag: flag});
-const writeLegendMap = (text, flag = 'a+') => fs.writeFileSync('jass/lexer/jass-token-legend.mjs', text, {flag: flag});
-const writeLegendList = (text, flag = 'a+') => fs.writeFileSync('jass/lexer/jass-semantic-tokens-legend.mjs', text, {flag: flag});
+const writeLegendMap = (text, flag = 'a+') => fs.writeFileSync('semantic/token-legend.mjs', text, {flag: flag});
+const writeLegendList = (text, flag = 'a+') => fs.writeFileSync('semantic/ext-semantic-tokens-legend.mjs', text, {flag: flag});
 
 const tab = ' '.repeat(4);
 

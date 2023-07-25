@@ -1,11 +1,11 @@
 // noinspection NpmUsedModulesInstalled
-import {DiagnosticSeverity, SymbolInformation, SymbolKind} from 'vscode';
+import {DiagnosticSeverity, FoldingRange, SymbolInformation, SymbolKind} from 'vscode';
 import {WtsParser} from './wts-parser.mjs';
 import Rule from './wts-parser-rule-name.mjs';
-import JassTokenLegend from '../jass/lexer/jass-token-legend.mjs';
 import {WtsTokenMap} from './wts-lexer.mjs';
 import ITokenToRange from '../utils/i-token-to-range.mjs';
 import ITokenToRangeMerge from "../utils/i-token-to-range-merge.mjs";
+import TokenLegend from "../semantic/token-legend.mjs";
 
 const parser = new WtsParser();
 
@@ -49,23 +49,31 @@ export class WtsVisitor extends BaseCstVisitor {
         //console.log(Rule.block, ctx);
 
         const index = ctx[WtsTokenMap.index.name]?.[0];
-        const string = ctx[WtsTokenMap.string.name]?.[0];
-        const rparen = ctx[WtsTokenMap.rparen.name]?.[0];
 
-        if (index && string && rparen) {
-            this?.bridge?.mark(index, JassTokenLegend.wts_index);
-            this?.bridge?.mark(string, JassTokenLegend.wts_string);
-            this?.bridge?.mark(rparen, JassTokenLegend.wts_paren);
-            this?.bridge?.symbols.push(new SymbolInformation(
-                `${string.image} ${index.image}`,
-                SymbolKind.String,
-                ITokenToRangeMerge(string, rparen),
-            ));
+        const b = this?.bridge;
+        if (b) {
+            /** @type {IToken} */ const string = ctx[WtsTokenMap.string.name]?.[0];
+            /** @type {IToken} */ const rparen = ctx[WtsTokenMap.rparen.name]?.[0];
+
+            if (index && string && rparen) {
+                b.mark(index, TokenLegend.wts_index);
+                b.mark(string, TokenLegend.wts_string);
+                b.mark(rparen, TokenLegend.wts_paren);
+                b.symbols.push(new SymbolInformation(
+                    `${string.image} ${index.image}`,
+                    SymbolKind.String,
+                    ITokenToRangeMerge(string, rparen),
+                ));
+                b.foldings.push(new FoldingRange(
+                    string.startLine - 1,
+                    rparen.startLine - 1,
+                    3
+                ));
+
+            }
+            b.mark(ctx[WtsTokenMap.lparen.name]?.[0], TokenLegend.wts_paren);
+            ctx[WtsTokenMap.comment.name]?.map(item => b.mark(item, TokenLegend.wts_comment));
         }
-
-        this?.bridge?.mark(ctx[WtsTokenMap.lparen.name]?.[0], JassTokenLegend.wts_paren);
-
-        ctx[WtsTokenMap.comment.name]?.map(item => this?.bridge?.mark(item, JassTokenLegend.wts_comment));
 
         return {
             index: index,

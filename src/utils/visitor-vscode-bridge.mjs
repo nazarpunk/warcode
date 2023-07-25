@@ -1,18 +1,28 @@
 // noinspection NpmUsedModulesInstalled
-import {SemanticTokensBuilder} from "vscode";
+import {
+    SemanticTokensBuilder,
+    DocumentSymbol,
+    Diagnostic,
+    SymbolInformation
+} from 'vscode';
 
 export default class {
 
-    /** @param {import('vscode').DocumentSymbol[]|SymbolInformation[]} symbols */
-    constructor(symbols) {
+    /**
+     * @param {DocumentSymbol[]|SymbolInformation[]} symbols
+     * @param {FoldingRange[]} foldings
+     */
+    constructor(symbols, foldings) {
         this.diagnostics = [];
         this.builder = new SemanticTokensBuilder();
         this.symbols = symbols;
+        this.foldings = foldings;
     }
 
-    /** @type {import('vscode').Diagnostic[]} */ diagnostics;
+    /** @type {Diagnostic[]} */ diagnostics;
     /** @type {SemanticTokensBuilder} */ builder;
-    /** @type {import('vscode').DocumentSymbol[]|SymbolInformation[]} */ symbols;
+    /** @type {DocumentSymbol[]|SymbolInformation[]} */ symbols;
+    /** @type {FoldingRange[]} */ foldings;
 
     /**
      * @param {import('chevrotain').IToken} token

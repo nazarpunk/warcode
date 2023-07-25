@@ -9389,8 +9389,22 @@ var WtsParser = class extends CstParser {
 // src/wts/wts-visitor.mjs
 var import_vscode3 = require("vscode");
 
-// src/jass/lexer/jass-token-legend.mjs
-var jass_token_legend_default = {
+// src/utils/i-token-to-range.mjs
+var import_vscode = require("vscode");
+var i_token_to_range_default = (token) => new import_vscode.Range(
+  new import_vscode.Position(token.startLine - 1, token.startColumn - 1),
+  new import_vscode.Position(token.endLine - 1, token.endColumn)
+);
+
+// src/utils/i-token-to-range-merge.mjs
+var import_vscode2 = require("vscode");
+var i_token_to_range_merge_default = (a, b) => new import_vscode2.Range(
+  new import_vscode2.Position(a.startLine - 1, a.startColumn - 1),
+  new import_vscode2.Position(b.endLine - 1, b.endColumn)
+);
+
+// src/semantic/token-legend.mjs
+var token_legend_default = {
   jass_comment: 0,
   jass_and: 1,
   jass_array: 2,
@@ -9452,20 +9466,6 @@ var jass_token_legend_default = {
   wts_text: 58
 };
 
-// src/utils/i-token-to-range.mjs
-var import_vscode = require("vscode");
-var i_token_to_range_default = (token) => new import_vscode.Range(
-  new import_vscode.Position(token.startLine - 1, token.startColumn - 1),
-  new import_vscode.Position(token.endLine - 1, token.endColumn)
-);
-
-// src/utils/i-token-to-range-merge.mjs
-var import_vscode2 = require("vscode");
-var i_token_to_range_merge_default = (a, b) => new import_vscode2.Range(
-  new import_vscode2.Position(a.startLine - 1, a.startColumn - 1),
-  new import_vscode2.Position(b.endLine - 1, b.endColumn)
-);
-
 // src/wts/wts-visitor.mjs
 var parser = new WtsParser();
 var BaseCstVisitor = parser.getBaseCstVisitorConstructor();
@@ -9502,20 +9502,28 @@ var WtsVisitor = class extends BaseCstVisitor {
   }
   [wts_parser_rule_name_default.block](ctx) {
     const index = ctx[WtsTokenMap.index.name]?.[0];
-    const string = ctx[WtsTokenMap.string.name]?.[0];
-    const rparen = ctx[WtsTokenMap.rparen.name]?.[0];
-    if (index && string && rparen) {
-      this?.bridge?.mark(index, jass_token_legend_default.wts_index);
-      this?.bridge?.mark(string, jass_token_legend_default.wts_string);
-      this?.bridge?.mark(rparen, jass_token_legend_default.wts_paren);
-      this?.bridge?.symbols.push(new import_vscode3.SymbolInformation(
-        `${string.image} ${index.image}`,
-        import_vscode3.SymbolKind.String,
-        i_token_to_range_merge_default(string, rparen)
-      ));
+    const b = this?.bridge;
+    if (b) {
+      const string = ctx[WtsTokenMap.string.name]?.[0];
+      const rparen = ctx[WtsTokenMap.rparen.name]?.[0];
+      if (index && string && rparen) {
+        b.mark(index, token_legend_default.wts_index);
+        b.mark(string, token_legend_default.wts_string);
+        b.mark(rparen, token_legend_default.wts_paren);
+        b.symbols.push(new import_vscode3.SymbolInformation(
+          `${string.image} ${index.image}`,
+          import_vscode3.SymbolKind.String,
+          i_token_to_range_merge_default(string, rparen)
+        ));
+        b.foldings.push(new import_vscode3.FoldingRange(
+          string.startLine - 1,
+          rparen.startLine - 1,
+          3
+        ));
+      }
+      b.mark(ctx[WtsTokenMap.lparen.name]?.[0], token_legend_default.wts_paren);
+      ctx[WtsTokenMap.comment.name]?.map((item) => b.mark(item, token_legend_default.wts_comment));
     }
-    this?.bridge?.mark(ctx[WtsTokenMap.lparen.name]?.[0], jass_token_legend_default.wts_paren);
-    ctx[WtsTokenMap.comment.name]?.map((item) => this?.bridge?.mark(item, jass_token_legend_default.wts_comment));
     return {
       index
     };
