@@ -1,6 +1,7 @@
 import {createSyntaxDiagramsCode} from 'chevrotain'
-import {JassParser} from "../src/jass/jass-parser.ts";
-import {JassVisitor} from "../src/jass/jass-visitor.mjs";
+import {JassParser} from "../src/jass/jass-parser";
+import {JassVisitor} from "../src/jass/jass-visitor";
+import JassRule from "../src/jass/jass-rule";
 
 const parser = new JassParser(true)
 const iframe = document.createElement('iframe');
@@ -13,9 +14,7 @@ document.body.appendChild(iframe);
     const request = await fetch('test.txt');
     parser.inputText = await request.text();
 
-    const result = visitor.visit(parser.jass());
+    visitor.visit(parser[JassRule.jass]());
 
     for (const error of parser.errorlist) console.warn(error)
-
-    //console.log(result);
 })();

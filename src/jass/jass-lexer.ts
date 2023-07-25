@@ -1,7 +1,7 @@
 import {Lexer} from 'chevrotain';
-import JassTokenList from "./jass-token-list";
+import JassTokens from "./jass-tokens";
 
-const lexer = new Lexer(JassTokenList);
+const lexer = new Lexer(Object.values(JassTokens));
 for (const error of lexer.lexerDefinitionErrors) console.error(error);
 
 export default lexer;

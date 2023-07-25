@@ -1,10 +1,9 @@
-import {CstParser, EOF} from "chevrotain";
-import JassLexer from "./lexer/jass-lexer";
-import JassTokenList from "./lexer/jass-token-list";
+import {CstParser, EOF, ParserMethod} from "chevrotain";
+import JassLexer from "./jass-lexer";
 import ParserError from "../utils/parser-error";
 import ParserErrorType from "../utils/parser-error-type";
-import Rule from "./jass-parser-rule-name";
-import Token from "./lexer/jass-token-map";
+import JassRule from "./jass-rule";
+import JassTokens from "./jass-tokens";
 
 export class JassParser extends CstParser {
     errorlist: ParserError[] = [];
@@ -14,8 +13,10 @@ export class JassParser extends CstParser {
         this.input = JassLexer.tokenize(text).tokens;
     }
 
+    declare [JassRule.jass]: ParserMethod<any, any>;
+
     constructor(debug = false) {
-        super(JassTokenList, {
+        super(Object.values(JassTokens), {
             recoveryEnabled: true,
             errorMessageProvider: {
                 buildEarlyExitMessage: (options): string => {
@@ -44,178 +45,178 @@ export class JassParser extends CstParser {
 
 
         //region jass
-        $.RULE(Rule.jass, () => $.MANY(() => $.SUBRULE($[Rule.root])));
+        $.RULE(JassRule.jass, () => $.MANY(() => $.SUBRULE($[JassRule.root])));
         //endregion
 
         //region root
-        $.RULE(Rule.root, () => {
+        $.RULE(JassRule.root, () => {
             $.OR([
-                {ALT: () => $.SUBRULE($[Rule.type_declare])},
-                {ALT: () => $.SUBRULE($[Rule.native_declare])},
-                {ALT: () => $.SUBRULE($[Rule.function_declare])},
-                {ALT: () => $.SUBRULE($[Rule.globals_declare])},
-                {ALT: () => $.CONSUME(Token.linebreak)},
-                {ALT: () => $.CONSUME(Token.comment)},
+                {ALT: () => $.SUBRULE($[JassRule.type_declare])},
+                {ALT: () => $.SUBRULE($[JassRule.native_declare])},
+                {ALT: () => $.SUBRULE($[JassRule.function_declare])},
+                {ALT: () => $.SUBRULE($[JassRule.globals_declare])},
+                {ALT: () => $.CONSUME(JassTokens[JassRule.linebreak])},
+                {ALT: () => $.CONSUME(JassTokens[JassRule.comment])},
             ]);
         });
         //endregion
 
         //region type
-        $.RULE(Rule.type_declare, () => {
-            $.CONSUME(Token.type);
-            $.CONSUME(Token.identifier);
-            $.CONSUME(Token.extends);
-            $.CONSUME2(Token.identifier);
-            $.SUBRULE($[Rule.end]);
+        $.RULE(JassRule.type_declare, () => {
+            $.CONSUME(JassTokens[JassRule.type]);
+            $.CONSUME(JassTokens[JassRule.identifier]);
+            $.CONSUME(JassTokens[JassRule.extends]);
+            $.CONSUME2(JassTokens[JassRule.identifier]);
+            $.SUBRULE($[JassRule.end]);
         });
         //endregion
 
         //region native
-        $.RULE(Rule.native_declare, () => {
-            $.OPTION(() => $.CONSUME(Token.constant));
-            $.CONSUME(Token.native);
-            $.CONSUME2(Token.identifier);
-            $.CONSUME3(Token.takes);
-            $.SUBRULE($[Rule.function_args]);
-            $.CONSUME4(Token.returns);
-            $.SUBRULE($[Rule.function_returns]);
-            $.SUBRULE($[Rule.end]);
+        $.RULE(JassRule.native_declare, () => {
+            $.OPTION(() => $.CONSUME(JassTokens[JassRule.constant]));
+            $.CONSUME(JassTokens[JassRule.native]);
+            $.CONSUME2(JassTokens[JassRule.identifier]);
+            $.CONSUME3(JassTokens[JassRule.takes]);
+            $.SUBRULE($[JassRule.function_args]);
+            $.CONSUME4(JassTokens[JassRule.returns]);
+            $.SUBRULE($[JassRule.function_returns]);
+            $.SUBRULE($[JassRule.end]);
         });
         //endregion
 
         //region function
-        $.RULE(Rule.function_declare, () => {
-            $.CONSUME(Token.function);
-            $.CONSUME2(Token.identifier);
-            $.CONSUME3(Token.takes);
-            $.SUBRULE($[Rule.function_args]);
-            $.CONSUME4(Token.returns);
-            $.SUBRULE($[Rule.function_returns]);
-            $.SUBRULE($[Rule.end]);
-            $.MANY1(() => $.SUBRULE($[Rule.function_locals]));
-            $.MANY2(() => $.SUBRULE($[Rule.statement]));
-            $.CONSUME(Token.endfunction);
-            $.SUBRULE2($[Rule.end]);
+        $.RULE(JassRule.function_declare, () => {
+            $.CONSUME(JassTokens[JassRule.function]);
+            $.CONSUME2(JassTokens[JassRule.identifier]);
+            $.CONSUME3(JassTokens[JassRule.takes]);
+            $.SUBRULE($[JassRule.function_args]);
+            $.CONSUME4(JassTokens[JassRule.returns]);
+            $.SUBRULE($[JassRule.function_returns]);
+            $.SUBRULE($[JassRule.end]);
+            $.MANY1(() => $.SUBRULE($[JassRule.function_locals]));
+            $.MANY2(() => $.SUBRULE($[JassRule.statement]));
+            $.CONSUME(JassTokens[JassRule.endfunction]);
+            $.SUBRULE2($[JassRule.end]);
         });
         //endregion
 
         //region variable
-        $.RULE(Rule.variable_declare, () => {
+        $.RULE(JassRule.variable_declare, () => {
             $.OPTION(() => $.OR([
-                {ALT: () => $.CONSUME(Token.constant)},
-                {ALT: () => $.CONSUME(Token.local)},
+                {ALT: () => $.CONSUME(JassTokens[JassRule.constant])},
+                {ALT: () => $.CONSUME(JassTokens[JassRule.local])},
             ]));
-            $.SUBRULE($[Rule.typedname]);
+            $.SUBRULE($[JassRule.typedname]);
             $.OPTION2(() => {
-                $.CONSUME(Token.assign)
-                $.SUBRULE($[Rule.expression])
+                $.CONSUME(JassTokens[JassRule.assign])
+                $.SUBRULE($[JassRule.expression])
             });
-            $.SUBRULE($[Rule.end]);
+            $.SUBRULE($[JassRule.end]);
         });
         //endregion
 
         //region globals
-        $.RULE(Rule.globals_declare, () => {
-            $.CONSUME(Token.globals);
-            $.SUBRULE($[Rule.end]);
+        $.RULE(JassRule.globals_declare, () => {
+            $.CONSUME(JassTokens[JassRule.globals]);
+            $.SUBRULE($[JassRule.end]);
             $.MANY(() => $.OR([
-                {ALT: () => $.SUBRULE($[Rule.variable_declare])},
-                {ALT: () => $.CONSUME(Token.linebreak)},
-                {ALT: () => $.CONSUME(Token.comment)},
+                {ALT: () => $.SUBRULE($[JassRule.variable_declare])},
+                {ALT: () => $.CONSUME(JassTokens[JassRule.linebreak])},
+                {ALT: () => $.CONSUME(JassTokens[JassRule.comment])},
             ]));
-            $.CONSUME3(Token.endglobals);
-            $.SUBRULE2($[Rule.end]);
+            $.CONSUME3(JassTokens[JassRule.endglobals]);
+            $.SUBRULE2($[JassRule.end]);
         });
         //endregion
 
         //region if
-        $.RULE(Rule.if_statement, () => {
-            $.CONSUME(Token.if)
-            $.SUBRULE($[Rule.expression])
-            $.CONSUME(Token.then)
-            $.SUBRULE($[Rule.end]);
-            $.MANY(() => $.SUBRULE($[Rule.statement]))
-            $.MANY2(() => $.SUBRULE($[Rule.elseif_statement]))
-            $.OPTION(() => $.SUBRULE($[Rule.else_statement]))
-            $.CONSUME(Token.endif)
-            $.SUBRULE2($[Rule.end]);
+        $.RULE(JassRule.if_statement, () => {
+            $.CONSUME(JassTokens[JassRule.if])
+            $.SUBRULE($[JassRule.expression])
+            $.CONSUME(JassTokens[JassRule.then])
+            $.SUBRULE($[JassRule.end]);
+            $.MANY(() => $.SUBRULE($[JassRule.statement]))
+            $.MANY2(() => $.SUBRULE($[JassRule.elseif_statement]))
+            $.OPTION(() => $.SUBRULE($[JassRule.else_statement]))
+            $.CONSUME(JassTokens[JassRule.endif])
+            $.SUBRULE2($[JassRule.end]);
         });
         //endregion
 
         //region elseif
-        $.RULE(Rule.elseif_statement, () => {
-            $.CONSUME(Token.elseif);
-            $.SUBRULE($[Rule.expression]);
-            $.CONSUME(Token.then);
-            $.SUBRULE($[Rule.end]);
-            $.MANY(() => $.SUBRULE($[Rule.statement]));
+        $.RULE(JassRule.elseif_statement, () => {
+            $.CONSUME(JassTokens[JassRule.elseif]);
+            $.SUBRULE($[JassRule.expression]);
+            $.CONSUME(JassTokens[JassRule.then]);
+            $.SUBRULE($[JassRule.end]);
+            $.MANY(() => $.SUBRULE($[JassRule.statement]));
         });
         //endregion
 
         //region else
-        $.RULE(Rule.else_statement, () => {
-            $.CONSUME(Token.else);
-            $.SUBRULE($[Rule.end]);
-            $.MANY(() => $.SUBRULE($[Rule.statement]));
+        $.RULE(JassRule.else_statement, () => {
+            $.CONSUME(JassTokens[JassRule.else]);
+            $.SUBRULE($[JassRule.end]);
+            $.MANY(() => $.SUBRULE($[JassRule.statement]));
         });
         //endregion
 
         //region call
-        $.RULE(Rule.call_statement, () => {
-            $.OPTION(() => $.CONSUME(Token.debug));
-            $.CONSUME(Token.call)
-            $.SUBRULE($[Rule.function_call])
-            $.SUBRULE($[Rule.end]);
+        $.RULE(JassRule.call_statement, () => {
+            $.OPTION(() => $.CONSUME(JassTokens[JassRule.debug]));
+            $.CONSUME(JassTokens[JassRule.call])
+            $.SUBRULE($[JassRule.function_call])
+            $.SUBRULE($[JassRule.end]);
         });
         //endregion
 
         //region return
-        $.RULE(Rule.return_statement, () => {
-            $.CONSUME(Token.return);
-            $.OPTION(() => $.SUBRULE($[Rule.expression]));
-            $.SUBRULE($[Rule.end]);
+        $.RULE(JassRule.return_statement, () => {
+            $.CONSUME(JassTokens[JassRule.return]);
+            $.OPTION(() => $.SUBRULE($[JassRule.expression]));
+            $.SUBRULE($[JassRule.end]);
         });
         //endregion
 
         //region set
-        $.RULE(Rule.set_statement, () => {
-            $.CONSUME(Token.set)
-            $.CONSUME(Token.identifier)
-            $.OPTION(() => $.SUBRULE($[Rule.arrayaccess]))
-            $.CONSUME(Token.assign)
-            $.SUBRULE($[Rule.expression]);
-            $.SUBRULE($[Rule.end]);
+        $.RULE(JassRule.set_statement, () => {
+            $.CONSUME(JassTokens[JassRule.set])
+            $.CONSUME(JassTokens[JassRule.identifier])
+            $.OPTION(() => $.SUBRULE($[JassRule.arrayaccess]))
+            $.CONSUME(JassTokens[JassRule.assign])
+            $.SUBRULE($[JassRule.expression]);
+            $.SUBRULE($[JassRule.end]);
         });
         //endregion
 
         //region loop
-        $.RULE(Rule.loop_statement, () => {
-            $.CONSUME(Token.loop);
-            $.SUBRULE($[Rule.end]);
-            $.MANY(() => $.SUBRULE($[Rule.statement]));
-            $.CONSUME(Token.endloop);
-            $.SUBRULE2($[Rule.end]);
+        $.RULE(JassRule.loop_statement, () => {
+            $.CONSUME(JassTokens[JassRule.loop]);
+            $.SUBRULE($[JassRule.end]);
+            $.MANY(() => $.SUBRULE($[JassRule.statement]));
+            $.CONSUME(JassTokens[JassRule.endloop]);
+            $.SUBRULE2($[JassRule.end]);
         });
         //endregion
 
         //region exitwhen
-        $.RULE(Rule.exitwhen_statement, () => {
-            $.CONSUME(Token.exitwhen);
-            $.SUBRULE($[Rule.expression]);
-            $.SUBRULE($[Rule.end]);
+        $.RULE(JassRule.exitwhen_statement, () => {
+            $.CONSUME(JassTokens[JassRule.exitwhen]);
+            $.SUBRULE($[JassRule.expression]);
+            $.SUBRULE($[JassRule.end]);
         });
         //endregion
 
         //region args
-        $.RULE(Rule.function_args, () => {
+        $.RULE(JassRule.function_args, () => {
             $.OR([
-                {ALT: () => $.CONSUME(Token.nothing)},
+                {ALT: () => $.CONSUME(JassTokens[JassRule.nothing])},
                 {
                     ALT: () => {
-                        $.SUBRULE($[Rule.typedname])
+                        $.SUBRULE($[JassRule.typedname])
                         $.MANY(() => {
-                            $.CONSUME(Token.comma);
-                            $.SUBRULE2($[Rule.typedname]);
+                            $.CONSUME(JassTokens[JassRule.comma]);
+                            $.SUBRULE2($[JassRule.typedname]);
                         })
                     }
                 },
@@ -224,46 +225,46 @@ export class JassParser extends CstParser {
         //endregion
 
         //region typedname
-        $.RULE(Rule.typedname, () => {
-            $.CONSUME(Token.identifier)
-            $.OPTION2(() => $.CONSUME(Token.array));
-            $.CONSUME2(Token.identifier)
+        $.RULE(JassRule.typedname, () => {
+            $.CONSUME(JassTokens[JassRule.identifier])
+            $.OPTION2(() => $.CONSUME(JassTokens[JassRule.array]));
+            $.CONSUME2(JassTokens[JassRule.identifier])
         });
         //endregion
 
-        $.RULE(Rule.function_returns, () => {
+        $.RULE(JassRule.function_returns, () => {
             $.OR([
-                {ALT: () => $.CONSUME(Token.nothing)},
-                {ALT: () => $.CONSUME(Token.identifier)},
+                {ALT: () => $.CONSUME(JassTokens[JassRule.nothing])},
+                {ALT: () => $.CONSUME(JassTokens[JassRule.identifier])},
             ]);
         });
 
-        $.RULE(Rule.function_locals, () => {
+        $.RULE(JassRule.function_locals, () => {
             $.OR([
-                {ALT: () => $.CONSUME(Token.comment)},
-                {ALT: () => $.CONSUME(Token.linebreak)},
-                {ALT: () => $.SUBRULE($[Rule.variable_declare])},
+                {ALT: () => $.CONSUME(JassTokens[JassRule.comment])},
+                {ALT: () => $.CONSUME(JassTokens[JassRule.linebreak])},
+                {ALT: () => $.SUBRULE($[JassRule.variable_declare])},
             ]);
         });
 
         //region expression
-        $.RULE(Rule.expression, () => {
+        $.RULE(JassRule.expression, () => {
             $.OR([
                 {
                     ALT: () => {
-                        $.SUBRULE($[Rule.addition]);
+                        $.SUBRULE($[JassRule.addition]);
                         $.MANY(() => {
                             $.OR2([
-                                {ALT: () => $.CONSUME(Token.and)},
-                                {ALT: () => $.CONSUME(Token.or)},
-                                {ALT: () => $.CONSUME(Token.equals)},
-                                {ALT: () => $.CONSUME(Token.notequals)},
-                                {ALT: () => $.CONSUME(Token.less)},
-                                {ALT: () => $.CONSUME(Token.lessorequal)},
-                                {ALT: () => $.CONSUME(Token.great)},
-                                {ALT: () => $.CONSUME(Token.greatorequal)},
+                                {ALT: () => $.CONSUME(JassTokens[JassRule.and])},
+                                {ALT: () => $.CONSUME(JassTokens[JassRule.or])},
+                                {ALT: () => $.CONSUME(JassTokens[JassRule.equals])},
+                                {ALT: () => $.CONSUME(JassTokens[JassRule.notequals])},
+                                {ALT: () => $.CONSUME(JassTokens[JassRule.less])},
+                                {ALT: () => $.CONSUME(JassTokens[JassRule.lessorequal])},
+                                {ALT: () => $.CONSUME(JassTokens[JassRule.great])},
+                                {ALT: () => $.CONSUME(JassTokens[JassRule.greatorequal])},
                             ]);
-                            $.SUBRULE2($[Rule.addition]);
+                            $.SUBRULE2($[JassRule.addition]);
                         })
                     }
                 },
@@ -271,34 +272,34 @@ export class JassParser extends CstParser {
         });
         //endregion
 
-        $.RULE(Rule.addition, () => {
+        $.RULE(JassRule.addition, () => {
             $.OR([
                 {
                     ALT: () => {
-                        $.SUBRULE($[Rule.multiplication]);
+                        $.SUBRULE($[JassRule.multiplication]);
                         $.MANY(() => {
                             $.OR2([
-                                {ALT: () => $.CONSUME2(Token.add)},
-                                {ALT: () => $.CONSUME3(Token.sub)},
+                                {ALT: () => $.CONSUME2(JassTokens[JassRule.add])},
+                                {ALT: () => $.CONSUME3(JassTokens[JassRule.sub])},
                             ]);
-                            $.SUBRULE2($[Rule.multiplication]);
+                            $.SUBRULE2($[JassRule.multiplication]);
                         })
                     }
                 },
             ])
         });
 
-        $.RULE(Rule.multiplication, () => {
+        $.RULE(JassRule.multiplication, () => {
             $.OR([
                 {
                     ALT: () => {
-                        $.SUBRULE($[Rule.primary])
+                        $.SUBRULE($[JassRule.primary])
                         $.MANY(() => {
                             $.OR2([
-                                {ALT: () => $.CONSUME2(Token.mult)},
-                                {ALT: () => $.CONSUME3(Token.div)},
+                                {ALT: () => $.CONSUME2(JassTokens[JassRule.mult])},
+                                {ALT: () => $.CONSUME3(JassTokens[JassRule.div])},
                             ]);
-                            $.SUBRULE2($[Rule.primary])
+                            $.SUBRULE2($[JassRule.primary])
                         })
                     }
                 },
@@ -306,102 +307,102 @@ export class JassParser extends CstParser {
         });
 
         //region primary
-        $.RULE(Rule.primary, () => {
+        $.RULE(JassRule.primary, () => {
             $.OR([
                 {
                     ALT: () => {
-                        $.OPTION(() => $.CONSUME(Token.sub));
-                        $.CONSUME(Token.integer);
+                        $.OPTION(() => $.CONSUME(JassTokens[JassRule.sub]));
+                        $.CONSUME(JassTokens[JassRule.integer]);
                     }
                 },
                 {
                     ALT: () => {
-                        $.CONSUME(Token.not);
-                        $.SUBRULE($[Rule.primary]);
+                        $.CONSUME(JassTokens[JassRule.not]);
+                        $.SUBRULE($[JassRule.primary]);
                     }
                 },
                 {
                     ALT: () => {
-                        $.OPTION5(() => $.CONSUME3(Token.sub));
-                        $.SUBRULE($[Rule.function_call]);
+                        $.OPTION5(() => $.CONSUME3(JassTokens[JassRule.sub]));
+                        $.SUBRULE($[JassRule.function_call]);
                     }
                 },
                 {
                     ALT: () => {
-                        $.OPTION6(() => $.CONSUME6(Token.sub));
-                        $.CONSUME(Token.lparen)
-                        $.SUBRULE2($[Rule.expression])
-                        $.CONSUME(Token.rparen)
+                        $.OPTION6(() => $.CONSUME6(JassTokens[JassRule.sub]));
+                        $.CONSUME(JassTokens[JassRule.lparen])
+                        $.SUBRULE2($[JassRule.expression])
+                        $.CONSUME(JassTokens[JassRule.rparen])
                     }
                 },
                 {
                     ALT: () => {
-                        $.OPTION3(() => $.CONSUME5(Token.sub));
-                        $.CONSUME3(Token.identifier)
-                        $.OPTION4(() => $.SUBRULE($[Rule.arrayaccess]))
+                        $.OPTION3(() => $.CONSUME5(JassTokens[JassRule.sub]));
+                        $.CONSUME3(JassTokens[JassRule.identifier])
+                        $.OPTION4(() => $.SUBRULE($[JassRule.arrayaccess]))
                     }
                 },
                 {
                     ALT: () => {
-                        $.CONSUME(Token.function)
-                        $.CONSUME4(Token.identifier)
+                        $.CONSUME(JassTokens[JassRule.function])
+                        $.CONSUME4(JassTokens[JassRule.identifier])
                     }
                 },
                 {
                     ALT: () => {
-                        $.OPTION2(() => $.CONSUME2(Token.sub))
-                        $.CONSUME3(Token.real)
+                        $.OPTION2(() => $.CONSUME2(JassTokens[JassRule.sub]))
+                        $.CONSUME3(JassTokens[JassRule.real])
                     }
                 },
                 {
-                    ALT: () => $.CONSUME3(Token.idliteral)
+                    ALT: () => $.CONSUME3(JassTokens[JassRule.idliteral])
                 },
                 {
-                    ALT: () => $.CONSUME3(Token.stringliteral)
+                    ALT: () => $.CONSUME3(JassTokens[JassRule.stringliteral])
                 }
             ]);
         });
         //endregion
 
-        $.RULE(Rule.arrayaccess, () => {
-            $.CONSUME(Token.lsquareparen);
-            $.SUBRULE3($[Rule.expression]);
-            $.CONSUME(Token.rsquareparen);
+        $.RULE(JassRule.arrayaccess, () => {
+            $.CONSUME(JassTokens[JassRule.lsquareparen]);
+            $.SUBRULE3($[JassRule.expression]);
+            $.CONSUME(JassTokens[JassRule.rsquareparen]);
         })
 
-        $.RULE(Rule.function_call, () => {
-            $.CONSUME(Token.identifier);
-            $.CONSUME2(Token.lparen);
+        $.RULE(JassRule.function_call, () => {
+            $.CONSUME(JassTokens[JassRule.identifier]);
+            $.CONSUME2(JassTokens[JassRule.lparen]);
             $.OPTION(() => {
-                $.SUBRULE4($[Rule.expression]);
+                $.SUBRULE4($[JassRule.expression]);
                 $.MANY(() => {
-                    $.CONSUME(Token.comma);
-                    $.SUBRULE($[Rule.expression]);
+                    $.CONSUME(JassTokens[JassRule.comma]);
+                    $.SUBRULE($[JassRule.expression]);
                 })
             })
-            $.CONSUME3(Token.rparen);
+            $.CONSUME3(JassTokens[JassRule.rparen]);
         });
 
         //region statement
-        $.RULE(Rule.statement, () => {
+        $.RULE(JassRule.statement, () => {
             $.OR4([
-                {ALT: () => $.SUBRULE($[Rule.call_statement])},
-                {ALT: () => $.SUBRULE($[Rule.set_statement])},
-                {ALT: () => $.SUBRULE($[Rule.loop_statement])},
-                {ALT: () => $.SUBRULE($[Rule.exitwhen_statement])},
-                {ALT: () => $.SUBRULE($[Rule.if_statement])},
-                {ALT: () => $.SUBRULE($[Rule.return_statement])},
-                {ALT: () => $.CONSUME(Token.linebreak)},
-                {ALT: () => $.CONSUME(Token.comment)},
+                {ALT: () => $.SUBRULE($[JassRule.call_statement])},
+                {ALT: () => $.SUBRULE($[JassRule.set_statement])},
+                {ALT: () => $.SUBRULE($[JassRule.loop_statement])},
+                {ALT: () => $.SUBRULE($[JassRule.exitwhen_statement])},
+                {ALT: () => $.SUBRULE($[JassRule.if_statement])},
+                {ALT: () => $.SUBRULE($[JassRule.return_statement])},
+                {ALT: () => $.CONSUME(JassTokens[JassRule.linebreak])},
+                {ALT: () => $.CONSUME(JassTokens[JassRule.comment])},
             ]);
         });
         //endregion
 
         //region end
-        $.RULE(Rule.end, () => {
-            $.OPTION(() => $.CONSUME(Token.comment));
+        $.RULE(JassRule.end, () => {
+            $.OPTION(() => $.CONSUME(JassTokens[JassRule.comment]));
             $.OR([
-                {ALT: () => $.CONSUME(Token.linebreak)},
+                {ALT: () => $.CONSUME(JassTokens[JassRule.linebreak])},
                 {ALT: () => $.CONSUME2(EOF)}
             ]);
         });
