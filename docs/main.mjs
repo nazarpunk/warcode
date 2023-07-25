@@ -1,5 +1,5 @@
 import {createSyntaxDiagramsCode} from 'chevrotain'
-import {JassParser} from "../src/jass/jass-parser.mjs";
+import {JassParser} from "../src/jass/jass-parser.ts";
 import {JassVisitor} from "../src/jass/jass-visitor.mjs";
 
 const parser = new JassParser(true)

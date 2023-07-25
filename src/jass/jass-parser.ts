@@ -1,18 +1,15 @@
-// noinspection DuplicatedCode
-
 import {CstParser, EOF} from "chevrotain";
-import Rule from "./jass-parser-rule-name.mjs";
-import JassLexer from "./lexer/jass-lexer.mjs";
-import Token from "./lexer/jass-token-map.mjs";
-import JassTokenList from "./lexer/jass-token-list.mjs";
-import ParserError from "../utils/parser-error.mjs";
-import ParserErrorType from "../utils/parser-error-type.mjs";
+import JassLexer from "./lexer/jass-lexer";
+import JassTokenList from "./lexer/jass-token-list";
+import ParserError from "../utils/parser-error";
+import ParserErrorType from "../utils/parser-error-type";
+import Rule from "./jass-parser-rule-name";
+import Token from "./lexer/jass-token-map";
 
 export class JassParser extends CstParser {
-    /**@type {import('../utils/parser-error.mjs').default[]} */
-    errorlist = [];
+    errorlist: ParserError[] = [];
 
-    set inputText(text) {
+    set inputText(text: string) {
         this.errorlist = [];
         this.input = JassLexer.tokenize(text).tokens;
     }
@@ -21,29 +18,30 @@ export class JassParser extends CstParser {
         super(JassTokenList, {
             recoveryEnabled: true,
             errorMessageProvider: {
-                buildMismatchTokenMessage: options => {
-                    if (debug) console.error(options);
-                    this.errorlist.push(new ParserError(ParserErrorType.MismatchToken, options.actual));
-                    return null;
-                },
-                buildNotAllInputParsedMessage: options => {
-                    console.error('buildNotAllInputParsedMessage');
-                    console.log(options);
-                    return null;
-                },
-                buildNoViableAltMessage: options => {
-                    this.errorlist.push(new ParserError(ParserErrorType.NoViableAlt, options.previous));
-                    return null;
-                },
-                buildEarlyExitMessage: options => {
+                buildEarlyExitMessage: (options): string => {
                     console.error('buildEarlyExitMessag');
                     console.log(options);
-                    return null;
+                    return '';
+                },
+                buildMismatchTokenMessage: (options): string => {
+                    if (debug) console.error(options);
+                    this.errorlist.push(new ParserError(ParserErrorType.MismatchToken, options.actual));
+                    return '';
+                },
+                buildNoViableAltMessage: (options): string => {
+                    this.errorlist.push(new ParserError(ParserErrorType.NoViableAlt, options.previous));
+                    return '';
+                },
+                buildNotAllInputParsedMessage: (options): string => {
+                    console.error('buildNotAllInputParsedMessage');
+                    console.log(options);
+                    return '';
                 },
             },
         })
 
         const $ = this;
+
 
         //region jass
         $.RULE(Rule.jass, () => $.MANY(() => $.SUBRULE($[Rule.root])));

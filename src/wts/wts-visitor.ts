@@ -1,11 +1,13 @@
 // noinspection NpmUsedModulesInstalled
-import {DiagnosticSeverity, FoldingRange, SymbolInformation, SymbolKind} from 'vscode';
-import {WtsParser} from './wts-parser.mjs';
-import Rule from './wts-parser-rule-name.mjs';
-import {WtsTokenMap} from './wts-lexer.mjs';
-import ITokenToRange from '../utils/i-token-to-range.mjs';
-import ITokenToRangeMerge from "../utils/i-token-to-range-merge.mjs";
-import TokenLegend from "../semantic/token-legend.mjs";
+import {DiagnosticSeverity, FoldingRange, FoldingRangeKind, SymbolInformation, SymbolKind} from 'vscode';
+import {WtsParser} from './wts-parser';
+import ITokenToRange from '../utils/i-token-to-range';
+import ITokenToRangeMerge from "../utils/i-token-to-range-merge";
+import TokenLegend from "../semantic/token-legend";
+import {IToken} from "@chevrotain/types";
+import {CstNode} from "chevrotain";
+import WtsRule from "./wts-rule";
+import VisitorVscodeBridge from "../utils/visitor-vscode-bridge";
 
 const parser = new WtsParser();
 
@@ -17,17 +19,17 @@ export class WtsVisitor extends BaseCstVisitor {
         this.validateVisitor();
     }
 
-    /** @type {import('../utils/visitor-vscode-bridge.mjs').default} */ bridge;
+    bridge?: VisitorVscodeBridge;
 
-    [Rule.wts](ctx) {
+    [WtsRule.wts](ctx: CstNode[] & {
+        [WtsRule.block]: CstNode[];
+    }) {
         //console.log(Rule.wts, ctx);
-        const blocks = ctx[Rule.block];
-        /** @type {Object.<string,import('chevrotain').IToken[]>}*/
-        const indexMap = {};
+        const blocks = ctx[WtsRule.block];
+        const indexMap: Record<string, IToken[]> = {};
         if (blocks) for (const item of blocks) {
             const block = this.visit(item);
-            /** @type {import('chevrotain').IToken}*/
-            const index = block.index;
+            const index: IToken = block.index;
             if (index) {
                 (indexMap[index.image] ??= []).push(index);
             }
@@ -45,15 +47,20 @@ export class WtsVisitor extends BaseCstVisitor {
         return null;
     }
 
-    [Rule.block](ctx) {
+    [WtsRule.block](ctx: CstNode[] & {
+        [WtsRule.index]: IToken[],
+        [WtsRule.string]: IToken[],
+        [WtsRule.lparen]: IToken[],
+        [WtsRule.rparen]: IToken[],
+        [WtsRule.comment]: IToken[],
+    }) {
         //console.log(Rule.block, ctx);
-
-        const index = ctx[WtsTokenMap.index.name]?.[0];
+        const index = ctx[WtsRule.index]?.[0];
 
         const b = this?.bridge;
         if (b) {
-            /** @type {IToken} */ const string = ctx[WtsTokenMap.string.name]?.[0];
-            /** @type {IToken} */ const rparen = ctx[WtsTokenMap.rparen.name]?.[0];
+            const string = ctx[WtsRule.string]?.[0];
+            const rparen = ctx[WtsRule.rparen]?.[0];
 
             if (index && string && rparen) {
                 b.mark(index, TokenLegend.wts_index);
@@ -64,15 +71,15 @@ export class WtsVisitor extends BaseCstVisitor {
                     SymbolKind.String,
                     ITokenToRangeMerge(string, rparen),
                 ));
-                b.foldings.push(new FoldingRange(
-                    string.startLine - 1,
-                    rparen.startLine - 1,
-                    3
-                ));
 
+                b.foldings.push(new FoldingRange(
+                    string.startLine! - 1,
+                    rparen.startLine! - 1,
+                    FoldingRangeKind.Region,
+                ));
             }
-            b.mark(ctx[WtsTokenMap.lparen.name]?.[0], TokenLegend.wts_paren);
-            ctx[WtsTokenMap.comment.name]?.map(item => b.mark(item, TokenLegend.wts_comment));
+            b.mark(ctx[WtsRule.lparen]?.[0], TokenLegend.wts_paren);
+            ctx[WtsRule.comment]?.map(item => b.mark(item, TokenLegend.wts_comment));
         }
 
         return {

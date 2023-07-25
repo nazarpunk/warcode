@@ -1,15 +1,15 @@
-// noinspection JSAssignmentUsedAsCondition
-
-// noinspection NpmUsedModulesInstalled
 import {DiagnosticSeverity} from "vscode";
-import {JassParser} from "./jass-parser.mjs";
-import ParseRuleName from "./jass-parser-rule-name.mjs";
-import ITokenToRange from "../utils/i-token-to-range.mjs";
-import JassTokenMap from "./lexer/jass-token-map.mjs";
-import TokenLegend from "../semantic/token-legend.mjs";
+import {JassParser} from "./jass-parser";
+import VisitorVscodeBridge from "../utils/visitor-vscode-bridge";
+import JassTokenMap from "./lexer/jass-token-map";
+import TokenLegend from "../semantic/token-legend";
+import ITokenToRange from "../utils/i-token-to-range";
+import ParseRuleName from "./jass-parser-rule-name";
 
 const parser = new JassParser();
 const ParserVisitor = parser.getBaseCstVisitorConstructor();
+
+
 
 export class JassVisitor extends ParserVisitor {
     constructor() {
@@ -17,7 +17,7 @@ export class JassVisitor extends ParserVisitor {
         this.validateVisitor()
     }
 
-    /** @type {import('../utils/visitor-vscode-bridge.mjs').default} */ bridge;
+    bridge : VisitorVscodeBridge;
 
     #comment(ctx) {
         ctx[ParseRuleName.end]?.map(item => this.visit(item));

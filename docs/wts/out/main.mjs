@@ -1,9 +1,4 @@
-var __defProp = Object.defineProperty;
-var __defNormalProp = (obj, key, value) => key in obj ? __defProp(obj, key, { enumerable: true, configurable: true, writable: true, value }) : obj[key] = value;
-var __publicField = (obj, key, value) => {
-  __defNormalProp(obj, typeof key !== "symbol" ? key + "" : key, value);
-  return value;
-};
+"use strict";
 
 // node_modules/chevrotain/lib/src/version.js
 var VERSION = "11.0.1";
@@ -18,8 +13,8 @@ var root = freeGlobal_default || freeSelf || Function("return this")();
 var root_default = root;
 
 // node_modules/lodash-es/_Symbol.js
-var Symbol2 = root_default.Symbol;
-var Symbol_default = Symbol2;
+var Symbol = root_default.Symbol;
+var Symbol_default = Symbol;
 
 // node_modules/lodash-es/_getRawTag.js
 var objectProto = Object.prototype;
@@ -616,8 +611,8 @@ var stubFalse_default = stubFalse;
 var freeExports = typeof exports == "object" && exports && !exports.nodeType && exports;
 var freeModule = freeExports && typeof module == "object" && module && !module.nodeType && module;
 var moduleExports = freeModule && freeModule.exports === freeExports;
-var Buffer2 = moduleExports ? root_default.Buffer : void 0;
-var nativeIsBuffer = Buffer2 ? Buffer2.isBuffer : void 0;
+var Buffer = moduleExports ? root_default.Buffer : void 0;
+var nativeIsBuffer = Buffer ? Buffer.isBuffer : void 0;
 var isBuffer = nativeIsBuffer || stubFalse_default;
 var isBuffer_default = isBuffer;
 
@@ -1275,8 +1270,8 @@ var baseAssignIn_default = baseAssignIn;
 var freeExports3 = typeof exports == "object" && exports && !exports.nodeType && exports;
 var freeModule3 = freeExports3 && typeof module == "object" && module && !module.nodeType && module;
 var moduleExports3 = freeModule3 && freeModule3.exports === freeExports3;
-var Buffer3 = moduleExports3 ? root_default.Buffer : void 0;
-var allocUnsafe = Buffer3 ? Buffer3.allocUnsafe : void 0;
+var Buffer2 = moduleExports3 ? root_default.Buffer : void 0;
+var allocUnsafe = Buffer2 ? Buffer2.allocUnsafe : void 0;
 function cloneBuffer(buffer, isDeep) {
   if (isDeep) {
     return buffer.slice();
@@ -1425,8 +1420,8 @@ function initCloneArray(array) {
 var initCloneArray_default = initCloneArray;
 
 // node_modules/lodash-es/_Uint8Array.js
-var Uint8Array2 = root_default.Uint8Array;
-var Uint8Array_default = Uint8Array2;
+var Uint8Array = root_default.Uint8Array;
+var Uint8Array_default = Uint8Array;
 
 // node_modules/lodash-es/_cloneArrayBuffer.js
 function cloneArrayBuffer(arrayBuffer) {
@@ -9226,17 +9221,34 @@ function createSyntaxDiagramsCode(grammar, { resourceBase = `https://unpkg.com/c
   return header + cssHtml + scripts + diagramsDiv + serializedGrammar + initLogic;
 }
 
-// src/wts/wts-lexer.mjs
-var isWhitespace = (charCode) => charCode === 32 || charCode === 9 || charCode === 13 || charCode === 10 || charCode === 12 || charCode === 11;
-function whitespacePattern(text, startOffset, matchedTokens) {
-  if (matchedTokens.length > 0) {
-    let lastMatchedToken = matchedTokens[matchedTokens.length - 1];
-    if (tokenMatcher(lastMatchedToken, WtsTokenMap.lparen))
+// src/wts/wts-rule.ts
+var WtsRule = /* @__PURE__ */ ((WtsRule2) => {
+  WtsRule2["wts"] = "wts";
+  WtsRule2["block"] = "block";
+  WtsRule2["whitespace"] = "whitespace";
+  WtsRule2["string"] = "string";
+  WtsRule2["index"] = "index";
+  WtsRule2["comment"] = "comment";
+  WtsRule2["lparen"] = "lparen";
+  WtsRule2["rparen"] = "rparen";
+  WtsRule2["text"] = "text";
+  return WtsRule2;
+})(WtsRule || {});
+var wts_rule_default = WtsRule;
+
+// src/utils/is-char-whitespace.ts
+var is_char_whitespace_default = (charCode) => charCode === 32 /* space */ || charCode === 9 /* tab */ || charCode === 13 /* cr */ || charCode === 10 /* lf */ || charCode === 12 /* ff */ || charCode === 11 /* vt */;
+
+// src/wts/wts-tokens.ts
+function whitespacePattern(text, startOffset, tokens) {
+  if (tokens.length > 0) {
+    let lastMatchedToken = tokens[tokens.length - 1];
+    if (tokenMatcher(lastMatchedToken, WtsTokens.lparen))
       return null;
   }
   let endOffset = startOffset;
   let charCode = text.charCodeAt(endOffset);
-  while (isWhitespace(charCode)) {
+  while (is_char_whitespace_default(charCode)) {
     endOffset++;
     charCode = text.charCodeAt(endOffset);
   }
@@ -9247,80 +9259,62 @@ function whitespacePattern(text, startOffset, matchedTokens) {
     return [matchedString];
   }
 }
-var WtsTokenMap = {
-  whitespace: createToken({
-    name: "whitespace",
-    //pattern: /\s+/,
+var WtsTokens = {
+  [wts_rule_default.whitespace]: createToken({
+    name: wts_rule_default.whitespace,
     pattern: whitespacePattern,
     line_breaks: true,
     group: Lexer.SKIPPED
   }),
-  string: createToken({
-    name: "string",
+  [wts_rule_default.string]: createToken({
+    name: wts_rule_default.string,
     pattern: /\bSTRING\b/,
     start_chars_hint: ["S"],
     line_breaks: false
   }),
-  index: createToken({
-    name: "index",
+  [wts_rule_default.index]: createToken({
+    name: wts_rule_default.index,
     pattern: /\d+/,
     line_breaks: false
   }),
-  comment: createToken({
-    name: "comment",
+  [wts_rule_default.comment]: createToken({
+    name: wts_rule_default.comment,
     pattern: /\/\/[^\r\n]*/,
     start_chars_hint: ["/"],
     line_breaks: false
   }),
-  lparen: createToken({
-    name: "lparen",
+  [wts_rule_default.lparen]: createToken({
+    name: wts_rule_default.lparen,
     pattern: /\{/,
     line_breaks: false,
     start_chars_hint: ["{"],
     label: "{"
   }),
-  rparen: createToken({
-    name: "rparen",
+  [wts_rule_default.rparen]: createToken({
+    name: wts_rule_default.rparen,
     pattern: /}/,
     line_breaks: false,
     start_chars_hint: ["}"],
     label: "}"
   }),
-  text: createToken({
-    name: "text",
+  [wts_rule_default.text]: createToken({
+    name: wts_rule_default.text,
     pattern: /[^}]+/,
     line_breaks: true
   })
 };
-var WtsTokenList = [
-  WtsTokenMap.whitespace,
-  WtsTokenMap.string,
-  WtsTokenMap.index,
-  WtsTokenMap.comment,
-  WtsTokenMap.lparen,
-  WtsTokenMap.rparen,
-  WtsTokenMap.text
-];
-var lexer = new Lexer(WtsTokenList);
+var wts_tokens_default = WtsTokens;
+
+// src/wts/wts-lexer.ts
+var lexer = new Lexer(Object.values(wts_tokens_default));
 for (const error of lexer.lexerDefinitionErrors)
   console.error(error);
 var wts_lexer_default = lexer;
 
-// src/wts/wts-parser-rule-name.mjs
-var names = {
-  wts: "",
-  block: "",
-  end: ""
-};
-for (const key of Object.keys(names)) {
-  names[key] = key;
-}
-var wts_parser_rule_name_default = names;
-
-// src/utils/parser-error.mjs
+// src/utils/parser-error.ts
 var parser_error_default = class {
   /**
-   * @param {import('./parser-error-type.mjs').default} type
+   * @param {import('./parser-error-type').default} type
    * @param {import('chevrotain').IToken} token
    */
   constructor(type, token) {
@@ -9329,54 +9323,53 @@ var parser_error_default = class {
   }
 };
 
-// src/utils/parser-error-type.mjs
+// src/utils/parser-error-type.ts
 var parser_error_type_default = {
   MismatchToken: "MismatchToken",
   NoViableAlt: "NoViableAlt"
 };
 
-// src/wts/wts-parser.mjs
+// src/wts/wts-parser.ts
 var WtsParser = class extends CstParser {
   constructor() {
-    super(WtsTokenList, {
+    super(Object.values(wts_tokens_default), {
       recoveryEnabled: true,
       errorMessageProvider: {
+        buildEarlyExitMessage: (options) => {
+          console.error("EarlyExit");
+          console.log(options);
+          return "";
+        },
         buildMismatchTokenMessage: (options) => {
           console.error("MismatchToken");
           console.log(options);
           this.errorlist.push(new parser_error_default(parser_error_type_default.MismatchToken, options.actual));
-          return null;
-        },
-        buildNotAllInputParsedMessage: (options) => {
-          console.error("NotAllInputParsed");
-          console.log(options);
-          return null;
+          return "";
         },
         buildNoViableAltMessage: (options) => {
           console.error("NoViableAlt");
           console.log(options);
-          return null;
+          return "";
         },
-        buildEarlyExitMessage: (options) => {
-          console.error("EarlyExit");
+        buildNotAllInputParsedMessage: (options) => {
+          console.error("NotAllInputParsed");
           console.log(options);
-          return null;
+          return "";
         }
       }
     });
-    /**@type {import('../utils/parser-error.mjs').default[]} */
-    __publicField(this, "errorlist", []);
+    this.errorlist = [];
     const $ = this;
-    $.RULE(wts_parser_rule_name_default.wts, () => $.MANY(() => $.SUBRULE($[wts_parser_rule_name_default.block])));
-    $.RULE(wts_parser_rule_name_default.block, () => {
-      $.CONSUME(WtsTokenMap.string);
-      $.CONSUME(WtsTokenMap.index);
+    $.RULE(wts_rule_default.wts, () => $.MANY(() => $.SUBRULE($[wts_rule_default.block])));
+    $.RULE(wts_rule_default.block, () => {
+      $.CONSUME(wts_tokens_default[wts_rule_default.string]);
+      $.CONSUME(wts_tokens_default.index);
       $.MANY(() => $.OR([
-        { ALT: () => $.CONSUME(WtsTokenMap.comment) }
+        { ALT: () => $.CONSUME(wts_tokens_default.comment) }
       ]));
-      $.CONSUME(WtsTokenMap.lparen);
-      $.CONSUME(WtsTokenMap.text);
-      $.CONSUME(WtsTokenMap.rparen);
+      $.CONSUME(wts_tokens_default.lparen);
+      $.CONSUME(wts_tokens_default.text);
+      $.CONSUME(wts_tokens_default.rparen);
     });
     this.performSelfAnalysis();
   }
@@ -9386,24 +9379,24 @@ var WtsParser = class extends CstParser {
   }
 };
 
-// src/wts/wts-visitor.mjs
+// src/wts/wts-visitor.ts
 var import_vscode3 = require("vscode");
 
-// src/utils/i-token-to-range.mjs
+// src/utils/i-token-to-range.ts
 var import_vscode = require("vscode");
 var i_token_to_range_default = (token) => new import_vscode.Range(
   new import_vscode.Position(token.startLine - 1, token.startColumn - 1),
   new import_vscode.Position(token.endLine - 1, token.endColumn)
 );
 
-// src/utils/i-token-to-range-merge.mjs
+// src/utils/i-token-to-range-merge.ts
 var import_vscode2 = require("vscode");
 var i_token_to_range_merge_default = (a, b) => new import_vscode2.Range(
   new import_vscode2.Position(a.startLine - 1, a.startColumn - 1),
   new import_vscode2.Position(b.endLine - 1, b.endColumn)
 );
 
-// src/semantic/token-legend.mjs
+// src/semantic/token-legend.ts
 var token_legend_default = {
   jass_comment: 0,
   jass_and: 1,
@@ -9466,19 +9459,17 @@ var token_legend_default = {
   wts_text: 58
 };
 
-// src/wts/wts-visitor.mjs
+// src/wts/wts-visitor.ts
 var parser = new WtsParser();
 var BaseCstVisitor = parser.getBaseCstVisitorConstructor();
 var WtsVisitor = class extends BaseCstVisitor {
   constructor() {
     super();
-    /** @type {import('../utils/visitor-vscode-bridge.mjs').default} */
-    __publicField(this, "bridge");
     this.validateVisitor();
   }
-  [wts_parser_rule_name_default.wts](ctx) {
+  [wts_rule_default.wts](ctx) {
     var _a;
-    const blocks = ctx[wts_parser_rule_name_default.block];
+    const blocks = ctx[wts_rule_default.block];
     const indexMap = {};
     if (blocks)
       for (const item of blocks) {
@@ -9500,12 +9491,12 @@ var WtsVisitor = class extends BaseCstVisitor {
     }
     return null;
   }
-  [wts_parser_rule_name_default.block](ctx) {
-    const index = ctx[WtsTokenMap.index.name]?.[0];
+  [wts_rule_default.block](ctx) {
+    const index = ctx[wts_rule_default.index]?.[0];
     const b = this?.bridge;
     if (b) {
-      const string = ctx[WtsTokenMap.string.name]?.[0];
-      const rparen = ctx[WtsTokenMap.rparen.name]?.[0];
+      const string = ctx[wts_rule_default.string]?.[0];
+      const rparen = ctx[wts_rule_default.rparen]?.[0];
       if (index && string && rparen) {
         b.mark(index, token_legend_default.wts_index);
         b.mark(string, token_legend_default.wts_string);
@@ -9518,11 +9509,11 @@ var WtsVisitor = class extends BaseCstVisitor {
         b.foldings.push(new import_vscode3.FoldingRange(
           string.startLine - 1,
           rparen.startLine - 1,
-          3
+          import_vscode3.FoldingRangeKind.Region
         ));
       }
-      b.mark(ctx[WtsTokenMap.lparen.name]?.[0], token_legend_default.wts_paren);
-      ctx[WtsTokenMap.comment.name]?.map((item) => b.mark(item, token_legend_default.wts_comment));
+      b.mark(ctx[wts_rule_default.lparen]?.[0], token_legend_default.wts_paren);
+      ctx[wts_rule_default.comment]?.map((item) => b.mark(item, token_legend_default.wts_comment));
     }
     return {
       index
@@ -9530,7 +9521,7 @@ var WtsVisitor = class extends BaseCstVisitor {
   }
 };
 
-// docs/wts/main.mjs
+// docs/wts/main.ts
 var parser2 = new WtsParser();
 var iframe = document.createElement("iframe");
 iframe.src = "data:text/html;charset=utf-8," + encodeURI(createSyntaxDiagramsCode(parser2.getSerializedGastProductions()));
@@ -9539,7 +9530,7 @@ document.body.appendChild(iframe);
   const visitor = new WtsVisitor();
   const request = await fetch("test.txt");
   parser2.inputText = await request.text();
-  const result = visitor.visit(parser2[wts_parser_rule_name_default.wts]());
+  visitor.visit(parser2[wts_rule_default.wts]());
   for (const error of parser2.errorlist)
     console.warn(error);
 })();

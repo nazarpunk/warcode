@@ -1,57 +1,37 @@
-// noinspection NpmUsedModulesInstalled
 import {
     languages,
-    DiagnosticSeverity,
-    DocumentSymbol,
-    SymbolInformation,
     DocumentSemanticTokensProvider,
     DocumentSymbolProvider,
     FoldingRangeProvider,
-    FoldingRange,
-    commands
+    DiagnosticCollection,
+    TextDocument,
+    SemanticTokens,
+    DocumentSymbol,
+    SymbolInformation, FoldingRange, commands, DiagnosticSeverity
 } from 'vscode';
-import {
-    CstParser,
-} from 'chevrotain';
+import {CstParser, ICstVisitor} from 'chevrotain'
+import VisitorVscodeBridge from "./visitor-vscode-bridge";
+import ITokenToRange from "./i-token-to-range";
+import ParserErrorType from "./parser-error-type";
 
-import ITokenToRange from '../utils/i-token-to-range.mjs';
-import VisitorVscodeBridge from './visitor-vscode-bridge.mjs';
-import ParserErrorType from './parser-error-type.mjs';
+export default class ExtProvider implements DocumentSemanticTokensProvider, DocumentSymbolProvider, FoldingRangeProvider {
 
-/** @implements {DocumentSemanticTokensProvider ,DocumentSymbolProvider, FoldingRangeProvider} */
-export default class {
-
-    /**
-     * @param {string} name
-     * @param {CstParser} parser
-     * @param {import('vscode').ICstVisitor} visitor
-     */
-    constructor(name, {
-        parser,
-        visitor,
-    }) {
+    constructor(name: string, parser: CstParser, visitor: ICstVisitor<any, any>) {
         this.name = name;
         this.#collection = languages.createDiagnosticCollection(name);
         this.#parser = parser;
         this.#visitor = visitor;
     }
 
-    /** @type {DiagnosticCollection} */ #collection;
-    /** @type {CstParser} */ #parser;
-    /** @type {import('vscode').ICstVisitor} */ #visitor;
+    name: string;
+    #collection: DiagnosticCollection;
+    readonly #parser: CstParser;
+    #visitor: ICstVisitor<any, any>;
+    #version: Record<string, number> = {};
+    #symbols: Record<string, DocumentSymbol[] | SymbolInformation[]> = {};
+    #foldings: Record<string, FoldingRange[]> = {};
 
-    /** @type {Object.<string, number>} */ #version = {};
-
-    /** @type {Object.<string, DocumentSymbol[]|SymbolInformation[]>} */ #symbols = {};
-    /** @type {Object.<string, FoldingRange[]>} */ #foldings = {};
-
-
-    // noinspection JSUnusedGlobalSymbols,DuplicatedCode
-    /**
-     * @param {import("vscode.TextDocument")} document
-     * @return {import("vscode.CancellationToken").SemanticTokens}
-     */
-    async provideDocumentSemanticTokens(document) {
+    async provideDocumentSemanticTokens(document: TextDocument): Promise<SemanticTokens> {
         const text = document.getText();
 
         this.#collection.clear();
@@ -93,24 +73,14 @@ export default class {
         return tokens;
     }
 
-    // noinspection JSUnusedGlobalSymbols
-    /**
-     * @param {import('vscode').TextDocument} document
-     * @return {import('vscode').DocumentSymbol[]|SymbolInformation[]}
-     */
-    async provideDocumentSymbols(document) {
+    async provideDocumentSymbols(document: TextDocument): Promise<SymbolInformation[] | DocumentSymbol[]> {
         if (document.version !== this.#version[document.uri.path]) {
             await commands.executeCommand('_provideDocumentSemanticTokens', document.uri);
         }
         return this.#symbols?.[document.uri.path];
     }
 
-    // noinspection JSUnusedGlobalSymbols
-    /**
-     * @param {import('vscode').TextDocument} document
-     * @return {import('vscode').FoldingRange[]}
-     */
-    async provideFoldingRanges(document) {
+    async provideFoldingRanges(document: TextDocument): Promise<FoldingRange[]> {
         if (document.version !== this.#version[document.uri.path]) {
             await commands.executeCommand('_provideDocumentSemanticTokens', document.uri);
         }

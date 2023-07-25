@@ -1,6 +1,6 @@
 export default class {
     /**
-     * @param {import('./parser-error-type.mjs').default} type
+     * @param {import('./parser-error-type').default} type
      * @param {import('chevrotain').IToken} token
      */
     constructor(type, token) {

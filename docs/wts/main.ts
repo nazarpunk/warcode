@@ -1,7 +1,7 @@
-import {WtsParser} from "../../src/wts/wts-parser.mjs";
+import {WtsParser} from "../../src/wts/wts-parser";
 import {createSyntaxDiagramsCode} from "chevrotain";
-import {WtsVisitor} from "../../src/wts/wts-visitor.mjs";
-import WtsParserRuleName from "../../src/wts/wts-parser-rule-name.mjs";
+import {WtsVisitor} from "../../src/wts/wts-visitor";
+import WtsRule from "../../src/wts/wts-rule";
 
 const parser = new WtsParser()
 const iframe = document.createElement('iframe');
@@ -13,9 +13,7 @@ document.body.appendChild(iframe);
     const request = await fetch('test.txt');
     parser.inputText = await request.text();
 
-    const result = visitor.visit(parser[WtsParserRuleName.wts]());
+    visitor.visit(parser[WtsRule.wts]());
 
     for (const error of parser.errorlist) console.warn(error)
-
-    //console.log(result);
 })();
