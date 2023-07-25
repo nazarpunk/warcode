@@ -3,13 +3,16 @@ import {SemanticTokensBuilder} from "vscode";
 
 export default class {
 
-    constructor() {
+    /** @param {import('vscode').DocumentSymbol[]|SymbolInformation[]} symbols */
+    constructor(symbols) {
         this.diagnostics = [];
-        this.builder = new SemanticTokensBuilder()
+        this.builder = new SemanticTokensBuilder();
+        this.symbols = symbols;
     }
 
     /** @type {import('vscode').Diagnostic[]} */ diagnostics;
     /** @type {SemanticTokensBuilder} */ builder;
+    /** @type {import('vscode').DocumentSymbol[]|SymbolInformation[]} */ symbols;
 
     /**
      * @param {import('chevrotain').IToken} token

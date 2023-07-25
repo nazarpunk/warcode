@@ -7,7 +7,7 @@ import JassParserRuleName from "./jass-parser-rule-name.mjs";
 import VisitorVscodeBridge from "../utils/visitor-vscode-bridge.mjs";
 import ParserErrorType from "../utils/parser-error-type.mjs";
 
-/** @implements {DocumentSemanticTokensProvider} */
+/** @implements {import('vscode').DocumentSemanticTokensProvider} */
 export default class {
     #collection = languages.createDiagnosticCollection('jass');
     #parser = new JassParser();
@@ -16,9 +16,9 @@ export default class {
     // noinspection JSUnusedGlobalSymbols,DuplicatedCode
     /**
      * @param {import("vscode.TextDocument")} document
-     * @return {Promise<import("vscode.CancellationToken").SemanticTokens>}
+     * @return {import("vscode.CancellationToken").SemanticTokens}
      */
-    async provideDocumentSemanticTokens(document) {
+    provideDocumentSemanticTokens(document) {
         const text = document.getText();
 
         this.#collection.clear();

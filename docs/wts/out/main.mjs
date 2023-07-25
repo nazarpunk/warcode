@@ -9387,7 +9387,7 @@ var WtsParser = class extends CstParser {
 };
 
 // src/wts/wts-visitor.mjs
-var import_vscode2 = require("vscode");
+var import_vscode3 = require("vscode");
 
 // src/jass/lexer/jass-token-legend.mjs
 var jass_token_legend_default = {
@@ -9459,6 +9459,13 @@ var i_token_to_range_default = (token) => new import_vscode.Range(
   new import_vscode.Position(token.endLine - 1, token.endColumn)
 );
 
+// src/utils/i-token-to-range-merge.mjs
+var import_vscode2 = require("vscode");
+var i_token_to_range_merge_default = (a, b) => new import_vscode2.Range(
+  new import_vscode2.Position(a.startLine - 1, a.startColumn - 1),
+  new import_vscode2.Position(b.endLine - 1, b.endColumn)
+);
+
 // src/wts/wts-visitor.mjs
 var parser = new WtsParser();
 var BaseCstVisitor = parser.getBaseCstVisitorConstructor();
@@ -9471,7 +9478,6 @@ var WtsVisitor = class extends BaseCstVisitor {
   }
   [wts_parser_rule_name_default.wts](ctx) {
     var _a;
-    ctx[wts_parser_rule_name_default.block]?.map((item) => this.visit(item));
     const blocks = ctx[wts_parser_rule_name_default.block];
     const indexMap = {};
     if (blocks)
@@ -9489,17 +9495,26 @@ var WtsVisitor = class extends BaseCstVisitor {
         this.bridge?.diagnostics.push({
           message: `String index redeclared: ${token.image}`,
           range: i_token_to_range_default(token),
-          severity: import_vscode2.DiagnosticSeverity.Warning
+          severity: import_vscode3.DiagnosticSeverity.Warning
         });
     }
     return null;
   }
   [wts_parser_rule_name_default.block](ctx) {
     const index = ctx[WtsTokenMap.index.name]?.[0];
-    this?.bridge?.mark(index, jass_token_legend_default.wts_index);
-    this?.bridge?.mark(ctx[WtsTokenMap.string.name]?.[0], jass_token_legend_default.wts_string);
+    const string = ctx[WtsTokenMap.string.name]?.[0];
+    const rparen = ctx[WtsTokenMap.rparen.name]?.[0];
+    if (index && string && rparen) {
+      this?.bridge?.mark(index, jass_token_legend_default.wts_index);
+      this?.bridge?.mark(string, jass_token_legend_default.wts_string);
+      this?.bridge?.mark(rparen, jass_token_legend_default.wts_paren);
+      this?.bridge?.symbols.push(new import_vscode3.SymbolInformation(
+        `${string.image} ${index.image}`,
+        import_vscode3.SymbolKind.String,
+        i_token_to_range_merge_default(string, rparen)
+      ));
+    }
     this?.bridge?.mark(ctx[WtsTokenMap.lparen.name]?.[0], jass_token_legend_default.wts_paren);
-    this?.bridge?.mark(ctx[WtsTokenMap.rparen.name]?.[0], jass_token_legend_default.wts_paren);
     ctx[WtsTokenMap.comment.name]?.map((item) => this?.bridge?.mark(item, jass_token_legend_default.wts_comment));
     return {
       index

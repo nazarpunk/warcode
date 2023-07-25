@@ -1,10 +1,11 @@
 // noinspection NpmUsedModulesInstalled
-import {DiagnosticSeverity} from 'vscode';
+import {DiagnosticSeverity, SymbolInformation, SymbolKind} from 'vscode';
 import {WtsParser} from './wts-parser.mjs';
 import Rule from './wts-parser-rule-name.mjs';
 import JassTokenLegend from '../jass/lexer/jass-token-legend.mjs';
 import {WtsTokenMap} from './wts-lexer.mjs';
 import ITokenToRange from '../utils/i-token-to-range.mjs';
+import ITokenToRangeMerge from "../utils/i-token-to-range-merge.mjs";
 
 const parser = new WtsParser();
 
@@ -20,7 +21,6 @@ export class WtsVisitor extends BaseCstVisitor {
 
     [Rule.wts](ctx) {
         //console.log(Rule.wts, ctx);
-        ctx[Rule.block]?.map(item => this.visit(item));
         const blocks = ctx[Rule.block];
         /** @type {Object.<string,import('chevrotain').IToken[]>}*/
         const indexMap = {};
@@ -47,13 +47,24 @@ export class WtsVisitor extends BaseCstVisitor {
 
     [Rule.block](ctx) {
         //console.log(Rule.block, ctx);
-        const index = ctx[WtsTokenMap.index.name]?.[0];
 
-        this?.bridge?.mark(index, JassTokenLegend.wts_index);
-        this?.bridge?.mark(ctx[WtsTokenMap.string.name]?.[0], JassTokenLegend.wts_string);
+        const index = ctx[WtsTokenMap.index.name]?.[0];
+        const string = ctx[WtsTokenMap.string.name]?.[0];
+        const rparen = ctx[WtsTokenMap.rparen.name]?.[0];
+
+        if (index && string && rparen) {
+            this?.bridge?.mark(index, JassTokenLegend.wts_index);
+            this?.bridge?.mark(string, JassTokenLegend.wts_string);
+            this?.bridge?.mark(rparen, JassTokenLegend.wts_paren);
+            this?.bridge?.symbols.push(new SymbolInformation(
+                `${string.image} ${index.image}`,
+                SymbolKind.String,
+                ITokenToRangeMerge(string, rparen),
+            ));
+        }
+
         this?.bridge?.mark(ctx[WtsTokenMap.lparen.name]?.[0], JassTokenLegend.wts_paren);
-        this?.bridge?.mark(ctx[WtsTokenMap.rparen.name]?.[0], JassTokenLegend.wts_paren);
-        //this?.bridge?.mark(ctx[WtsTokenMap.text.name]?.[0], JassTokenLegend.wts_text);
+
         ctx[WtsTokenMap.comment.name]?.map(item => this?.bridge?.mark(item, JassTokenLegend.wts_comment));
 
         return {
