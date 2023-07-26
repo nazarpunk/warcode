@@ -12,11 +12,10 @@ import {
     commands,
     DiagnosticSeverity,
     CancellationToken,
-    Range, Position,
+    Range
 } from 'vscode';
 import {CstParser, ICstVisitor, Lexer} from 'chevrotain';
 import VscodeBridge from "./vscode-bridge";
-import ITokenToRange from "./i-token-to-range";
 import {IParserConfig, IToken, TokenType} from "@chevrotain/types";
 
 interface IParserConstructor {
@@ -64,12 +63,16 @@ export default class ExtProvider implements DocumentSemanticTokensProvider, Docu
             const text = document.getText();
             const path = document.uri.path;
             const bridge = new VscodeBridge(
+                document,
                 this.#symbols[path] = [],
                 this.#foldings[path] = [],
             );
 
             //===  lexing
             const lexer = this.#lexers[path] ??= new Lexer(this.#lexerDefinition, {
+                skipValidations: true,
+                deferDefinitionErrorsHandling: true,
+                positionTracking: "onlyOffset",
                 errorMessageProvider: {
                     buildUnexpectedCharactersMessage: (): string => {
                         return 'Unexpected Character';
@@ -83,17 +86,16 @@ export default class ExtProvider implements DocumentSemanticTokensProvider, Docu
 
             });
             const lexing = lexer.tokenize(text);
+
             for (const error of lexing.errors) {
-                if (error.line && error.column && error.length) {
-                    bridge.diagnostics.push({
-                        message: error.message,
-                        range: new Range(
-                            new Position(error.line - 1, error.column - 1),
-                            new Position(error.line - 1, error.column - 1 + error.length)
-                        ),
-                        severity: DiagnosticSeverity.Error,
-                    });
-                }
+                bridge.diagnostics.push({
+                    message: error.message,
+                    range: new Range(
+                        document.positionAt(error.offset),
+                        document.positionAt(error.offset + error.length)
+                    ),
+                    severity: DiagnosticSeverity.Error,
+                });
             }
 
             //=== parsing
@@ -112,7 +114,10 @@ export default class ExtProvider implements DocumentSemanticTokensProvider, Docu
             for (const error of parser.errors) {
                 bridge.diagnostics.push({
                     message: error.message,
-                    range: ITokenToRange(error.token),
+                    range: new Range(
+                        document.positionAt(error.token.startOffset),
+                        document.positionAt(error.token.startOffset + error.token.image.length),
+                    ),
                     severity: DiagnosticSeverity.Error,
                 });
             }

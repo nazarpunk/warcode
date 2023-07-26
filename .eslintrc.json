@@ -17,7 +17,6 @@
     "no-console": "warn",
     "curly": "off",
     "no-unsafe-optional-chaining": "off",
-    "semi": ["error", "always"],
     "@typescript-eslint/ban-ts-comment": "off",
     "@typescript-eslint/no-explicit-any": "off",
     "@typescript-eslint/no-non-null-assertion": "off",

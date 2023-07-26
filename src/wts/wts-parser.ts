@@ -1,42 +1,16 @@
 import {CstParser, ParserMethod} from "chevrotain";
-import ParserError from "../utils/parser-error";
-import ParserErrorType from "../utils/parser-error-type";
 import WtsRule from "./wts-rule";
 import WtsTokens from "./wts-tokens";
+import WtsTokensList from "./wts-tokens-list";
+import {IParserConfig} from "@chevrotain/types";
 
 export class WtsParser extends CstParser {
-    errorlist: ParserError[] = [];
 
     declare [WtsRule.wts]: ParserMethod<any, any>;
     declare [WtsRule.block]: ParserMethod<any, any>;
 
-    constructor() {
-        super(Object.values(WtsTokens), {
-            recoveryEnabled: true,
-            errorMessageProvider: {
-                buildEarlyExitMessage: (options): string => {
-                    console.error('EarlyExit');
-                    console.log(options);
-                    return '';
-                },
-                buildMismatchTokenMessage: (options): string => {
-                    console.error('MismatchToken');
-                    console.log(options);
-                    this.errorlist.push(new ParserError(ParserErrorType.MismatchToken, options.actual));
-                    return '';
-                },
-                buildNoViableAltMessage: (options): string => {
-                    console.error('NoViableAlt');
-                    console.log(options);
-                    return '';
-                },
-                buildNotAllInputParsedMessage: (options): string => {
-                    console.error('NotAllInputParsed');
-                    console.log(options);
-                    return '';
-                },
-            },
-        });
+    constructor(config?: IParserConfig) {
+        super(WtsTokensList, config);
 
         const $ = this;
 

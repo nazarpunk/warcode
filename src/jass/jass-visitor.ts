@@ -1,9 +1,8 @@
 // noinspection JSAssignmentUsedAsCondition
 
-import {DiagnosticSeverity} from 'vscode';
+import {DiagnosticSeverity, Range} from 'vscode';
 import type VscodeBridge from '../utils/vscode-bridge';
 import TokenLegend from '../semantic/token-legend';
-import ITokenToRange from '../utils/i-token-to-range';
 import JassRule from './jass-rule';
 import {type IToken} from '@chevrotain/types';
 import type JassCstNode from './jass-cst-node';
@@ -15,7 +14,6 @@ const ParserVisitor = parser.getBaseCstVisitorConstructor();
 export class JassVisitor extends ParserVisitor {
     constructor() {
         super();
-        this.bridge = undefined;
         this.validateVisitor();
     }
 
@@ -29,17 +27,23 @@ export class JassVisitor extends ParserVisitor {
     #string(ctx: JassCstNode) {
         const strings = ctx[JassRule.stringliteral];
         if (strings == null) return;
-        for (const string of strings) {
-            if (string.startLine === string.endLine) {
-                this?.bridge?.mark(string, TokenLegend.jass_stringliteral);
-                continue;
-            }
-            if (string) {
-                this.bridge?.diagnostics.push({
-                    message: 'Avoid multiline strings. Use |n or \\n to linebreak.',
-                    range: ITokenToRange(string),
-                    severity: DiagnosticSeverity.Warning
-                });
+        const b = this.bridge;
+        if (b) {
+            for (const string of strings) {
+                if (string.startLine === string.endLine) {
+                    b.mark(string, TokenLegend.jass_stringliteral);
+                    continue;
+                }
+                if (string) {
+                    b.diagnostics.push({
+                        message: 'Avoid multiline strings. Use |n or \\n to linebreak.',
+                        range: new Range(
+                            b.document.positionAt(string.startOffset),
+                            b.document.positionAt(string.startOffset + string.image.length),
+                        ),
+                        severity: DiagnosticSeverity.Warning
+                    });
+                }
             }
         }
     }
@@ -65,8 +69,12 @@ export class JassVisitor extends ParserVisitor {
     [JassRule.globals_declare](ctx: JassCstNode) {
         this.#comment(ctx);
 
-        this?.bridge?.mark(ctx[JassRule.globals]?.[0], TokenLegend.jass_globals);
-        this?.bridge?.mark(ctx[JassRule.endglobals]?.[0], TokenLegend.jass_endglobals);
+        const b = this?.bridge;
+
+        if (b) {
+            b.mark(ctx[JassRule.globals]?.[0], TokenLegend.jass_globals);
+            b.mark(ctx[JassRule.endglobals]?.[0], TokenLegend.jass_endglobals);
+        }
 
         const vardecl = ctx[JassRule.variable_declare];
 
@@ -74,12 +82,15 @@ export class JassVisitor extends ParserVisitor {
             for (const vd of vardecl) {
                 const variable = this.visit(vd);
                 const typedname = variable?.[JassRule.typedname];
-                const local = variable?.[JassRule.local];
+                const local: IToken = variable?.[JassRule.local];
 
-                if (local) {
-                    this.bridge?.diagnostics.push({
+                if (b && local) {
+                    b.diagnostics.push({
                         message: 'Local variable not allowed in globals block.',
-                        range: ITokenToRange(local),
+                        range: new Range(
+                            b.document.positionAt(local.startOffset),
+                            b.document.positionAt(local.startOffset + local.image.length)
+                        ),
                         severity: DiagnosticSeverity.Error
                     });
                 }
@@ -121,6 +132,8 @@ export class JassVisitor extends ParserVisitor {
 
         const b = this?.bridge;
         if (b != null) {
+            //console.log(ctx[JassRule.takes]?.[0].startColumn);
+
             b.mark(ctx[JassRule.constant]?.[0], TokenLegend.jass_constant);
             b.mark(ctx[JassRule.identifier]?.[0], TokenLegend.jass_function_native);
             b.mark(ctx[JassRule.native]?.[0], TokenLegend.jass_native);
@@ -135,23 +148,30 @@ export class JassVisitor extends ParserVisitor {
     [JassRule.function_declare](ctx: JassCstNode) {
         this.#comment(ctx);
 
-        this?.bridge?.mark(ctx[JassRule.function]?.[0], TokenLegend.jass_function);
-        this?.bridge?.mark(ctx[JassRule.identifier]?.[0], TokenLegend.jass_function_user);
-        this?.bridge?.mark(ctx[JassRule.takes]?.[0], TokenLegend.jass_takes);
-        this?.bridge?.mark(ctx[JassRule.returns]?.[0], TokenLegend.jass_returns);
-        this?.bridge?.mark(ctx[JassRule.endfunction]?.[0], TokenLegend.jass_endfunction);
+        const b = this?.bridge;
+
+        if (b) {
+            b.mark(ctx[JassRule.function]?.[0], TokenLegend.jass_function);
+            b.mark(ctx[JassRule.identifier]?.[0], TokenLegend.jass_function_user);
+            b.mark(ctx[JassRule.takes]?.[0], TokenLegend.jass_takes);
+            b.mark(ctx[JassRule.returns]?.[0], TokenLegend.jass_returns);
+            b.mark(ctx[JassRule.endfunction]?.[0], TokenLegend.jass_endfunction);
+        }
 
         // argument
         const args = this.visit(ctx[JassRule.function_args]!);
 
         // check array in argument
-        if (args?.list) {
+        if (b && args?.list) {
             for (const arg of args.list) {
                 const array = arg[JassRule.array];
                 if (array) {
-                    this.bridge?.diagnostics.push({
+                    b.diagnostics.push({
                         message: 'Array not allowed in function argument.',
-                        range: ITokenToRange(array),
+                        range: new Range(
+                            b.document.positionAt(array.startOffset),
+                            b.document.positionAt(array.startOffset + array.image.length)
+                        ),
                         severity: DiagnosticSeverity.Error
                     });
                 }
@@ -161,7 +181,7 @@ export class JassVisitor extends ParserVisitor {
         const locals = ctx?.[JassRule.function_locals];
 
         // locals, check locals with same name, check local redeclare argument
-        if (locals != null) {
+        if (b && locals != null) {
             const localMap: Record<string, IToken[]> = {};
 
             for (const local of locals) {
@@ -171,8 +191,8 @@ export class JassVisitor extends ParserVisitor {
                     type,
                     name
                 } = typedname;
-                this?.bridge?.mark(type, TokenLegend.jass_type_name);
-                this?.bridge?.mark(name, TokenLegend.jass_variable);
+                b.mark(type, TokenLegend.jass_type_name);
+                b.mark(name, TokenLegend.jass_variable);
                 if (name) {
                     (localMap[name.image] ??= []).push(name);
                     const argList = args.map[name.image];
@@ -180,7 +200,10 @@ export class JassVisitor extends ParserVisitor {
                         for (const t of [name, ...argList]) {
                             this.bridge?.diagnostics.push({
                                 message: `Local variable redeclare argument: ${t.image}`,
-                                range: ITokenToRange(t),
+                                range: new Range(
+                                    b.document.positionAt(t.startOffset),
+                                    b.document.positionAt(t.startOffset + t.image.length)
+                                ),
                                 severity: DiagnosticSeverity.Warning
                             });
                         }
@@ -191,9 +214,12 @@ export class JassVisitor extends ParserVisitor {
             for (const v of Object.values(localMap)) {
                 if (v.length < 2) continue;
                 for (const t of v) {
-                    this.bridge?.diagnostics.push({
+                    b.diagnostics.push({
                         message: `Local variable with same name: ${t.image}`,
-                        range: ITokenToRange(t),
+                        range: new Range(
+                            b.document.positionAt(t.startOffset),
+                            b.document.positionAt(t.startOffset + t.image.length)
+                        ),
                         severity: DiagnosticSeverity.Warning
                     });
                 }
@@ -222,24 +248,33 @@ export class JassVisitor extends ParserVisitor {
         if (variableDeclare == null) return null;
         const variable = this.visit(variableDeclare);
 
-        const constant = variable?.[JassRule.constant];
-        if (constant) {
-            this.bridge?.diagnostics.push({
-                message: 'Constant not allowed in function.',
-                range: ITokenToRange(constant),
-                severity: DiagnosticSeverity.Error
-            });
-        }
-
-        const local = variable?.[JassRule.local];
-        if (!local) {
-            const {type} = variable?.[JassRule.typedname];
-            if (type) {
-                this.bridge?.diagnostics.push({
-                    message: 'Missing local keyword.',
-                    range: ITokenToRange(type),
+        const b = this.bridge;
+        if (b) {
+            const constant = variable?.[JassRule.constant];
+            if (constant) {
+                b.diagnostics.push({
+                    message: 'Constant not allowed in function.',
+                    range: new Range(
+                        b.document.positionAt(constant.startOffset),
+                        b.document.positionAt(constant.startOffset + constant.image.length)
+                    ),
                     severity: DiagnosticSeverity.Error
                 });
+            }
+
+            const local = variable?.[JassRule.local];
+            if (!local) {
+                const {type} = variable?.[JassRule.typedname];
+                if (type) {
+                    b.diagnostics.push({
+                        message: 'Missing local keyword.',
+                        range: new Range(
+                            b.document.positionAt(type.startOffset),
+                            b.document.positionAt(type.startOffset + type.image.length)
+                        ),
+                        severity: DiagnosticSeverity.Error
+                    });
+                }
             }
         }
 
@@ -294,6 +329,8 @@ export class JassVisitor extends ParserVisitor {
         const args = ctx?.[JassRule.typedname]?.map(item => this.visit(item));
         const argMap: Record<string, IToken[]> = {};
 
+        const b = this.bridge;
+
         // typedname, check type same name
         if (args != null) {
             for (const arg of args) {
@@ -306,12 +343,15 @@ export class JassVisitor extends ParserVisitor {
                 if (name) (argMap[name.image] ??= []).push(name);
             }
 
-            for (const v of Object.values(argMap)) {
+            if (b) for (const v of Object.values(argMap)) {
                 if (v.length < 2) continue;
                 for (const t of v) {
-                    this.bridge?.diagnostics.push({
+                    b.diagnostics.push({
                         message: `Arguments with same name: ${t.image}`,
-                        range: ITokenToRange(t),
+                        range: new Range(
+                            b.document.positionAt(t.startOffset),
+                            b.document.positionAt(t.startOffset + t.image.length)
+                        ),
                         severity: DiagnosticSeverity.Warning
                     });
                 }
@@ -348,12 +388,16 @@ export class JassVisitor extends ParserVisitor {
         const equals = ctx[JassRule.assign]?.[0];
         const typedname = this.visit(ctx[JassRule.typedname]!);
         const array = typedname[JassRule.array];
+        const b = this.bridge;
 
         // check array assing
-        if (equals != null && array) {
-            this.bridge?.diagnostics.push({
+        if (b && equals != null && array) {
+            b.diagnostics.push({
                 message: 'Array varriables can\'t be initialised.',
-                range: ITokenToRange(array),
+                range: new Range(
+                    b.document.positionAt(array.startOffset),
+                    b.document.positionAt(array.startOffset + array.image.length)
+                ),
                 severity: DiagnosticSeverity.Error
             });
         }

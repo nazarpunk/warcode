@@ -1,7 +1,13 @@
-import {DiagnosticSeverity, FoldingRange, FoldingRangeKind, SymbolInformation, SymbolKind} from 'vscode';
+import {
+    DiagnosticSeverity,
+    FoldingRange,
+    FoldingRangeKind,
+    Location,
+    Range,
+    SymbolInformation,
+    SymbolKind
+} from 'vscode';
 import {WtsParser} from './wts-parser';
-import ITokenToRange from '../utils/i-token-to-range';
-import ITokenToRangeMerge from "../utils/i-token-to-range-merge";
 import TokenLegend from "../semantic/token-legend";
 import {IToken} from "@chevrotain/types";
 import WtsRule from "./wts-rule";
@@ -34,12 +40,17 @@ export class WtsVisitor extends BaseCstVisitor {
             }
         }
 
-        for (const tokens of Object.values(indexMap)) {
+        const b = this.bridge;
+
+        if (b) for (const tokens of Object.values(indexMap)) {
             if (tokens.length < 2) continue;
             for (const token of tokens) {
-                this.bridge?.diagnostics.push({
+                b.diagnostics.push({
                     message: `String index redeclared: ${token.image}`,
-                    range: ITokenToRange(token),
+                    range: new Range(
+                        b.document.positionAt(token.startOffset),
+                        b.document.positionAt(token.startOffset + token.image.length)
+                    ),
                     severity: DiagnosticSeverity.Warning,
                 });
             }
@@ -61,15 +72,21 @@ export class WtsVisitor extends BaseCstVisitor {
                 b.mark(index, TokenLegend.wts_index);
                 b.mark(string, TokenLegend.wts_string);
                 b.mark(rparen, TokenLegend.wts_paren);
+
+                const start = b.document.positionAt(string.startOffset);
+                const end = b.document.positionAt(rparen.startOffset + 1);
+
                 b.symbols.push(new SymbolInformation(
                     `${string.image} ${index.image}`,
                     SymbolKind.String,
-                    ITokenToRangeMerge(string, rparen),
+                    '',
+                    new Location(b.document.uri, new Range(start, end)
+                    ),
                 ));
 
                 b.foldings.push(new FoldingRange(
-                    string.startLine! - 1,
-                    rparen.startLine! - 1,
+                    start.line,
+                    end.line,
                     FoldingRangeKind.Region,
                 ));
             }

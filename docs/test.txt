@@ -1,1 +1,2 @@
-type extends
+
+native a хуйпизда takes nothing returns nothing
