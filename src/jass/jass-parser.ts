@@ -1,48 +1,44 @@
+// noinspection DuplicatedCode
+
 import {CstParser, EOF, ParserMethod} from "chevrotain";
-import JassLexer from "./jass-lexer";
-import ParserError from "../utils/parser-error";
-import ParserErrorType from "../utils/parser-error-type";
 import JassRule from "./jass-rule";
 import JassTokens from "./jass-tokens";
+import JassTokensList from "./jass-tokens-list";
+import {IParserConfig} from "@chevrotain/types";
 
-export class JassParser extends CstParser {
-    errorlist: ParserError[] = [];
-
-    set inputText(text: string) {
-        this.errorlist = [];
-        this.input = JassLexer.tokenize(text).tokens;
-    }
-
+export default class JassParser extends CstParser {
     declare [JassRule.jass]: ParserMethod<any, any>;
+    declare [JassRule.root]: ParserMethod<any, any>;
+    declare [JassRule.type_declare]: ParserMethod<any, any>;
+    declare [JassRule.native_declare]: ParserMethod<any, any>;
+    declare [JassRule.function_declare]: ParserMethod<any, any>;
+    declare [JassRule.globals_declare]: ParserMethod<any, any>;
+    declare [JassRule.end]: ParserMethod<any, any>;
+    declare [JassRule.function_args]: ParserMethod<any, any>;
+    declare [JassRule.function_returns]: ParserMethod<any, any>;
+    declare [JassRule.function_locals]: ParserMethod<any, any>;
+    declare [JassRule.statement]: ParserMethod<any, any>;
+    declare [JassRule.typedname]: ParserMethod<any, any>;
+    declare [JassRule.expression]: ParserMethod<any, any>;
+    declare [JassRule.variable_declare]: ParserMethod<any, any>;
+    declare [JassRule.elseif_statement]: ParserMethod<any, any>;
+    declare [JassRule.else_statement]: ParserMethod<any, any>;
+    declare [JassRule.function_call]: ParserMethod<any, any>;
+    declare [JassRule.arrayaccess]: ParserMethod<any, any>;
+    declare [JassRule.addition]: ParserMethod<any, any>;
+    declare [JassRule.multiplication]: ParserMethod<any, any>;
+    declare [JassRule.primary]: ParserMethod<any, any>;
+    declare [JassRule.call_statement]: ParserMethod<any, any>;
+    declare [JassRule.set_statement]: ParserMethod<any, any>;
+    declare [JassRule.loop_statement]: ParserMethod<any, any>;
+    declare [JassRule.exitwhen_statement]: ParserMethod<any, any>;
+    declare [JassRule.if_statement]: ParserMethod<any, any>;
+    declare [JassRule.return_statement]: ParserMethod<any, any>;
 
-    constructor(debug = false) {
-        super(Object.values(JassTokens), {
-            recoveryEnabled: true,
-            errorMessageProvider: {
-                buildEarlyExitMessage: (options): string => {
-                    console.error('buildEarlyExitMessag');
-                    console.log(options);
-                    return '';
-                },
-                buildMismatchTokenMessage: (options): string => {
-                    if (debug) console.error(options);
-                    this.errorlist.push(new ParserError(ParserErrorType.MismatchToken, options.actual));
-                    return '';
-                },
-                buildNoViableAltMessage: (options): string => {
-                    this.errorlist.push(new ParserError(ParserErrorType.NoViableAlt, options.previous));
-                    return '';
-                },
-                buildNotAllInputParsedMessage: (options): string => {
-                    console.error('buildNotAllInputParsedMessage');
-                    console.log(options);
-                    return '';
-                },
-            },
-        })
+    constructor(config?: IParserConfig) {
+        super(JassTokensList, config);
 
         const $ = this;
-
 
         //region jass
         $.RULE(JassRule.jass, () => $.MANY(() => $.SUBRULE($[JassRule.root])));
@@ -108,8 +104,8 @@ export class JassParser extends CstParser {
             ]));
             $.SUBRULE($[JassRule.typedname]);
             $.OPTION2(() => {
-                $.CONSUME(JassTokens[JassRule.assign])
-                $.SUBRULE($[JassRule.expression])
+                $.CONSUME(JassTokens[JassRule.assign]);
+                $.SUBRULE($[JassRule.expression]);
             });
             $.SUBRULE($[JassRule.end]);
         });
@@ -131,14 +127,14 @@ export class JassParser extends CstParser {
 
         //region if
         $.RULE(JassRule.if_statement, () => {
-            $.CONSUME(JassTokens[JassRule.if])
-            $.SUBRULE($[JassRule.expression])
-            $.CONSUME(JassTokens[JassRule.then])
+            $.CONSUME(JassTokens[JassRule.if]);
+            $.SUBRULE($[JassRule.expression]);
+            $.CONSUME(JassTokens[JassRule.then]);
             $.SUBRULE($[JassRule.end]);
-            $.MANY(() => $.SUBRULE($[JassRule.statement]))
-            $.MANY2(() => $.SUBRULE($[JassRule.elseif_statement]))
-            $.OPTION(() => $.SUBRULE($[JassRule.else_statement]))
-            $.CONSUME(JassTokens[JassRule.endif])
+            $.MANY(() => $.SUBRULE($[JassRule.statement]));
+            $.MANY2(() => $.SUBRULE($[JassRule.elseif_statement]));
+            $.OPTION(() => $.SUBRULE($[JassRule.else_statement]));
+            $.CONSUME(JassTokens[JassRule.endif]);
             $.SUBRULE2($[JassRule.end]);
         });
         //endregion
@@ -164,8 +160,8 @@ export class JassParser extends CstParser {
         //region call
         $.RULE(JassRule.call_statement, () => {
             $.OPTION(() => $.CONSUME(JassTokens[JassRule.debug]));
-            $.CONSUME(JassTokens[JassRule.call])
-            $.SUBRULE($[JassRule.function_call])
+            $.CONSUME(JassTokens[JassRule.call]);
+            $.SUBRULE($[JassRule.function_call]);
             $.SUBRULE($[JassRule.end]);
         });
         //endregion
@@ -180,10 +176,10 @@ export class JassParser extends CstParser {
 
         //region set
         $.RULE(JassRule.set_statement, () => {
-            $.CONSUME(JassTokens[JassRule.set])
-            $.CONSUME(JassTokens[JassRule.identifier])
-            $.OPTION(() => $.SUBRULE($[JassRule.arrayaccess]))
-            $.CONSUME(JassTokens[JassRule.assign])
+            $.CONSUME(JassTokens[JassRule.set]);
+            $.CONSUME(JassTokens[JassRule.identifier]);
+            $.OPTION(() => $.SUBRULE($[JassRule.arrayaccess]));
+            $.CONSUME(JassTokens[JassRule.assign]);
             $.SUBRULE($[JassRule.expression]);
             $.SUBRULE($[JassRule.end]);
         });
@@ -213,11 +209,11 @@ export class JassParser extends CstParser {
                 {ALT: () => $.CONSUME(JassTokens[JassRule.nothing])},
                 {
                     ALT: () => {
-                        $.SUBRULE($[JassRule.typedname])
+                        $.SUBRULE($[JassRule.typedname]);
                         $.MANY(() => {
                             $.CONSUME(JassTokens[JassRule.comma]);
                             $.SUBRULE2($[JassRule.typedname]);
-                        })
+                        });
                     }
                 },
             ]);
@@ -226,9 +222,9 @@ export class JassParser extends CstParser {
 
         //region typedname
         $.RULE(JassRule.typedname, () => {
-            $.CONSUME(JassTokens[JassRule.identifier])
+            $.CONSUME(JassTokens[JassRule.identifier]);
             $.OPTION2(() => $.CONSUME(JassTokens[JassRule.array]));
-            $.CONSUME2(JassTokens[JassRule.identifier])
+            $.CONSUME2(JassTokens[JassRule.identifier]);
         });
         //endregion
 
@@ -265,10 +261,10 @@ export class JassParser extends CstParser {
                                 {ALT: () => $.CONSUME(JassTokens[JassRule.greatorequal])},
                             ]);
                             $.SUBRULE2($[JassRule.addition]);
-                        })
+                        });
                     }
                 },
-            ])
+            ]);
         });
         //endregion
 
@@ -283,27 +279,27 @@ export class JassParser extends CstParser {
                                 {ALT: () => $.CONSUME3(JassTokens[JassRule.sub])},
                             ]);
                             $.SUBRULE2($[JassRule.multiplication]);
-                        })
+                        });
                     }
                 },
-            ])
+            ]);
         });
 
         $.RULE(JassRule.multiplication, () => {
             $.OR([
                 {
                     ALT: () => {
-                        $.SUBRULE($[JassRule.primary])
+                        $.SUBRULE($[JassRule.primary]);
                         $.MANY(() => {
                             $.OR2([
                                 {ALT: () => $.CONSUME2(JassTokens[JassRule.mult])},
                                 {ALT: () => $.CONSUME3(JassTokens[JassRule.div])},
                             ]);
-                            $.SUBRULE2($[JassRule.primary])
-                        })
+                            $.SUBRULE2($[JassRule.primary]);
+                        });
                     }
                 },
-            ])
+            ]);
         });
 
         //region primary
@@ -330,28 +326,28 @@ export class JassParser extends CstParser {
                 {
                     ALT: () => {
                         $.OPTION6(() => $.CONSUME6(JassTokens[JassRule.sub]));
-                        $.CONSUME(JassTokens[JassRule.lparen])
-                        $.SUBRULE2($[JassRule.expression])
-                        $.CONSUME(JassTokens[JassRule.rparen])
+                        $.CONSUME(JassTokens[JassRule.lparen]);
+                        $.SUBRULE2($[JassRule.expression]);
+                        $.CONSUME(JassTokens[JassRule.rparen]);
                     }
                 },
                 {
                     ALT: () => {
                         $.OPTION3(() => $.CONSUME5(JassTokens[JassRule.sub]));
-                        $.CONSUME3(JassTokens[JassRule.identifier])
-                        $.OPTION4(() => $.SUBRULE($[JassRule.arrayaccess]))
+                        $.CONSUME3(JassTokens[JassRule.identifier]);
+                        $.OPTION4(() => $.SUBRULE($[JassRule.arrayaccess]));
                     }
                 },
                 {
                     ALT: () => {
-                        $.CONSUME(JassTokens[JassRule.function])
-                        $.CONSUME4(JassTokens[JassRule.identifier])
+                        $.CONSUME(JassTokens[JassRule.function]);
+                        $.CONSUME4(JassTokens[JassRule.identifier]);
                     }
                 },
                 {
                     ALT: () => {
-                        $.OPTION2(() => $.CONSUME2(JassTokens[JassRule.sub]))
-                        $.CONSUME3(JassTokens[JassRule.real])
+                        $.OPTION2(() => $.CONSUME2(JassTokens[JassRule.sub]));
+                        $.CONSUME3(JassTokens[JassRule.real]);
                     }
                 },
                 {
@@ -368,7 +364,7 @@ export class JassParser extends CstParser {
             $.CONSUME(JassTokens[JassRule.lsquareparen]);
             $.SUBRULE3($[JassRule.expression]);
             $.CONSUME(JassTokens[JassRule.rsquareparen]);
-        })
+        });
 
         $.RULE(JassRule.function_call, () => {
             $.CONSUME(JassTokens[JassRule.identifier]);
@@ -378,8 +374,8 @@ export class JassParser extends CstParser {
                 $.MANY(() => {
                     $.CONSUME(JassTokens[JassRule.comma]);
                     $.SUBRULE($[JassRule.expression]);
-                })
-            })
+                });
+            });
             $.CONSUME3(JassTokens[JassRule.rparen]);
         });
 

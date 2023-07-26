@@ -1,13 +1,12 @@
-// noinspection NpmUsedModulesInstalled
 import {DiagnosticSeverity, FoldingRange, FoldingRangeKind, SymbolInformation, SymbolKind} from 'vscode';
 import {WtsParser} from './wts-parser';
 import ITokenToRange from '../utils/i-token-to-range';
 import ITokenToRangeMerge from "../utils/i-token-to-range-merge";
 import TokenLegend from "../semantic/token-legend";
 import {IToken} from "@chevrotain/types";
-import {CstNode} from "chevrotain";
 import WtsRule from "./wts-rule";
-import VisitorVscodeBridge from "../utils/visitor-vscode-bridge";
+import VscodeBridge from "../utils/vscode-bridge";
+import WtsCstNode from "./wts-cst-node";
 
 const parser = new WtsParser();
 
@@ -19,41 +18,37 @@ export class WtsVisitor extends BaseCstVisitor {
         this.validateVisitor();
     }
 
-    bridge?: VisitorVscodeBridge;
+    bridge?: VscodeBridge;
 
-    [WtsRule.wts](ctx: CstNode[] & {
-        [WtsRule.block]: CstNode[];
-    }) {
+    [WtsRule.wts](ctx: WtsCstNode) {
         //console.log(Rule.wts, ctx);
         const blocks = ctx[WtsRule.block];
         const indexMap: Record<string, IToken[]> = {};
-        if (blocks) for (const item of blocks) {
-            const block = this.visit(item);
-            const index: IToken = block.index;
-            if (index) {
-                (indexMap[index.image] ??= []).push(index);
+        if (blocks) {
+            for (const item of blocks) {
+                const block = this.visit(item);
+                const index: IToken = block.index;
+                if (index) {
+                    (indexMap[index.image] ??= []).push(index);
+                }
             }
         }
 
         for (const tokens of Object.values(indexMap)) {
             if (tokens.length < 2) continue;
-            for (const token of tokens) this.bridge?.diagnostics.push({
-                message: `String index redeclared: ${token.image}`,
-                range: ITokenToRange(token),
-                severity: DiagnosticSeverity.Warning,
-            });
+            for (const token of tokens) {
+                this.bridge?.diagnostics.push({
+                    message: `String index redeclared: ${token.image}`,
+                    range: ITokenToRange(token),
+                    severity: DiagnosticSeverity.Warning,
+                });
+            }
         }
 
         return null;
     }
 
-    [WtsRule.block](ctx: CstNode[] & {
-        [WtsRule.index]: IToken[],
-        [WtsRule.string]: IToken[],
-        [WtsRule.lparen]: IToken[],
-        [WtsRule.rparen]: IToken[],
-        [WtsRule.comment]: IToken[],
-    }) {
+    [WtsRule.block](ctx: WtsCstNode) {
         //console.log(Rule.block, ctx);
         const index = ctx[WtsRule.index]?.[0];
 

@@ -42,10 +42,18 @@
     "publish": "vsce publish patch"
   },
   "devDependencies": {
+    "@types/node": "^20.4.5",
+    "@types/vscode": "^1.80.0",
+    "@typescript-eslint/eslint-plugin": "^5.62.0",
+    "@vscode/vsce": "^2.15.0",
     "chevrotain": "^11.0.1",
     "esbuild": "^0.18.14",
-    "@vscode/vsce": "^2.15.0",
-    "@types/vscode": "^1.80.0"
+    "eslint": "^8.45.0",
+    "eslint-config-standard-with-typescript": "^37.0.0",
+    "eslint-plugin-import": "^2.27.5",
+    "eslint-plugin-n": "^16.0.1",
+    "eslint-plugin-promise": "^6.1.1",
+    "typescript": "^5.1.6"
   },
   "configurationDefaults": {
     "jass": {

@@ -3,9 +3,9 @@ import {createToken, Lexer, tokenMatcher, TokenType} from "chevrotain";
 import {CustomPatternMatcherReturn, IToken} from "@chevrotain/types";
 import isCharWhitespace from "../utils/is-char-whitespace";
 
-function whitespacePattern(text: string, startOffset: number, tokens: IToken[]): CustomPatternMatcherReturn | null {
+const whitespacePattern = (text: string, startOffset: number, tokens: IToken[]): CustomPatternMatcherReturn | null => {
     if (tokens.length > 0) {
-        let lastMatchedToken = tokens[tokens.length - 1];
+        const lastMatchedToken = tokens[tokens.length - 1];
         if (tokenMatcher(lastMatchedToken, WtsTokens.lparen)) return null;
     }
 
@@ -19,10 +19,10 @@ function whitespacePattern(text: string, startOffset: number, tokens: IToken[]):
     if (endOffset === startOffset) {
         return null;
     } else {
-        let matchedString = text.substring(startOffset, endOffset);
+        const matchedString = text.substring(startOffset, endOffset);
         return [matchedString];
     }
-}
+};
 
 const WtsTokens: Record<Exclude<WtsRule, WtsRule.wts | WtsRule.block>, TokenType> = {
     [WtsRule.whitespace]: createToken({

@@ -9337,6 +9337,7 @@ var parenColor = "#e1d132";
 var JassTokens = {
   [jass_rule_default.whitespace]: add({
     name: jass_rule_default.whitespace,
+    //pattern: whitespacePattern,
     pattern: /[^\S\r\n]+/,
     line_breaks: false,
     group: Lexer.SKIPPED
@@ -9518,7 +9519,7 @@ var JassTokens = {
   }),
   [jass_rule_default.linebreak]: add({
     name: jass_rule_default.linebreak,
-    pattern: /\n|\r\n/,
+    pattern: /\n|\r\n?/,
     label: "\\n",
     line_breaks: true
   }),
@@ -9543,59 +9544,13 @@ var JassTokens = {
 };
 var jass_tokens_default = JassTokens;
 
-// src/jass/jass-lexer.ts
-var lexer = new Lexer(Object.values(jass_tokens_default));
-for (const error of lexer.lexerDefinitionErrors)
-  console.error(error);
-var jass_lexer_default = lexer;
-
-// src/utils/parser-error.ts
-var parser_error_default = class {
-  /**
-   * @param {import('./parser-error-type').default} type
-   * @param {import('chevrotain').IToken} token
-   */
-  constructor(type, token) {
-    this.type = type;
-    this.token = token;
-  }
-};
-
-// src/utils/parser-error-type.ts
-var parser_error_type_default = {
-  MismatchToken: "MismatchToken",
-  NoViableAlt: "NoViableAlt"
-};
+// src/jass/jass-tokens-list.ts
+var jass_tokens_list_default = Object.values(jass_tokens_default);
 
 // src/jass/jass-parser.ts
 var JassParser = class extends CstParser {
-  constructor(debug = false) {
-    super(Object.values(jass_tokens_default), {
-      recoveryEnabled: true,
-      errorMessageProvider: {
-        buildEarlyExitMessage: (options) => {
-          console.error("buildEarlyExitMessag");
-          console.log(options);
-          return "";
-        },
-        buildMismatchTokenMessage: (options) => {
-          if (debug)
-            console.error(options);
-          this.errorlist.push(new parser_error_default(parser_error_type_default.MismatchToken, options.actual));
-          return "";
-        },
-        buildNoViableAltMessage: (options) => {
-          this.errorlist.push(new parser_error_default(parser_error_type_default.NoViableAlt, options.previous));
-          return "";
-        },
-        buildNotAllInputParsedMessage: (options) => {
-          console.error("buildNotAllInputParsedMessage");
-          console.log(options);
-          return "";
-        }
-      }
-    });
-    this.errorlist = [];
+  constructor(config) {
+    super(jass_tokens_list_default, config);
     const $ = this;
     $.RULE(jass_rule_default.jass, () => $.MANY(() => $.SUBRULE($[jass_rule_default.root])));
     $.RULE(jass_rule_default.root, () => {
@@ -9894,10 +9849,6 @@ var JassParser = class extends CstParser {
     });
     this.performSelfAnalysis();
   }
-  set inputText(text) {
-    this.errorlist = [];
-    this.input = jass_lexer_default.tokenize(text).tokens;
-  }
 };
 
 // src/jass/jass-visitor.ts
@@ -9982,6 +9933,7 @@ var JassVisitor = class extends ParserVisitor {
     super();
     __privateAdd(this, _comment);
     __privateAdd(this, _string);
+    this.bridge = void 0;
     this.validateVisitor();
   }
   [jass_rule_default.jass](ctx) {
@@ -9990,13 +9942,13 @@ var JassVisitor = class extends ParserVisitor {
   [jass_rule_default.root](ctx) {
     __privateMethod(this, _comment, comment_fn).call(this, ctx);
     let node;
-    if (node = ctx[jass_rule_default.type_declare])
+    if ((node = ctx[jass_rule_default.type_declare]) != null)
       return this.visit(node);
-    if (node = ctx[jass_rule_default.native_declare])
+    if ((node = ctx[jass_rule_default.native_declare]) != null)
       return this.visit(node);
-    if (node = ctx[jass_rule_default.function_declare])
+    if ((node = ctx[jass_rule_default.function_declare]) != null)
       return this.visit(node);
-    if (node = ctx[jass_rule_default.globals_declare])
+    if ((node = ctx[jass_rule_default.globals_declare]) != null)
       return this.visit(node);
   }
   [jass_rule_default.end](ctx) {
@@ -10007,23 +9959,28 @@ var JassVisitor = class extends ParserVisitor {
     this?.bridge?.mark(ctx[jass_rule_default.globals]?.[0], token_legend_default.jass_globals);
     this?.bridge?.mark(ctx[jass_rule_default.endglobals]?.[0], token_legend_default.jass_endglobals);
     const vardecl = ctx[jass_rule_default.variable_declare];
-    if (vardecl)
+    if (vardecl != null) {
       for (const vd of vardecl) {
         const variable = this.visit(vd);
         const typedname = variable?.[jass_rule_default.typedname];
         const local = variable?.[jass_rule_default.local];
-        if (local)
+        if (local) {
           this.bridge?.diagnostics.push({
-            message: `Local variable not allowed in globals block.`,
+            message: "Local variable not allowed in globals block.",
             range: i_token_to_range_default(local),
             severity: import_vscode2.DiagnosticSeverity.Error
           });
+        }
         if (typedname) {
-          const { type, name } = typedname;
+          const {
+            type,
+            name
+          } = typedname;
           this?.bridge?.mark(type, token_legend_default.jass_type_name);
           this?.bridge?.mark(name, token_legend_default.jass_variable);
         }
       }
+    }
     return ctx;
   }
   [jass_rule_default.type_declare](ctx) {
@@ -10041,11 +9998,14 @@ var JassVisitor = class extends ParserVisitor {
   }
   [jass_rule_default.native_declare](ctx) {
     __privateMethod(this, _comment, comment_fn).call(this, ctx);
-    this?.bridge?.mark(ctx[jass_rule_default.constant]?.[0], token_legend_default.jass_constant);
-    this?.bridge?.mark(ctx[jass_rule_default.identifier]?.[0], token_legend_default.jass_function_native);
-    this?.bridge?.mark(ctx[jass_rule_default.native]?.[0], token_legend_default.jass_native);
-    this?.bridge?.mark(ctx[jass_rule_default.takes]?.[0], token_legend_default.jass_takes);
-    this?.bridge?.mark(ctx[jass_rule_default.returns]?.[0], token_legend_default.jass_returns);
+    const b = this?.bridge;
+    if (b != null) {
+      b.mark(ctx[jass_rule_default.constant]?.[0], token_legend_default.jass_constant);
+      b.mark(ctx[jass_rule_default.identifier]?.[0], token_legend_default.jass_function_native);
+      b.mark(ctx[jass_rule_default.native]?.[0], token_legend_default.jass_native);
+      b.mark(ctx[jass_rule_default.takes]?.[0], token_legend_default.jass_takes);
+      b.mark(ctx[jass_rule_default.returns]?.[0], token_legend_default.jass_returns);
+    }
     this.visit(ctx[jass_rule_default.function_args]);
     this.visit(ctx[jass_rule_default.function_returns]);
   }
@@ -10057,31 +10017,36 @@ var JassVisitor = class extends ParserVisitor {
     this?.bridge?.mark(ctx[jass_rule_default.takes]?.[0], token_legend_default.jass_takes);
     this?.bridge?.mark(ctx[jass_rule_default.returns]?.[0], token_legend_default.jass_returns);
     this?.bridge?.mark(ctx[jass_rule_default.endfunction]?.[0], token_legend_default.jass_endfunction);
-    const locals = ctx?.[jass_rule_default.function_locals];
     const args = this.visit(ctx[jass_rule_default.function_args]);
-    if (args?.list)
+    if (args?.list) {
       for (const arg of args.list) {
         const array = arg[jass_rule_default.array];
-        if (array)
+        if (array) {
           this.bridge?.diagnostics.push({
-            message: `Array not allowed in function argument.`,
+            message: "Array not allowed in function argument.",
             range: i_token_to_range_default(array),
             severity: import_vscode2.DiagnosticSeverity.Error
           });
+        }
       }
-    if (locals) {
+    }
+    const locals = ctx?.[jass_rule_default.function_locals];
+    if (locals != null) {
       const localMap = {};
       for (const local of locals) {
         const typedname = this.visit(local)?.[jass_rule_default.typedname];
         if (!typedname)
           continue;
-        const { type, name } = typedname;
+        const {
+          type,
+          name
+        } = typedname;
         this?.bridge?.mark(type, token_legend_default.jass_type_name);
         this?.bridge?.mark(name, token_legend_default.jass_variable);
         if (name) {
           (localMap[_a = name.image] ?? (localMap[_a] = [])).push(name);
           const argList = args.map[name.image];
-          if (argList)
+          if (argList) {
             for (const t of [name, ...argList]) {
               this.bridge?.diagnostics.push({
                 message: `Local variable redeclare argument: ${t.image}`,
@@ -10089,6 +10054,7 @@ var JassVisitor = class extends ParserVisitor {
                 severity: import_vscode2.DiagnosticSeverity.Warning
               });
             }
+          }
         }
       }
       for (const v of Object.values(localMap)) {
@@ -10104,35 +10070,38 @@ var JassVisitor = class extends ParserVisitor {
       }
     }
     const statements = ctx[jass_rule_default.statement];
-    if (statements)
+    if (statements != null) {
       for (const statement of statements) {
         this.visit(statement);
       }
+    }
     this.visit(ctx[jass_rule_default.function_returns]);
     return {};
   }
   [jass_rule_default.function_locals](ctx) {
     __privateMethod(this, _comment, comment_fn).call(this, ctx);
     const variableDeclare = ctx[jass_rule_default.variable_declare];
-    if (!variableDeclare)
+    if (variableDeclare == null)
       return null;
     const variable = this.visit(variableDeclare);
     const constant2 = variable?.[jass_rule_default.constant];
-    if (constant2)
+    if (constant2) {
       this.bridge?.diagnostics.push({
-        message: `Constant not allowed in function.`,
+        message: "Constant not allowed in function.",
         range: i_token_to_range_default(constant2),
         severity: import_vscode2.DiagnosticSeverity.Error
       });
+    }
     const local = variable?.[jass_rule_default.local];
     if (!local) {
       const { type } = variable?.[jass_rule_default.typedname];
-      if (type)
+      if (type) {
         this.bridge?.diagnostics.push({
-          message: `Missing local keyword.`,
+          message: "Missing local keyword.",
           range: i_token_to_range_default(type),
           severity: import_vscode2.DiagnosticSeverity.Error
         });
+      }
     }
     return variable;
   }
@@ -10140,16 +10109,12 @@ var JassVisitor = class extends ParserVisitor {
     const array = ctx[jass_rule_default.array]?.[0];
     this?.bridge?.mark(array, token_legend_default.jass_array);
     const list = ctx[jass_rule_default.identifier];
-    if (!list)
+    if (list == null)
       return {};
-    let [type, name] = list;
-    if (type?.isInsertedInRecovery ?? false)
-      type = null;
-    if (name?.isInsertedInRecovery ?? false)
-      name = null;
+    const [type, name] = list;
     return {
-      type,
-      name,
+      type: type?.isInsertedInRecovery ?? false ? null : type,
+      name: name?.isInsertedInRecovery ?? false ? null : name,
       array
     };
   }
@@ -10164,19 +10129,26 @@ var JassVisitor = class extends ParserVisitor {
   [jass_rule_default.function_args](ctx) {
     var _a;
     let token;
-    if (token = ctx?.[jass_rule_default.nothing]?.[0]) {
+    if ((token = ctx?.[jass_rule_default.nothing]?.[0]) != null) {
       this?.bridge?.mark(token, token_legend_default.jass_type_name);
-      return { map: {}, list: [] };
+      return {
+        map: {},
+        list: []
+      };
     }
-    if (token = ctx[jass_rule_default.comma])
+    if ((token = ctx[jass_rule_default.comma]) != null) {
       for (const comma of token) {
         this?.bridge?.mark(comma, token_legend_default.jass_comma);
       }
+    }
     const args = ctx?.[jass_rule_default.typedname]?.map((item) => this.visit(item));
     const argMap = {};
-    if (args) {
+    if (args != null) {
       for (const arg of args) {
-        const { type, name } = arg;
+        const {
+          type,
+          name
+        } = arg;
         this?.bridge?.mark(type, token_legend_default.jass_type_name);
         this?.bridge?.mark(name, token_legend_default.jass_argument);
         if (name)
@@ -10201,11 +10173,11 @@ var JassVisitor = class extends ParserVisitor {
   }
   [jass_rule_default.function_returns](ctx) {
     let token;
-    if (token = ctx[jass_rule_default.nothing]?.[0]) {
+    if ((token = ctx[jass_rule_default.nothing]?.[0]) != null) {
       this?.bridge?.mark(token, token_legend_default.jass_type_name);
       return token.image;
     }
-    if (token = ctx[jass_rule_default.identifier]?.[0]) {
+    if ((token = ctx[jass_rule_default.identifier]?.[0]) != null) {
       this?.bridge?.mark(token, token_legend_default.jass_type_name);
       return token.image;
     }
@@ -10216,20 +10188,21 @@ var JassVisitor = class extends ParserVisitor {
     const equals = ctx[jass_rule_default.assign]?.[0];
     const typedname = this.visit(ctx[jass_rule_default.typedname]);
     const array = typedname[jass_rule_default.array];
-    if (equals && array)
+    if (equals != null && array) {
       this.bridge?.diagnostics.push({
-        message: `Array varriables can't be initialised.`,
+        message: "Array varriables can't be initialised.",
         range: i_token_to_range_default(array),
         severity: import_vscode2.DiagnosticSeverity.Error
       });
+    }
     const local = ctx[jass_rule_default.local]?.[0];
-    if (local)
+    if (local != null)
       this?.bridge?.mark(local, token_legend_default.jass_local);
     const constant2 = ctx[jass_rule_default.constant]?.[0];
-    if (constant2)
+    if (constant2 != null)
       this?.bridge?.mark(constant2, token_legend_default.jass_constant);
     this?.bridge?.mark(ctx[jass_rule_default.assign]?.[0], token_legend_default.jass_equals);
-    this.visit(ctx[jass_rule_default.expression]?.[0]);
+    this.visit(ctx[jass_rule_default.expression]);
     return {
       [jass_rule_default.typedname]: typedname,
       [jass_rule_default.local]: local,
@@ -10239,17 +10212,17 @@ var JassVisitor = class extends ParserVisitor {
   [jass_rule_default.statement](ctx) {
     __privateMethod(this, _comment, comment_fn).call(this, ctx);
     let node;
-    if (node = ctx[jass_rule_default.if_statement])
+    if ((node = ctx[jass_rule_default.if_statement]) != null)
       return this.visit(node);
-    if (node = ctx[jass_rule_default.set_statement])
+    if ((node = ctx[jass_rule_default.set_statement]) != null)
       return this.visit(node);
-    if (node = ctx[jass_rule_default.call_statement])
+    if ((node = ctx[jass_rule_default.call_statement]) != null)
       return this.visit(node);
-    if (node = ctx[jass_rule_default.loop_statement])
+    if ((node = ctx[jass_rule_default.loop_statement]) != null)
       return this.visit(node);
-    if (node = ctx[jass_rule_default.exitwhen_statement])
+    if ((node = ctx[jass_rule_default.exitwhen_statement]) != null)
       return this.visit(node);
-    if (node = ctx[jass_rule_default.return_statement])
+    if ((node = ctx[jass_rule_default.return_statement]) != null)
       return this.visit(node);
     return null;
   }
@@ -10326,11 +10299,15 @@ var JassVisitor = class extends ParserVisitor {
   }
   [jass_rule_default.primary](ctx) {
     __privateMethod(this, _string, string_fn).call(this, ctx);
-    this?.bridge?.mark(ctx[jass_rule_default.sub]?.[0], token_legend_default.jass_sub);
-    this?.bridge?.mark(ctx[jass_rule_default.integer]?.[0], token_legend_default.jass_integer);
-    this?.bridge?.mark(ctx[jass_rule_default.real]?.[0], token_legend_default.jass_real);
-    this?.bridge?.mark(ctx[jass_rule_default.idliteral]?.[0], token_legend_default.jass_idliteral);
-    this?.bridge?.mark(ctx[jass_rule_default.identifier]?.[0], token_legend_default.jass_variable);
+    const b = this?.bridge;
+    if (b != null) {
+      b.mark(ctx[jass_rule_default.sub]?.[0], token_legend_default.jass_sub);
+      b.mark(ctx[jass_rule_default.integer]?.[0], token_legend_default.jass_integer);
+      b.mark(ctx[jass_rule_default.real]?.[0], token_legend_default.jass_real);
+      b.mark(ctx[jass_rule_default.idliteral]?.[0], token_legend_default.jass_idliteral);
+      b.mark(ctx[jass_rule_default.identifier]?.[0], token_legend_default.jass_variable);
+      b.mark(ctx[jass_rule_default.function]?.[0], token_legend_default.jass_function);
+    }
     this.visit(ctx[jass_rule_default.arrayaccess]);
     this.visit(ctx[jass_rule_default.function_call]);
     this.visit(ctx[jass_rule_default.expression]);
@@ -10351,7 +10328,7 @@ var JassVisitor = class extends ParserVisitor {
   [jass_rule_default.arrayaccess](ctx) {
     this?.bridge?.mark(ctx[jass_rule_default.lsquareparen]?.[0], token_legend_default.jass_lsquareparen);
     this?.bridge?.mark(ctx[jass_rule_default.rsquareparen]?.[0], token_legend_default.jass_rsquareparen);
-    this.visit(ctx[jass_rule_default.expression]?.[0]);
+    this.visit(ctx[jass_rule_default.expression]);
     return null;
   }
 };
@@ -10363,34 +10340,45 @@ comment_fn = function(ctx) {
 _string = new WeakSet();
 string_fn = function(ctx) {
   const strings = ctx[jass_rule_default.stringliteral];
-  if (!strings)
+  if (strings == null)
     return;
   for (const string of strings) {
     if (string.startLine === string.endLine) {
       this?.bridge?.mark(string, token_legend_default.jass_stringliteral);
       continue;
     }
-    if (string)
+    if (string) {
       this.bridge?.diagnostics.push({
         message: "Avoid multiline strings. Use |n or \\n to linebreak.",
         range: i_token_to_range_default(string),
         severity: import_vscode2.DiagnosticSeverity.Warning
       });
+    }
   }
 };
 
 // docs/main.ts
-var parser2 = new JassParser(true);
+var parser2 = new JassParser();
 var iframe = document.createElement("iframe");
 iframe.src = "data:text/html;charset=utf-8," + encodeURI(createSyntaxDiagramsCode(parser2.getSerializedGastProductions()));
 document.body.appendChild(iframe);
 (async () => {
   const visitor = new JassVisitor();
   const request = await fetch("test.txt");
-  parser2.inputText = await request.text();
-  visitor.visit(parser2[jass_rule_default.jass]());
-  for (const error of parser2.errorlist)
-    console.warn(error);
+  const text = await request.text();
+  const lexer = new Lexer(jass_tokens_list_default, {
+    //ensureOptimizations: true,
+    recoveryEnabled: true
+  });
+  const result = lexer.tokenize(text);
+  parser2.input = result.tokens;
+  const nodes = parser2[jass_rule_default.jass]();
+  visitor.visit(nodes);
+  for (const error of parser2.errors) {
+    console.log(error.name);
+    console.log(error.token);
+    console.warn("error", error);
+  }
 })();
 /*! Bundled license information:
 

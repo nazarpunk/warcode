@@ -1,5 +1,4 @@
 import {CstParser, ParserMethod} from "chevrotain";
-import WtsLexer from "./wts-lexer";
 import ParserError from "../utils/parser-error";
 import ParserErrorType from "../utils/parser-error-type";
 import WtsRule from "./wts-rule";
@@ -7,11 +6,6 @@ import WtsTokens from "./wts-tokens";
 
 export class WtsParser extends CstParser {
     errorlist: ParserError[] = [];
-
-    set inputText(text: string) {
-        this.errorlist = [];
-        this.input = WtsLexer.tokenize(text).tokens;
-    }
 
     declare [WtsRule.wts]: ParserMethod<any, any>;
     declare [WtsRule.block]: ParserMethod<any, any>;

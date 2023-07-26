@@ -1,5 +1,1 @@
-function ModuloInteger takes integer dividend, integer divisor returns integer
-
-    set s[d[portals]+1 - 22] = 2323
-
-endfunction
+type extends

@@ -1,12 +1,11 @@
 import {createToken, ITokenConfig, Lexer, TokenType} from "chevrotain";
 import JassRule from "./jass-rule";
 
-// export declare function createToken(config: ITokenConfig): TokenType;
 const add = (config: ITokenConfig & {
     color?: string
 }): TokenType => {
     return createToken(config);
-}
+};
 
 const keyword = (k: JassRule): TokenType => {
     // color: color ??= '#2C7AD6',
@@ -16,7 +15,7 @@ const keyword = (k: JassRule): TokenType => {
         start_chars_hint: [k[0]],
         line_breaks: false,
     });
-}
+};
 
 const numberColor = '#e760cc';
 const operatorColor = '#e7be60';
@@ -53,6 +52,7 @@ const JassTokens: Record<Exclude<JassRule,
 >, TokenType> = {
     [JassRule.whitespace]: add({
         name: JassRule.whitespace,
+        //pattern: whitespacePattern,
         pattern: /[^\S\r\n]+/,
         line_breaks: false,
         group: Lexer.SKIPPED,
@@ -234,7 +234,7 @@ const JassTokens: Record<Exclude<JassRule,
     }),
     [JassRule.linebreak]: add({
         name: JassRule.linebreak,
-        pattern: /\n|\r\n/,
+        pattern: /\n|\r\n?/,
         label: '\\n',
         line_breaks: true,
     }),
@@ -257,5 +257,5 @@ const JassTokens: Record<Exclude<JassRule,
         line_breaks: false,
     }),
 
-}
+};
 export default JassTokens;

@@ -6,7 +6,7 @@ import {
 } from 'vscode';
 import {IToken} from "chevrotain";
 
-export default class VisitorVscodeBridge {
+export default class VscodeBridge {
 
     constructor(
         symbols: DocumentSymbol[] | SymbolInformation[],
@@ -23,7 +23,7 @@ export default class VisitorVscodeBridge {
     symbols: (DocumentSymbol | SymbolInformation)[];
     foldings: FoldingRange[];
 
-    mark(token: IToken, type: number) {
+    mark(token: IToken | undefined, type: number) {
         if (!token) return;
         this.builder.push(
             token.startLine! - 1,

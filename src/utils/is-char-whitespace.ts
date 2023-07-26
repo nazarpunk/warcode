@@ -7,15 +7,10 @@ const enum code {
     space = 32, // Space
 }
 
-export default (charCode: number) =>
-    charCode === code.space
-    ||
-    charCode === code.tab
-    ||
-    charCode === code.cr
-    ||
-    charCode === code.lf
-    ||
-    charCode === code.ff
-    ||
+export default (charCode: number, linebreak = true) =>
+    charCode === code.space ||
+    charCode === code.tab ||
+    linebreak && charCode === code.cr ||
+    linebreak && charCode === code.lf ||
+    linebreak && charCode === code.ff ||
     charCode === code.vt;
