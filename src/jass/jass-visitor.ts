@@ -30,7 +30,10 @@ export class JassVisitor extends ParserVisitor {
         const b = this.bridge;
         if (b) {
             for (const string of strings) {
-                if (string.startLine === string.endLine) {
+                const start = b.document.positionAt(string.startOffset);
+                const end = b.document.positionAt(string.startOffset + string.image.length);
+
+                if (start.line === end.line) {
                     b.mark(string, TokenLegend.jass_stringliteral);
                     continue;
                 }
@@ -151,6 +154,7 @@ export class JassVisitor extends ParserVisitor {
         const b = this?.bridge;
 
         if (b) {
+            b.mark(ctx[JassRule.constant]?.[0], TokenLegend.jass_constant);
             b.mark(ctx[JassRule.function]?.[0], TokenLegend.jass_function);
             b.mark(ctx[JassRule.identifier]?.[0], TokenLegend.jass_function_user);
             b.mark(ctx[JassRule.takes]?.[0], TokenLegend.jass_takes);
@@ -181,7 +185,7 @@ export class JassVisitor extends ParserVisitor {
         const locals = ctx?.[JassRule.function_locals];
 
         // locals, check locals with same name, check local redeclare argument
-        if (b && locals != null) {
+        if (locals != null) {
             const localMap: Record<string, IToken[]> = {};
 
             for (const local of locals) {
@@ -191,12 +195,14 @@ export class JassVisitor extends ParserVisitor {
                     type,
                     name
                 } = typedname;
-                b.mark(type, TokenLegend.jass_type_name);
-                b.mark(name, TokenLegend.jass_variable);
+                if (b) {
+                    b.mark(type, TokenLegend.jass_type_name);
+                    b.mark(name, TokenLegend.jass_variable);
+                }
                 if (name) {
                     (localMap[name.image] ??= []).push(name);
                     const argList = args.map[name.image];
-                    if (argList) {
+                    if (b && argList) {
                         for (const t of [name, ...argList]) {
                             this.bridge?.diagnostics.push({
                                 message: `Local variable redeclare argument: ${t.image}`,
@@ -211,7 +217,7 @@ export class JassVisitor extends ParserVisitor {
                 }
             }
 
-            for (const v of Object.values(localMap)) {
+            if (b) for (const v of Object.values(localMap)) {
                 if (v.length < 2) continue;
                 for (const t of v) {
                     b.diagnostics.push({
@@ -382,7 +388,7 @@ export class JassVisitor extends ParserVisitor {
     }
 
     [JassRule.variable_declare](ctx: JassCstNode) {
-        // console.log(JassRule.variable_declare, ctx);
+        //console.log(JassRule.variable_declare, ctx);
         this.#comment(ctx);
 
         const equals = ctx[JassRule.assign]?.[0];
@@ -409,7 +415,10 @@ export class JassVisitor extends ParserVisitor {
         if (constant != null) this?.bridge?.mark(constant, TokenLegend.jass_constant);
 
         this?.bridge?.mark(ctx[JassRule.assign]?.[0], TokenLegend.jass_equals);
-        this.visit(ctx[JassRule.expression]!);
+
+        const exp = ctx[JassRule.expression];
+        if (exp) this.visit(exp);
+
         return {
             [JassRule.typedname]: typedname,
             [JassRule.local]: local,
@@ -508,7 +517,7 @@ export class JassVisitor extends ParserVisitor {
     }
 
     [JassRule.expression](ctx: JassCstNode) {
-        // console.log(JassRule.expression, ctx);
+        //console.log(JassRule.expression, ctx);
         ctx[JassRule.and]?.map(item => this?.bridge?.mark(item, TokenLegend.jass_and));
         ctx[JassRule.or]?.map(item => this?.bridge?.mark(item, TokenLegend.jass_or));
         ctx[JassRule.equals]?.map(item => this?.bridge?.mark(item, TokenLegend.jass_equals));
@@ -522,7 +531,7 @@ export class JassVisitor extends ParserVisitor {
     }
 
     [JassRule.primary](ctx: JassCstNode) {
-        // console.log(JassRule.primary, ctx);
+        //console.log(JassRule.primary, ctx);
         this.#string(ctx);
         const b = this?.bridge;
         if (b != null) {
@@ -530,12 +539,24 @@ export class JassVisitor extends ParserVisitor {
             b.mark(ctx[JassRule.integer]?.[0], TokenLegend.jass_integer);
             b.mark(ctx[JassRule.real]?.[0], TokenLegend.jass_real);
             b.mark(ctx[JassRule.idliteral]?.[0], TokenLegend.jass_idliteral);
-            b.mark(ctx[JassRule.identifier]?.[0], TokenLegend.jass_variable);
             b.mark(ctx[JassRule.function]?.[0], TokenLegend.jass_function);
+            // TODO add colors
+            b.mark(ctx[JassRule.not]?.[0], TokenLegend.jass_function);
+
+            const identifier = ctx[JassRule.identifier]?.[0];
+            if (identifier) {
+                if (['null', 'true', 'false'].indexOf(identifier.image) < 0) {
+                    b.mark(identifier, TokenLegend.jass_variable);
+                } else {
+                    // TODO add colors
+                    b.mark(identifier, TokenLegend.jass_function);
+                }
+            }
         }
         this.visit(ctx[JassRule.arrayaccess]!);
         this.visit(ctx[JassRule.function_call]!);
         this.visit(ctx[JassRule.expression]!);
+        this.visit(ctx[JassRule.primary]!);
         return null;
     }
 

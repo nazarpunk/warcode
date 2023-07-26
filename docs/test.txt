@@ -1,2 +1,3 @@
-
-native a хуйпизда takes nothing returns nothing
+function PolarProjectionBJ takes location source, real dist, real angle returns location
+    local real x = not(null + true + end + someone)
+endfunction

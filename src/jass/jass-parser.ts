@@ -82,6 +82,7 @@ export default class JassParser extends CstParser {
 
         //region function
         $.RULE(JassRule.function_declare, () => {
+            $.OPTION(() => $.CONSUME(JassTokens[JassRule.constant]));
             $.CONSUME(JassTokens[JassRule.function]);
             $.CONSUME2(JassTokens[JassRule.identifier]);
             $.CONSUME3(JassTokens[JassRule.takes]);

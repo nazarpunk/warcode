@@ -15,29 +15,9 @@ document.body.appendChild(iframe);
     const request = await fetch('test.txt');
     const text = await request.text();
 
-    //=== lexing
-    const lexer = new Lexer(JassTokensList, {
-        //ensureOptimizations: true,
-        positionTracking: 'onlyOffset',
-        recoveryEnabled: true,
-    });
+    const lexer = new Lexer(JassTokensList, {recoveryEnabled: true});
     const result = lexer.tokenize(text);
-    for (const token of result.tokens) {
-        console.log(token);
-    }
-
-    console.log(result.errors);
-
-    //console.log('tokens', result.tokens);
-    //console.log('tokens', result.errors);
     parser.input = result.tokens;
-
     const nodes = parser[JassRule.jass]();
-
     visitor.visit(nodes);
-    for (const error of parser.errors) {
-        console.log(error.name);
-        console.log(error.token);
-        console.warn('error', error);
-    }
 })();

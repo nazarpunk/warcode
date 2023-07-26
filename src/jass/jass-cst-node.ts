@@ -63,6 +63,7 @@ export default interface JassCstNode extends CstNode {
     [JassRule.else]?: IToken[],
     [JassRule.endif]?: IToken[],
     [JassRule.elseif]?: IToken[],
+    [JassRule.not]?: IToken[],
     [JassRule.sub]?: IToken[],
     [JassRule.integer]?: IToken[],
     [JassRule.real]?: IToken[],
