@@ -57,11 +57,13 @@ export default class ExtProvider implements DocumentSemanticTokensProvider, Docu
     //async provideDocumentSemanticTokens(document: vscode.TextDocument, token: vscode.CancellationToken): Promise<vscode.SemanticTokens>
     async provideDocumentSemanticTokens(document: TextDocument, token: CancellationToken): Promise<SemanticTokens> {
         return new Promise<SemanticTokens>(resolve => {
+            const now = performance.now();
+            //=== cancelation
             token.onCancellationRequested(resolve);
 
             //=== settings
-            const text = document.getText();
             const path = document.uri.path;
+            const text = document.getText();
             const bridge = new VscodeBridge(
                 document,
                 this.#symbols[path] = [],
@@ -75,7 +77,7 @@ export default class ExtProvider implements DocumentSemanticTokensProvider, Docu
                 positionTracking: "onlyOffset",
                 errorMessageProvider: {
                     buildUnexpectedCharactersMessage: (): string => {
-                        return 'Unexpected Character';
+                        return 'Unexpected character';
                     },
                     buildUnableToPopLexerModeMessage: (token: IToken): string => {
                         // eslint-disable-next-line no-console
@@ -132,22 +134,19 @@ export default class ExtProvider implements DocumentSemanticTokensProvider, Docu
             else collection.clear();
 
             //=== resolve
-            this.#versions[document.uri.path] = document.version;
+            this.#versions[path] = document.version;
             resolve(bridge.builder.build());
+            console.log('end', performance.now() - now, 'ms');
         });
     }
 
     async provideDocumentSymbols(document: TextDocument): Promise<SymbolInformation[] | DocumentSymbol[]> {
-        if (document.version !== this.#versions[document.uri.path])
-            await commands.executeCommand('_provideDocumentSemanticTokens', document.uri);
-
+        if (document.version !== this.#versions[document.uri.path]) await commands.executeCommand('_provideDocumentSemanticTokens', document.uri);
         return this.#symbols?.[document.uri.path];
     }
 
     async provideFoldingRanges(document: TextDocument): Promise<FoldingRange[]> {
-        if (document.version !== this.#versions[document.uri.path])
-            await commands.executeCommand('_provideDocumentSemanticTokens', document.uri);
-
+        if (document.version !== this.#versions[document.uri.path]) await commands.executeCommand('_provideDocumentSemanticTokens', document.uri);
         return this.#foldings?.[document.uri.path];
     }
 

@@ -1,3 +1,5 @@
+// https://en.wikipedia.org/wiki/Whitespace_character
+
 const enum code {
     tab = 9, // Tab
     lf = 10, // Line Feed
@@ -6,6 +8,9 @@ const enum code {
     cr = 13, // Carriage Return
     space = 32, // Space
 }
+
+
+
 
 export default (charCode: number, linebreak = true) =>
     charCode === code.space ||

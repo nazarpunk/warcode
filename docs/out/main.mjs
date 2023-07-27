@@ -9319,6 +9319,24 @@ var JassRule = /* @__PURE__ */ ((JassRule2) => {
 })(JassRule || {});
 var jass_rule_default = JassRule;
 
+// src/utils/char-code.ts
+var CharCodeWhitespaceList = [
+  9 /* HorizontalTab */,
+  32 /* Space */
+];
+var CharCodeBreakList = [
+  10 /* LineFeed */,
+  13 /* CarriageReturn */
+];
+var CharCodeDigitList = [];
+for (let i = 48 /* d0 */; i <= 57 /* d9 */; i++)
+  CharCodeDigitList.push(i);
+var CharCodeLetterList = [];
+for (let i = 65 /* A */; i <= 90 /* Z */; i++)
+  CharCodeLetterList.push(i);
+for (let i = 97 /* a */; i <= 122 /* z */; i++)
+  CharCodeLetterList.push(i);
+
 // src/jass/jass-tokens.ts
 var add = (config) => {
   return createToken(config);
@@ -9327,7 +9345,7 @@ var keyword = (k) => {
   return createToken({
     name: k,
     pattern: new RegExp(`\\b${k}\\b`),
-    start_chars_hint: [k[0]],
+    start_chars_hint: [k.charCodeAt(0)],
     line_breaks: false
   });
 };
@@ -9337,17 +9355,26 @@ var parenColor = "#e1d132";
 var JassTokens = {
   [jass_rule_default.whitespace]: add({
     name: jass_rule_default.whitespace,
-    //pattern: whitespacePattern,
     pattern: /[^\S\r\n]+/,
     line_breaks: false,
+    start_chars_hint: CharCodeWhitespaceList,
     group: Lexer.SKIPPED
   }),
   [jass_rule_default.comment]: add({
     name: jass_rule_default.comment,
     pattern: /\/\/[^\r\n]*/,
     line_breaks: false,
+    start_chars_hint: [47 /* Slash */],
     color: "#308030"
   }),
+  [jass_rule_default.linebreak]: add({
+    name: jass_rule_default.linebreak,
+    pattern: /\n|\r\n?/,
+    label: "\\n",
+    start_chars_hint: CharCodeBreakList,
+    line_breaks: true
+  }),
+  // keyword
   [jass_rule_default.and]: keyword(jass_rule_default.and),
   [jass_rule_default.array]: keyword(jass_rule_default.array),
   [jass_rule_default.call]: keyword(jass_rule_default.call),
@@ -9376,10 +9403,11 @@ var JassTokens = {
   [jass_rule_default.takes]: keyword(jass_rule_default.takes),
   [jass_rule_default.then]: keyword(jass_rule_default.then),
   [jass_rule_default.type]: keyword(jass_rule_default.type),
+  // operator
   [jass_rule_default.comma]: add({
     name: jass_rule_default.comma,
     pattern: /,/,
-    start_chars_hint: [","],
+    start_chars_hint: [44 /* Comma */],
     label: ",",
     line_breaks: false,
     color: "#FFFFFF"
@@ -9387,7 +9415,7 @@ var JassTokens = {
   [jass_rule_default.equals]: add({
     name: jass_rule_default.equals,
     pattern: /==/,
-    start_chars_hint: ["="],
+    start_chars_hint: [61 /* Equal */],
     line_breaks: false,
     label: "==",
     color: operatorColor
@@ -9395,7 +9423,7 @@ var JassTokens = {
   [jass_rule_default.assign]: add({
     name: jass_rule_default.assign,
     pattern: /=/,
-    start_chars_hint: ["="],
+    start_chars_hint: [61 /* Equal */],
     line_breaks: false,
     label: "=",
     color: operatorColor
@@ -9403,7 +9431,7 @@ var JassTokens = {
   [jass_rule_default.notequals]: add({
     name: jass_rule_default.notequals,
     pattern: /!=/,
-    start_chars_hint: ["!"],
+    start_chars_hint: [33 /* Exclamation */],
     line_breaks: false,
     label: "!=",
     color: operatorColor
@@ -9411,7 +9439,7 @@ var JassTokens = {
   [jass_rule_default.lessorequal]: add({
     name: jass_rule_default.lessorequal,
     pattern: /<=/,
-    start_chars_hint: ["<"],
+    start_chars_hint: [60 /* Less */],
     line_breaks: false,
     label: "<=",
     color: operatorColor
@@ -9419,7 +9447,7 @@ var JassTokens = {
   [jass_rule_default.less]: add({
     name: jass_rule_default.less,
     pattern: /</,
-    start_chars_hint: ["<"],
+    start_chars_hint: [60 /* Less */],
     line_breaks: false,
     label: "<",
     color: operatorColor
@@ -9427,7 +9455,7 @@ var JassTokens = {
   [jass_rule_default.greatorequal]: add({
     name: jass_rule_default.greatorequal,
     pattern: />=/,
-    start_chars_hint: [">"],
+    start_chars_hint: [62 /* Greater */],
     line_breaks: false,
     label: ">=",
     color: operatorColor
@@ -9435,7 +9463,7 @@ var JassTokens = {
   [jass_rule_default.great]: add({
     name: jass_rule_default.great,
     pattern: />/,
-    start_chars_hint: [">"],
+    start_chars_hint: [62 /* Greater */],
     line_breaks: false,
     label: ">",
     color: operatorColor
@@ -9443,7 +9471,7 @@ var JassTokens = {
   [jass_rule_default.add]: add({
     name: jass_rule_default.add,
     pattern: /\+/,
-    start_chars_hint: ["+"],
+    start_chars_hint: [43 /* Plus */],
     line_breaks: false,
     label: "+",
     color: operatorColor
@@ -9451,7 +9479,7 @@ var JassTokens = {
   [jass_rule_default.sub]: add({
     name: jass_rule_default.sub,
     pattern: /-/,
-    start_chars_hint: ["-"],
+    start_chars_hint: [45 /* Minus */],
     line_breaks: false,
     label: "-",
     color: operatorColor
@@ -9459,7 +9487,7 @@ var JassTokens = {
   [jass_rule_default.mult]: add({
     name: jass_rule_default.mult,
     pattern: /\*/,
-    start_chars_hint: ["*"],
+    start_chars_hint: [42 /* Asterisk */],
     line_breaks: false,
     label: "*",
     color: operatorColor
@@ -9467,7 +9495,7 @@ var JassTokens = {
   [jass_rule_default.div]: add({
     name: jass_rule_default.div,
     pattern: /\//,
-    start_chars_hint: ["/"],
+    start_chars_hint: [47 /* Slash */],
     line_breaks: false,
     label: "/",
     color: operatorColor
@@ -9475,7 +9503,7 @@ var JassTokens = {
   [jass_rule_default.lparen]: add({
     name: jass_rule_default.lparen,
     pattern: /\(/,
-    start_chars_hint: ["("],
+    start_chars_hint: [40 /* LeftParenthesis */],
     line_breaks: false,
     label: "(",
     color: parenColor
@@ -9483,7 +9511,7 @@ var JassTokens = {
   [jass_rule_default.rparen]: add({
     name: jass_rule_default.rparen,
     pattern: /\)/,
-    start_chars_hint: [")"],
+    start_chars_hint: [41 /* RightParenthesis */],
     line_breaks: false,
     label: ")",
     color: parenColor
@@ -9491,7 +9519,7 @@ var JassTokens = {
   [jass_rule_default.lsquareparen]: add({
     name: jass_rule_default.lsquareparen,
     pattern: /\[/,
-    start_chars_hint: ["["],
+    start_chars_hint: [91 /* LeftSquareBracket */],
     line_breaks: false,
     label: "[",
     color: parenColor
@@ -9499,47 +9527,45 @@ var JassTokens = {
   [jass_rule_default.rsquareparen]: add({
     name: jass_rule_default.rsquareparen,
     pattern: /]/,
-    start_chars_hint: ["]"],
+    start_chars_hint: [93 /* RightSquareBracket */],
     line_breaks: false,
     label: "]",
     color: parenColor
   }),
-  // no start_chars_hint
-  [jass_rule_default.real]: add({
-    name: jass_rule_default.real,
-    pattern: /\d+\.\d*|\.\d+/,
-    line_breaks: false,
-    color: numberColor
-  }),
-  [jass_rule_default.integer]: add({
-    name: jass_rule_default.integer,
-    pattern: /\b0x[0-9a-z]+|\$[0-9a-z]+|\d+\b/i,
-    line_breaks: false,
-    color: numberColor
-  }),
-  [jass_rule_default.linebreak]: add({
-    name: jass_rule_default.linebreak,
-    pattern: /\n|\r\n?/,
-    label: "\\n",
-    line_breaks: true
-  }),
+  //
   [jass_rule_default.idliteral]: add({
     name: jass_rule_default.idliteral,
     pattern: /'[^']*'/,
     line_breaks: true,
+    start_chars_hint: [39 /* Apostrophe */],
     color: numberColor
   }),
   [jass_rule_default.stringliteral]: add({
     name: jass_rule_default.stringliteral,
     pattern: /"[^"\\]*(?:\\.[^"\\]*)*"/,
-    start_chars_hint: ['"'],
+    start_chars_hint: [34 /* Quotation */],
     line_breaks: true,
     color: "#CE9178"
+  }),
+  [jass_rule_default.real]: add({
+    name: jass_rule_default.real,
+    pattern: /\d+\.\d*|\.\d+/,
+    line_breaks: false,
+    start_chars_hint: [46 /* Dot */, ...CharCodeDigitList],
+    color: numberColor
+  }),
+  [jass_rule_default.integer]: add({
+    name: jass_rule_default.integer,
+    pattern: /\b0x[0-9a-z]+|\$[0-9a-z]+|\d+\b/i,
+    start_chars_hint: [36 /* Dollar */, ...CharCodeDigitList],
+    line_breaks: false,
+    color: numberColor
   }),
   [jass_rule_default.identifier]: add({
     name: jass_rule_default.identifier,
     pattern: /\b[a-zA-Z][a-zA-Z0-9_]*\b/,
-    line_breaks: false
+    line_breaks: false,
+    start_chars_hint: CharCodeLetterList
   })
 };
 var jass_tokens_default = JassTokens;
@@ -10418,10 +10444,17 @@ document.body.appendChild(iframe);
   const visitor = new JassVisitor();
   const request = await fetch("test.txt");
   const text = await request.text();
-  const lexer = new Lexer(jass_tokens_list_default, { recoveryEnabled: true });
+  const lexer = new Lexer(jass_tokens_list_default, {
+    recoveryEnabled: true,
+    positionTracking: "onlyOffset",
+    deferDefinitionErrorsHandling: true,
+    ensureOptimizations: true
+  });
   const result = lexer.tokenize(text);
+  const now = performance.now();
   parser2.input = result.tokens;
   const nodes = parser2[jass_rule_default.jass]();
+  console.log(performance.now() - now);
   visitor.visit(nodes);
 })();
 /*! Bundled license information:

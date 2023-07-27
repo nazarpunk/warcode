@@ -15,9 +15,19 @@ document.body.appendChild(iframe);
     const request = await fetch('test.txt');
     const text = await request.text();
 
-    const lexer = new Lexer(JassTokensList, {recoveryEnabled: true});
+    const lexer = new Lexer(JassTokensList, {
+        recoveryEnabled: true,
+        positionTracking: 'onlyOffset',
+        deferDefinitionErrorsHandling: true,
+        ensureOptimizations: true,
+    });
     const result = lexer.tokenize(text);
+
+    const now = performance.now();
     parser.input = result.tokens;
     const nodes = parser[JassRule.jass]();
+    console.log(performance.now() - now);
+
     visitor.visit(nodes);
+
 })();
