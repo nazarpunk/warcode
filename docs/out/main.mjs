@@ -9702,10 +9702,9 @@ var JassParser = class extends CstParser {
         { ALT: () => $.CONSUME(jass_tokens_default[jass_rule_default.nothing]) },
         {
           ALT: () => {
-            $.SUBRULE($[jass_rule_default.typedname]);
-            $.MANY(() => {
-              $.CONSUME(jass_tokens_default[jass_rule_default.comma]);
-              $.SUBRULE2($[jass_rule_default.typedname]);
+            $.AT_LEAST_ONE_SEP({
+              SEP: jass_tokens_default[jass_rule_default.comma],
+              DEF: () => $.SUBRULE($[jass_rule_default.typedname])
             });
           }
         }
@@ -9846,12 +9845,9 @@ var JassParser = class extends CstParser {
     $.RULE(jass_rule_default.function_call, () => {
       $.CONSUME(jass_tokens_default[jass_rule_default.identifier]);
       $.CONSUME2(jass_tokens_default[jass_rule_default.lparen]);
-      $.OPTION(() => {
-        $.SUBRULE4($[jass_rule_default.expression]);
-        $.MANY(() => {
-          $.CONSUME(jass_tokens_default[jass_rule_default.comma]);
-          $.SUBRULE($[jass_rule_default.expression]);
-        });
+      $.MANY_SEP({
+        SEP: jass_tokens_default[jass_rule_default.comma],
+        DEF: () => $.SUBRULE($[jass_rule_default.expression])
       });
       $.CONSUME3(jass_tokens_default[jass_rule_default.rparen]);
     });
@@ -10454,7 +10450,7 @@ document.body.appendChild(iframe);
   const now = performance.now();
   parser2.input = result.tokens;
   const nodes = parser2[jass_rule_default.jass]();
-  console.log(performance.now() - now);
+  console.log(performance.now() - now, nodes);
   visitor.visit(nodes);
 })();
 /*! Bundled license information:

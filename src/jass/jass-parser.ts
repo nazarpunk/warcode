@@ -204,16 +204,15 @@ export default class JassParser extends CstParser {
         });
         //endregion
 
-        //region args
+        //region function_args
         $.RULE(JassRule.function_args, () => {
             $.OR([
                 {ALT: () => $.CONSUME(JassTokens[JassRule.nothing])},
                 {
                     ALT: () => {
-                        $.SUBRULE($[JassRule.typedname]);
-                        $.MANY(() => {
-                            $.CONSUME(JassTokens[JassRule.comma]);
-                            $.SUBRULE2($[JassRule.typedname]);
+                        $.AT_LEAST_ONE_SEP({
+                            SEP: JassTokens[JassRule.comma],
+                            DEF: () => $.SUBRULE($[JassRule.typedname])
                         });
                     }
                 },
@@ -370,12 +369,9 @@ export default class JassParser extends CstParser {
         $.RULE(JassRule.function_call, () => {
             $.CONSUME(JassTokens[JassRule.identifier]);
             $.CONSUME2(JassTokens[JassRule.lparen]);
-            $.OPTION(() => {
-                $.SUBRULE4($[JassRule.expression]);
-                $.MANY(() => {
-                    $.CONSUME(JassTokens[JassRule.comma]);
-                    $.SUBRULE($[JassRule.expression]);
-                });
+            $.MANY_SEP({
+                SEP: JassTokens[JassRule.comma],
+                DEF: () => $.SUBRULE($[JassRule.expression])
             });
             $.CONSUME3(JassTokens[JassRule.rparen]);
         });

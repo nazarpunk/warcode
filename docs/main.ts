@@ -26,8 +26,11 @@ document.body.appendChild(iframe);
     const now = performance.now();
     parser.input = result.tokens;
     const nodes = parser[JassRule.jass]();
-    console.log(performance.now() - now);
+
+    console.log(performance.now() - now, nodes);
 
     visitor.visit(nodes);
+
+
 
 })();
