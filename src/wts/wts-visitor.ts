@@ -13,6 +13,8 @@ import {IToken} from "@chevrotain/types";
 import WtsRule from "./wts-rule";
 import VscodeBridge from "../utils/vscode-bridge";
 import WtsCstNode from "./wts-cst-node";
+import {i18n} from "../utils/i18n";
+import i18next from "i18next";
 
 const parser = new WtsParser();
 
@@ -46,7 +48,7 @@ export class WtsVisitor extends BaseCstVisitor {
             if (tokens.length < 2) continue;
             for (const token of tokens) {
                 b.diagnostics.push({
-                    message: `String index redeclared: ${token.image}`,
+                    message: i18next.t(i18n.stringIndexRedeclareError, {index: token.image}),
                     range: new Range(
                         b.document.positionAt(token.startOffset),
                         b.document.positionAt(token.startOffset + token.image.length)

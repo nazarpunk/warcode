@@ -6,7 +6,9 @@ import TokenLegend from '../semantic/token-legend';
 import JassRule from './jass-rule';
 import {type IToken} from '@chevrotain/types';
 import type JassCstNode from './jass-cst-node';
-import JassParser from "./jass-parser";
+import JassParser from './jass-parser';
+import i18next from 'i18next';
+import {i18n} from '../utils/i18n';
 
 const parser = new JassParser();
 const ParserVisitor = parser.getBaseCstVisitorConstructor();
@@ -39,7 +41,7 @@ export class JassVisitor extends ParserVisitor {
                 }
                 if (string) {
                     b.diagnostics.push({
-                        message: 'Avoid multiline strings. Use |n or \\n to linebreak.',
+                        message: i18next.t(i18n.multilineStringError),
                         range: new Range(
                             b.document.positionAt(string.startOffset),
                             b.document.positionAt(string.startOffset + string.image.length),
@@ -89,7 +91,7 @@ export class JassVisitor extends ParserVisitor {
 
                 if (b && local) {
                     b.diagnostics.push({
-                        message: 'Local variable not allowed in globals block.',
+                        message: i18next.t(i18n.localInGlobalsError),
                         range: new Range(
                             b.document.positionAt(local.startOffset),
                             b.document.positionAt(local.startOffset + local.image.length)
@@ -171,7 +173,7 @@ export class JassVisitor extends ParserVisitor {
                 const array = arg[JassRule.array];
                 if (array) {
                     b.diagnostics.push({
-                        message: 'Array not allowed in function argument.',
+                        message: i18next.t(i18n.arrayInFunctionArgumentError),
                         range: new Range(
                             b.document.positionAt(array.startOffset),
                             b.document.positionAt(array.startOffset + array.image.length)
@@ -205,7 +207,7 @@ export class JassVisitor extends ParserVisitor {
                     if (b && argList) {
                         for (const t of [name, ...argList]) {
                             this.bridge?.diagnostics.push({
-                                message: `Local variable redeclare argument: ${t.image}`,
+                                message: i18next.t(i18n.localRedeclareArgumentError, {name: t.image}),
                                 range: new Range(
                                     b.document.positionAt(t.startOffset),
                                     b.document.positionAt(t.startOffset + t.image.length)
@@ -221,7 +223,7 @@ export class JassVisitor extends ParserVisitor {
                 if (v.length < 2) continue;
                 for (const t of v) {
                     b.diagnostics.push({
-                        message: `Local variable with same name: ${t.image}`,
+                        message: i18next.t(i18n.localRedeclaredError, {name: t.image}),
                         range: new Range(
                             b.document.positionAt(t.startOffset),
                             b.document.positionAt(t.startOffset + t.image.length)
@@ -259,7 +261,7 @@ export class JassVisitor extends ParserVisitor {
             const constant = variable?.[JassRule.constant];
             if (constant) {
                 b.diagnostics.push({
-                    message: 'Constant not allowed in function.',
+                    message: i18next.t(i18n.constantInFunctionError),
                     range: new Range(
                         b.document.positionAt(constant.startOffset),
                         b.document.positionAt(constant.startOffset + constant.image.length)
@@ -273,7 +275,7 @@ export class JassVisitor extends ParserVisitor {
                 const {type} = variable?.[JassRule.typedname];
                 if (type) {
                     b.diagnostics.push({
-                        message: 'Missing local keyword.',
+                        message: i18next.t(i18n.misssingLocalKeywordError),
                         range: new Range(
                             b.document.positionAt(type.startOffset),
                             b.document.positionAt(type.startOffset + type.image.length)
@@ -303,7 +305,7 @@ export class JassVisitor extends ParserVisitor {
     }
 
     [JassRule.function_call](ctx: JassCstNode) {
-        // console.log('function_call', ctx);
+        // console.log(JassRule.function_call, ctx);
         this?.bridge?.mark(ctx[JassRule.identifier]?.[0], TokenLegend.jass_function_user);
         this?.bridge?.mark(ctx[JassRule.lparen]?.[0], TokenLegend.jass_lparen);
         this?.bridge?.mark(ctx[JassRule.rparen]?.[0], TokenLegend.jass_rparen);
@@ -353,7 +355,7 @@ export class JassVisitor extends ParserVisitor {
                 if (v.length < 2) continue;
                 for (const t of v) {
                     b.diagnostics.push({
-                        message: `Arguments with same name: ${t.image}`,
+                        message: i18next.t(i18n.sameNameArgumentError, {name: t.image}),
                         range: new Range(
                             b.document.positionAt(t.startOffset),
                             b.document.positionAt(t.startOffset + t.image.length)
@@ -399,7 +401,7 @@ export class JassVisitor extends ParserVisitor {
         // check array assing
         if (b && equals != null && array) {
             b.diagnostics.push({
-                message: 'Array varriables can\'t be initialised.',
+                message: i18next.t(i18n.arrayInitializeError),
                 range: new Range(
                     b.document.positionAt(array.startOffset),
                     b.document.positionAt(array.startOffset + array.image.length)
@@ -485,7 +487,7 @@ export class JassVisitor extends ParserVisitor {
     }
 
     [JassRule.if_statement](ctx: JassCstNode) {
-        // console.log('if_statement', ctx);
+        // console.log(JassRule.if_statement, ctx);
         this.#comment(ctx);
 
         this?.bridge?.mark(ctx[JassRule.if]?.[0], TokenLegend.jass_if);
@@ -561,7 +563,7 @@ export class JassVisitor extends ParserVisitor {
     }
 
     [JassRule.addition](ctx: JassCstNode) {
-        // console.log('addition', ctx);
+        // console.log(JassRule.addition, ctx);
         ctx[JassRule.add]?.map(item => this?.bridge?.mark(item, TokenLegend.jass_add));
         ctx[JassRule.sub]?.map(item => this?.bridge?.mark(item, TokenLegend.jass_sub));
 
@@ -570,7 +572,7 @@ export class JassVisitor extends ParserVisitor {
     }
 
     [JassRule.multiplication](ctx: JassCstNode) {
-        // console.log('multiplication', ctx);
+        // console.log(JassRule.multiplication, ctx);
         ctx[JassRule.mult]?.map(item => this?.bridge?.mark(item, TokenLegend.jass_mult));
         ctx[JassRule.div]?.map(item => this?.bridge?.mark(item, TokenLegend.jass_div));
 

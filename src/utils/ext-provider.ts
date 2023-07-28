@@ -16,7 +16,9 @@ import {
 } from 'vscode';
 import {CstParser, ICstVisitor, Lexer} from 'chevrotain';
 import VscodeBridge from "./vscode-bridge";
-import {IParserConfig, IToken, TokenType} from "@chevrotain/types";
+import {IParserConfig, TokenType} from "@chevrotain/types";
+import i18next from "i18next";
+import {i18n} from "./i18n";
 
 interface IParserConstructor {
     new(config?: IParserConfig): CstParser;
@@ -73,16 +75,10 @@ export default class ExtProvider implements DocumentSemanticTokensProvider, Docu
             const lexer = this.#lexers[path] ??= new Lexer(this.#lexerDefinition, {
                 skipValidations: true,
                 deferDefinitionErrorsHandling: true,
-                positionTracking: "onlyOffset",
+                positionTracking: 'onlyOffset',
                 errorMessageProvider: {
-                    buildUnexpectedCharactersMessage: (): string => {
-                        return 'Unexpected character';
-                    },
-                    buildUnableToPopLexerModeMessage: (token: IToken): string => {
-                        // eslint-disable-next-line no-console
-                        console.error('buildUnableToPopLexerModeMessage', token);
-                        return 'buildUnableToPopLexerModeMessage';
-                    },
+                    buildUnexpectedCharactersMessage: (): string => i18next.t(i18n.unexpectedCharacter),
+                    buildUnableToPopLexerModeMessage: (): string => i18next.t(i18n.unableToPopLexerMode),
                 },
 
             });
@@ -103,10 +99,10 @@ export default class ExtProvider implements DocumentSemanticTokensProvider, Docu
             const parser = this.#parsers[path] ??= new this.#parser({
                 recoveryEnabled: true,
                 errorMessageProvider: {
-                    buildMismatchTokenMessage: (): string => 'MismatchToken',
-                    buildNotAllInputParsedMessage: (): string => 'NotAllInputParsed',
-                    buildNoViableAltMessage: (): string => 'NoViableAlt',
-                    buildEarlyExitMessage: (): string => 'EarlyExit',
+                    buildMismatchTokenMessage: (): string => i18next.t(i18n.mismatchToken),
+                    buildNotAllInputParsedMessage: (): string => i18next.t(i18n.notAllInputParsed),
+                    buildNoViableAltMessage: (): string => i18next.t(i18n.noViableAlt),
+                    buildEarlyExitMessage: (): string => i18next.t(i18n.earlyExit),
                 }
             });
             parser.input = lexing.tokens;
