@@ -45,12 +45,11 @@
   "devDependencies": {
     "@types/node": "^20.4.5",
     "@types/vscode": "^1.80.0",
-    "@typescript-eslint/eslint-plugin": "^6.2.0",
-    "@vscode/vsce": "^2.20.0",
+    "@vscode/vsce": "^2.15.0",
     "chevrotain": "^11.0.1",
     "esbuild": "^0.18.17",
-    "eslint": "^8.46.0",
-    "i18next": "^23.3.0"
+    "i18next": "^23.3.0",
+    "typescript": "^5.1.6"
   },
   "configurationDefaults": {
     "jass": {

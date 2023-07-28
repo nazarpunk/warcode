@@ -1,5 +1,4 @@
 // noinspection JSAssignmentUsedAsCondition
-
 import {DiagnosticSeverity, Range} from 'vscode';
 import type VscodeBridge from '../utils/vscode-bridge';
 import TokenLegend from '../semantic/token-legend';
@@ -28,7 +27,7 @@ export class JassVisitor extends ParserVisitor {
 
     #string(ctx: JassCstNode) {
         const strings = ctx[JassRule.stringliteral];
-        if (strings == null) return;
+        if (!strings) return;
         const b = this.bridge;
         if (b) {
             for (const string of strings) {
@@ -61,7 +60,7 @@ export class JassVisitor extends ParserVisitor {
     [JassRule.root](ctx: JassCstNode) {
         this.#comment(ctx);
         let node;
-        if ((node = ctx[JassRule.type_declare]) != null) return this.visit(node);
+        if (node = ctx[JassRule.type_declare]) return this.visit(node);
         if ((node = ctx[JassRule.native_declare]) != null) return this.visit(node);
         if ((node = ctx[JassRule.function_declare]) != null) return this.visit(node);
         if ((node = ctx[JassRule.globals_declare]) != null) return this.visit(node);
