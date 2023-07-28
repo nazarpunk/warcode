@@ -57,7 +57,6 @@ export default class ExtProvider implements DocumentSemanticTokensProvider, Docu
     //async provideDocumentSemanticTokens(document: vscode.TextDocument, token: vscode.CancellationToken): Promise<vscode.SemanticTokens>
     async provideDocumentSemanticTokens(document: TextDocument, token: CancellationToken): Promise<SemanticTokens> {
         return new Promise<SemanticTokens>(resolve => {
-            const now = performance.now();
             //=== cancelation
             token.onCancellationRequested(resolve);
 
@@ -136,7 +135,6 @@ export default class ExtProvider implements DocumentSemanticTokensProvider, Docu
             //=== resolve
             this.#versions[path] = document.version;
             resolve(bridge.builder.build());
-            console.log('end', performance.now() - now, 'ms');
         });
     }
 

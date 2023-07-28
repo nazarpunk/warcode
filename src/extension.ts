@@ -1,4 +1,4 @@
-import {ExtensionContext, languages} from "vscode";
+import {env, ExtensionContext, languages} from "vscode";
 import ExtProvider from "./utils/ext-provider";
 import {JassVisitor} from "./jass/jass-visitor";
 import {WtsParser} from "./wts/wts-parser";
@@ -12,6 +12,8 @@ import WtsTokensList from "./wts/wts-tokens-list";
 export function activate(context: ExtensionContext) {
     const jass = new ExtProvider('jass', JassTokensList, JassParser, JassVisitor);
     const wts = new ExtProvider('wts', WtsTokensList, WtsParser, WtsVisitor);
+
+    console.log(env.language);
 
     context.subscriptions.push(
         languages.registerDocumentSemanticTokensProvider({language: jass.name}, jass, ExtSemanticTokensLegend),

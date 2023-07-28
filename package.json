@@ -31,6 +31,7 @@
     "url": "https://github.com/nazarpunk/vscode-jass-vanilla/issues"
   },
   "main": "./out/extension.js",
+  "l10n": "./l10n",
   "scripts": {
     "esbuild-docs-calculator": "esbuild docs/calculator/main.mjs --outfile=docs/calculator/out/main.mjs --target=es2020 --bundle --external:vscode --format=cjs --platform=browser --tree-shaking=true --sourcemap --watch",
     "esbuild-docs-wts": "esbuild docs/wts/main.ts --outfile=docs/wts/out/main.mjs --target=es2020 --bundle --external:vscode --format=cjs --platform=browser --tree-shaking=true --sourcemap --watch",
@@ -53,6 +54,7 @@
     "eslint-plugin-import": "^2.27.5",
     "eslint-plugin-n": "^16.0.1",
     "eslint-plugin-promise": "^6.1.1",
+    "i18next": "^23.3.0",
     "typescript": "^5.1.6"
   },
   "configurationDefaults": {
