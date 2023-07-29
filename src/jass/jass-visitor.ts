@@ -1,4 +1,3 @@
-// noinspection JSAssignmentUsedAsCondition
 import {DiagnosticSeverity, Range} from 'vscode';
 import type VscodeBridge from '../utils/vscode-bridge';
 import TokenLegend from '../semantic/token-legend';
@@ -59,11 +58,18 @@ export class JassVisitor extends ParserVisitor {
 
     [JassRule.root](ctx: JassCstNode) {
         this.#comment(ctx);
-        let node;
-        if (node = ctx[JassRule.type_declare]) return this.visit(node);
-        if ((node = ctx[JassRule.native_declare]) != null) return this.visit(node);
-        if ((node = ctx[JassRule.function_declare]) != null) return this.visit(node);
-        if ((node = ctx[JassRule.globals_declare]) != null) return this.visit(node);
+
+        const type = ctx[JassRule.type_declare];
+        if (type) return this.visit(type);
+
+        const native = ctx[JassRule.native_declare];
+        if (native) return this.visit(native);
+
+        const func = ctx[JassRule.function_declare];
+        if (func) return this.visit(func);
+
+        const globals = ctx[JassRule.globals_declare];
+        if (globals) return this.visit(globals);
     }
 
     [JassRule.end](ctx: JassCstNode) {
@@ -82,7 +88,7 @@ export class JassVisitor extends ParserVisitor {
 
         const vardecl = ctx[JassRule.variable_declare];
 
-        if (vardecl != null) {
+        if (vardecl) {
             for (const vd of vardecl) {
                 const variable = this.visit(vd);
                 const typedname = variable?.[JassRule.typedname];
@@ -135,7 +141,7 @@ export class JassVisitor extends ParserVisitor {
         this.#comment(ctx);
 
         const b = this?.bridge;
-        if (b != null) {
+        if (b) {
             //console.log(ctx[JassRule.takes]?.[0].startColumn);
 
             b.mark(ctx[JassRule.constant]?.[0], TokenLegend.jass_constant);
@@ -186,16 +192,13 @@ export class JassVisitor extends ParserVisitor {
         const locals = ctx?.[JassRule.function_locals];
 
         // locals, check locals with same name, check local redeclare argument
-        if (locals != null) {
+        if (locals) {
             const localMap: Record<string, IToken[]> = {};
 
             for (const local of locals) {
                 const typedname = this.visit(local)?.[JassRule.typedname];
                 if (!typedname) continue;
-                const {
-                    type,
-                    name
-                } = typedname;
+                const {type, name} = typedname;
                 if (b) {
                     b.mark(type, TokenLegend.jass_type_name);
                     b.mark(name, TokenLegend.jass_variable);
@@ -235,7 +238,7 @@ export class JassVisitor extends ParserVisitor {
 
         // statement
         const statements = ctx[JassRule.statement];
-        if (statements != null) {
+        if (statements) {
             for (const statement of statements) {
                 this.visit(statement);
             }
@@ -252,7 +255,7 @@ export class JassVisitor extends ParserVisitor {
         this.#comment(ctx);
 
         const variableDeclare = ctx[JassRule.variable_declare];
-        if (variableDeclare == null) return null;
+        if (!variableDeclare) return null;
         const variable = this.visit(variableDeclare);
 
         const b = this.bridge;
@@ -293,7 +296,7 @@ export class JassVisitor extends ParserVisitor {
         this?.bridge?.mark(array, TokenLegend.jass_array);
 
         const list = ctx[JassRule.identifier];
-        if (list == null) return {};
+        if (!list) return {};
 
         const [type, name] = list;
         return {
@@ -305,46 +308,41 @@ export class JassVisitor extends ParserVisitor {
 
     [JassRule.function_call](ctx: JassCstNode) {
         // console.log(JassRule.function_call, ctx);
-        this?.bridge?.mark(ctx[JassRule.identifier]?.[0], TokenLegend.jass_function_user);
-        this?.bridge?.mark(ctx[JassRule.lparen]?.[0], TokenLegend.jass_lparen);
-        this?.bridge?.mark(ctx[JassRule.rparen]?.[0], TokenLegend.jass_rparen);
-        ctx[JassRule.comma]?.map(item => this?.bridge?.mark(item, TokenLegend.jass_comma));
+        const b = this.bridge;
+        if (b) {
+            b.mark(ctx[JassRule.identifier]?.[0], TokenLegend.jass_function_user);
+            b.mark(ctx[JassRule.lparen]?.[0], TokenLegend.jass_lparen);
+            b.mark(ctx[JassRule.rparen]?.[0], TokenLegend.jass_rparen);
+            ctx[JassRule.comma]?.map(item => this?.bridge?.mark(item, TokenLegend.jass_comma));
+        }
         ctx[JassRule.expression]?.map(item => this.visit(item));
         return ctx;
     }
 
     [JassRule.function_args](ctx: JassCstNode) {
-        let token;
+        const b = this?.bridge;
 
         // nothing
-        if ((token = ctx?.[JassRule.nothing]?.[0]) != null) {
-            this?.bridge?.mark(token, TokenLegend.jass_type_name);
-            return {
-                map: {},
-                list: []
-            };
+        const nothing = ctx?.[JassRule.nothing]?.[0];
+        if (nothing) {
+            b?.mark(nothing, TokenLegend.jass_type_name);
+            return {map: {}, list: []};
         }
 
         // commas
-        if ((token = ctx[JassRule.comma]) != null) {
-            for (const comma of token) {
-                this?.bridge?.mark(comma, TokenLegend.jass_comma);
-            }
+        const commas = ctx[JassRule.comma];
+        if (b && commas) for (const comma of commas) {
+            this?.bridge?.mark(comma, TokenLegend.jass_comma);
         }
 
         // args
         const args = ctx?.[JassRule.typedname]?.map(item => this.visit(item));
         const argMap: Record<string, IToken[]> = {};
 
-        const b = this.bridge;
-
         // typedname, check type same name
-        if (args != null) {
+        if (args) {
             for (const arg of args) {
-                const {
-                    type,
-                    name
-                } = arg;
+                const {type, name} = arg;
                 this?.bridge?.mark(type, TokenLegend.jass_type_name);
                 this?.bridge?.mark(name, TokenLegend.jass_argument);
                 if (name) (argMap[name.image] ??= []).push(name);
@@ -373,16 +371,13 @@ export class JassVisitor extends ParserVisitor {
     }
 
     [JassRule.function_returns](ctx: JassCstNode) {
-        let token;
+        const b = this?.bridge;
+        const nothing = ctx[JassRule.nothing]?.[0];
+        const type = ctx[JassRule.identifier]?.[0];
 
-        if ((token = ctx[JassRule.nothing]?.[0]) != null) {
-            this?.bridge?.mark(token, TokenLegend.jass_type_name);
-            return token.image;
-        }
-
-        if ((token = ctx[JassRule.identifier]?.[0]) != null) {
-            this?.bridge?.mark(token, TokenLegend.jass_type_name);
-            return token.image;
+        if (b) {
+            if (nothing) b.mark(nothing, TokenLegend.jass_type_name);
+            if (type) b.mark(type, TokenLegend.jass_type_name);
         }
 
         return null;
@@ -398,7 +393,7 @@ export class JassVisitor extends ParserVisitor {
         const b = this.bridge;
 
         // check array assing
-        if (b && equals != null && array) {
+        if (b && equals && array) {
             b.diagnostics.push({
                 message: i18next.t(i18n.arrayInitializeError),
                 range: new Range(
@@ -410,12 +405,13 @@ export class JassVisitor extends ParserVisitor {
         }
 
         const local = ctx[JassRule.local]?.[0];
-        if (local != null) this?.bridge?.mark(local, TokenLegend.jass_local);
-
         const constant = ctx[JassRule.constant]?.[0];
-        if (constant != null) this?.bridge?.mark(constant, TokenLegend.jass_constant);
 
-        this?.bridge?.mark(ctx[JassRule.assign]?.[0], TokenLegend.jass_equals);
+        if (b) {
+            if (local) b.mark(local, TokenLegend.jass_local);
+            if (constant) b.mark(constant, TokenLegend.jass_constant);
+            b.mark(ctx[JassRule.assign]?.[0], TokenLegend.jass_equals);
+        }
 
         const exp = ctx[JassRule.expression];
         if (exp) this.visit(exp);
@@ -429,13 +425,16 @@ export class JassVisitor extends ParserVisitor {
 
     [JassRule.statement](ctx: JassCstNode) {
         this.#comment(ctx);
-        let node;
-        if ((node = ctx[JassRule.if_statement]) != null) return this.visit(node);
-        if ((node = ctx[JassRule.set_statement]) != null) return this.visit(node);
-        if ((node = ctx[JassRule.call_statement]) != null) return this.visit(node);
-        if ((node = ctx[JassRule.loop_statement]) != null) return this.visit(node);
-        if ((node = ctx[JassRule.exitwhen_statement]) != null) return this.visit(node);
-        if ((node = ctx[JassRule.return_statement]) != null) return this.visit(node);
+
+        for (const statement of [
+            ctx[JassRule.if_statement],
+            ctx[JassRule.set_statement],
+            ctx[JassRule.call_statement],
+            ctx[JassRule.loop_statement],
+            ctx[JassRule.exitwhen_statement],
+            ctx[JassRule.return_statement]
+        ]) if (statement) return this.visit(statement);
+
         return null;
     }
 
@@ -535,7 +534,7 @@ export class JassVisitor extends ParserVisitor {
         //console.log(JassRule.primary, ctx);
         this.#string(ctx);
         const b = this?.bridge;
-        if (b != null) {
+        if (b) {
             b.mark(ctx[JassRule.sub]?.[0], TokenLegend.jass_sub);
             b.mark(ctx[JassRule.integer]?.[0], TokenLegend.jass_integer);
             b.mark(ctx[JassRule.real]?.[0], TokenLegend.jass_real);

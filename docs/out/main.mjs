@@ -12448,15 +12448,12 @@ var JassVisitor = class extends ParserVisitor {
   }
   [jass_rule_default.root](ctx) {
     __privateMethod(this, _comment, comment_fn).call(this, ctx);
-    let node;
-    if ((node = ctx[jass_rule_default.type_declare]) != null)
-      return this.visit(node);
-    if ((node = ctx[jass_rule_default.native_declare]) != null)
-      return this.visit(node);
-    if ((node = ctx[jass_rule_default.function_declare]) != null)
-      return this.visit(node);
-    if ((node = ctx[jass_rule_default.globals_declare]) != null)
-      return this.visit(node);
+    const type = ctx[jass_rule_default.type_declare];
+    if (type)
+      return this.visit(type);
+    const native = ctx[jass_rule_default.native_declare];
+    if (native)
+      return this.visit(native);
   }
   [jass_rule_default.end](ctx) {
     __privateMethod(this, _comment, comment_fn).call(this, ctx);
@@ -12557,10 +12554,7 @@ var JassVisitor = class extends ParserVisitor {
         const typedname = this.visit(local)?.[jass_rule_default.typedname];
         if (!typedname)
           continue;
-        const {
-          type,
-          name
-        } = typedname;
+        const { type, name } = typedname;
         if (b) {
           b.mark(type, token_legend_default.jass_type_name);
           b.mark(name, token_legend_default.jass_variable);
@@ -12667,7 +12661,7 @@ var JassVisitor = class extends ParserVisitor {
   [jass_rule_default.function_args](ctx) {
     var _a;
     let token;
-    if (token = ctx?.[jass_rule_default.nothing]?.[0] != null) {
+    if ((token = ctx?.[jass_rule_default.nothing]?.[0]) != null) {
       this?.bridge?.mark(token, token_legend_default.jass_type_name);
       return {
         map: {},
@@ -12898,7 +12892,7 @@ comment_fn = function(ctx) {
 _string = new WeakSet();
 string_fn = function(ctx) {
   const strings = ctx[jass_rule_default.stringliteral];
-  if (strings == null)
+  if (!strings)
     return;
   const b = this.bridge;
   if (b) {
@@ -12929,7 +12923,6 @@ var iframe = document.createElement("iframe");
 iframe.src = "data:text/html;charset=utf-8," + encodeURI(createSyntaxDiagramsCode(parser2.getSerializedGastProductions()));
 document.body.appendChild(iframe);
 (async () => {
-  const visitor = new JassVisitor();
   const request = await fetch("test.txt");
   const text = await request.text();
   const lexer = new Lexer(jass_tokens_list_default, {
@@ -12939,10 +12932,9 @@ document.body.appendChild(iframe);
     ensureOptimizations: true
   });
   const result = lexer.tokenize(text);
-  const now = performance.now();
   parser2.input = result.tokens;
   const nodes = parser2[jass_rule_default.jass]();
-  console.log(performance.now() - now, nodes);
+  const visitor = new JassVisitor();
   visitor.visit(nodes);
 })();
 /*! Bundled license information:

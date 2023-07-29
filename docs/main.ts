@@ -3,6 +3,7 @@ import JassParser from "../src/jass/jass-parser";
 import {JassVisitor} from "../src/jass/jass-visitor";
 import JassRule from "../src/jass/jass-rule";
 import JassTokensList from "../src/jass/jass-tokens-list";
+import VscodeBridge from "../src/utils/vscode-bridge";
 
 const parser = new JassParser();
 
@@ -11,7 +12,6 @@ iframe.src = 'data:text/html;charset=utf-8,' + encodeURI(createSyntaxDiagramsCod
 document.body.appendChild(iframe);
 
 (async () => {
-    const visitor = new JassVisitor();
     const request = await fetch('test.txt');
     const text = await request.text();
 
@@ -23,14 +23,12 @@ document.body.appendChild(iframe);
     });
     const result = lexer.tokenize(text);
 
-    const now = performance.now();
     parser.input = result.tokens;
     const nodes = parser[JassRule.jass]();
 
-    console.log(performance.now() - now, nodes);
+    const visitor = new JassVisitor();
+    // @ts-ignore
+    //visitor.bridge = new VscodeBridge(_document, [], []);
 
     visitor.visit(nodes);
-
-
-
 })();

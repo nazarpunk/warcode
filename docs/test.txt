@@ -1,0 +1,7 @@
+function Test takes real a returns nothing
+    local real a = 111
+endfunction
+
+constant function PolarProjectionBJ takes location source, real dist, real angle returns location
+    local real x = not not not not not not(null + true + end + someone)
+endfunction
