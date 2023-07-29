@@ -29,16 +29,14 @@ export class WtsVisitor extends BaseCstVisitor {
     bridge?: VscodeBridge;
 
     [WtsRule.wts](ctx: WtsCstNode) {
-        //console.log(Rule.wts, ctx);
+        //console.log(WtsRule.wts, ctx);
         const blocks = ctx[WtsRule.block];
         const indexMap: Record<string, IToken[]> = {};
         if (blocks) {
             for (const item of blocks) {
                 const block = this.visit(item);
                 const index: IToken = block.index;
-                if (index) {
-                    (indexMap[index.image] ??= []).push(index);
-                }
+                if (index) (indexMap[index.image] ??= []).push(index);
             }
         }
 

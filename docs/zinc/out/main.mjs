@@ -9237,9 +9237,8 @@ function createSyntaxDiagramsCode(grammar, { resourceBase = `https://unpkg.com/c
 // src/zinc/zinc-rule.ts
 var ZincRule = /* @__PURE__ */ ((ZincRule2) => {
   ZincRule2["zinc"] = "zinc";
-  ZincRule2["root"] = "root";
+  ZincRule2["library"] = "library";
   ZincRule2["variable_declare"] = "variable_declare";
-  ZincRule2["native_declare"] = "native_declare";
   ZincRule2["function_declare"] = "function_declare";
   ZincRule2["function_locals"] = "function_locals";
   ZincRule2["function_returns"] = "function_returns";
@@ -9260,7 +9259,6 @@ var ZincRule = /* @__PURE__ */ ((ZincRule2) => {
   ZincRule2["primary"] = "primary";
   ZincRule2["set_statement"] = "set_statement";
   ZincRule2["statement"] = "statement";
-  ZincRule2["end"] = "end";
   ZincRule2["whitespace"] = "whitespace";
   ZincRule2["comment"] = "comment";
   ZincRule2["and"] = "and";
@@ -9318,9 +9316,14 @@ var ZincRule = /* @__PURE__ */ ((ZincRule2) => {
 var zinc_rule_default = ZincRule;
 
 // src/utils/char-code.ts
-var CharCodeWhitespaceList = [
+var CharCodeWhitespaceBreakList = [
   9 /* HorizontalTab */,
-  32 /* Space */
+  10 /* LineFeed */,
+  11 /* LineTabulation */,
+  12 /* FormFeed */,
+  13 /* CarriageReturn */,
+  32 /* Space */,
+  133 /* NextLine */
 ];
 var CharCodeBreakList = [
   10 /* LineFeed */,
@@ -9353,9 +9356,9 @@ var parenColor = "#e1d132";
 var ZincTokens = {
   [zinc_rule_default.whitespace]: add({
     name: zinc_rule_default.whitespace,
-    pattern: /[^\S\r\n]+/,
-    line_breaks: false,
-    start_chars_hint: CharCodeWhitespaceList,
+    pattern: /\s+/,
+    line_breaks: true,
+    start_chars_hint: CharCodeWhitespaceBreakList,
     group: Lexer.SKIPPED
   }),
   [zinc_rule_default.comment]: add({
@@ -9373,6 +9376,7 @@ var ZincTokens = {
     line_breaks: true
   }),
   // keyword
+  [zinc_rule_default.library]: keyword(zinc_rule_default.library),
   [zinc_rule_default.and]: keyword(zinc_rule_default.and),
   [zinc_rule_default.array]: keyword(zinc_rule_default.array),
   [zinc_rule_default.call]: keyword(zinc_rule_default.call),
@@ -9576,25 +9580,7 @@ var ZincParser = class extends CstParser {
   constructor(config) {
     super(zinc_tokens_list_default, config);
     const $ = this;
-    $.RULE(zinc_rule_default.zinc, () => $.MANY(() => $.SUBRULE($[zinc_rule_default.root])));
-    $.RULE(zinc_rule_default.root, () => {
-      $.OR([
-        { ALT: () => $.SUBRULE($[zinc_rule_default.native_declare]) },
-        { ALT: () => $.SUBRULE($[zinc_rule_default.function_declare]) },
-        { ALT: () => $.CONSUME(zinc_tokens_default[zinc_rule_default.linebreak]) },
-        { ALT: () => $.CONSUME(zinc_tokens_default[zinc_rule_default.comment]) }
-      ]);
-    });
-    $.RULE(zinc_rule_default.native_declare, () => {
-      $.OPTION(() => $.CONSUME(zinc_tokens_default[zinc_rule_default.constant]));
-      $.CONSUME(zinc_tokens_default[zinc_rule_default.native]);
-      $.CONSUME2(zinc_tokens_default[zinc_rule_default.identifier]);
-      $.CONSUME3(zinc_tokens_default[zinc_rule_default.takes]);
-      $.SUBRULE($[zinc_rule_default.function_args]);
-      $.CONSUME4(zinc_tokens_default[zinc_rule_default.returns]);
-      $.SUBRULE($[zinc_rule_default.function_returns]);
-      $.SUBRULE($[zinc_rule_default.end]);
-    });
+    $.RULE(zinc_rule_default.zinc, () => $.MANY(() => $.SUBRULE($[zinc_rule_default.function_declare])));
     $.RULE(zinc_rule_default.function_declare, () => {
       $.OPTION(() => $.CONSUME(zinc_tokens_default[zinc_rule_default.constant]));
       $.CONSUME(zinc_tokens_default[zinc_rule_default.function]);
@@ -9603,11 +9589,9 @@ var ZincParser = class extends CstParser {
       $.SUBRULE($[zinc_rule_default.function_args]);
       $.CONSUME4(zinc_tokens_default[zinc_rule_default.returns]);
       $.SUBRULE($[zinc_rule_default.function_returns]);
-      $.SUBRULE($[zinc_rule_default.end]);
       $.MANY1(() => $.SUBRULE($[zinc_rule_default.function_locals]));
       $.MANY2(() => $.SUBRULE($[zinc_rule_default.statement]));
       $.CONSUME(zinc_tokens_default[zinc_rule_default.endfunction]);
-      $.SUBRULE2($[zinc_rule_default.end]);
     });
     $.RULE(zinc_rule_default.variable_declare, () => {
       $.OPTION(() => $.OR([
@@ -9619,41 +9603,34 @@ var ZincParser = class extends CstParser {
         $.CONSUME(zinc_tokens_default[zinc_rule_default.assign]);
         $.SUBRULE($[zinc_rule_default.expression]);
       });
-      $.SUBRULE($[zinc_rule_default.end]);
     });
     $.RULE(zinc_rule_default.if_statement, () => {
       $.CONSUME(zinc_tokens_default[zinc_rule_default.if]);
       $.SUBRULE($[zinc_rule_default.expression]);
       $.CONSUME(zinc_tokens_default[zinc_rule_default.then]);
-      $.SUBRULE($[zinc_rule_default.end]);
       $.MANY(() => $.SUBRULE($[zinc_rule_default.statement]));
       $.MANY2(() => $.SUBRULE($[zinc_rule_default.elseif_statement]));
       $.OPTION(() => $.SUBRULE($[zinc_rule_default.else_statement]));
       $.CONSUME(zinc_tokens_default[zinc_rule_default.endif]);
-      $.SUBRULE2($[zinc_rule_default.end]);
     });
     $.RULE(zinc_rule_default.elseif_statement, () => {
       $.CONSUME(zinc_tokens_default[zinc_rule_default.elseif]);
       $.SUBRULE($[zinc_rule_default.expression]);
       $.CONSUME(zinc_tokens_default[zinc_rule_default.then]);
-      $.SUBRULE($[zinc_rule_default.end]);
       $.MANY(() => $.SUBRULE($[zinc_rule_default.statement]));
     });
     $.RULE(zinc_rule_default.else_statement, () => {
       $.CONSUME(zinc_tokens_default[zinc_rule_default.else]);
-      $.SUBRULE($[zinc_rule_default.end]);
       $.MANY(() => $.SUBRULE($[zinc_rule_default.statement]));
     });
     $.RULE(zinc_rule_default.call_statement, () => {
       $.OPTION(() => $.CONSUME(zinc_tokens_default[zinc_rule_default.debug]));
       $.CONSUME(zinc_tokens_default[zinc_rule_default.call]);
       $.SUBRULE($[zinc_rule_default.function_call]);
-      $.SUBRULE($[zinc_rule_default.end]);
     });
     $.RULE(zinc_rule_default.return_statement, () => {
       $.CONSUME(zinc_tokens_default[zinc_rule_default.return]);
       $.OPTION(() => $.SUBRULE($[zinc_rule_default.expression]));
-      $.SUBRULE($[zinc_rule_default.end]);
     });
     $.RULE(zinc_rule_default.set_statement, () => {
       $.CONSUME(zinc_tokens_default[zinc_rule_default.set]);
@@ -9661,19 +9638,15 @@ var ZincParser = class extends CstParser {
       $.OPTION(() => $.SUBRULE($[zinc_rule_default.arrayaccess]));
       $.CONSUME(zinc_tokens_default[zinc_rule_default.assign]);
       $.SUBRULE($[zinc_rule_default.expression]);
-      $.SUBRULE($[zinc_rule_default.end]);
     });
     $.RULE(zinc_rule_default.loop_statement, () => {
       $.CONSUME(zinc_tokens_default[zinc_rule_default.loop]);
-      $.SUBRULE($[zinc_rule_default.end]);
       $.MANY(() => $.SUBRULE($[zinc_rule_default.statement]));
       $.CONSUME(zinc_tokens_default[zinc_rule_default.endloop]);
-      $.SUBRULE2($[zinc_rule_default.end]);
     });
     $.RULE(zinc_rule_default.exitwhen_statement, () => {
       $.CONSUME(zinc_tokens_default[zinc_rule_default.exitwhen]);
       $.SUBRULE($[zinc_rule_default.expression]);
-      $.SUBRULE($[zinc_rule_default.end]);
     });
     $.RULE(zinc_rule_default.function_args, () => {
       $.OR([
@@ -9701,8 +9674,6 @@ var ZincParser = class extends CstParser {
     });
     $.RULE(zinc_rule_default.function_locals, () => {
       $.OR([
-        { ALT: () => $.CONSUME(zinc_tokens_default[zinc_rule_default.comment]) },
-        { ALT: () => $.CONSUME(zinc_tokens_default[zinc_rule_default.linebreak]) },
         { ALT: () => $.SUBRULE($[zinc_rule_default.variable_declare]) }
       ]);
     });
@@ -9836,16 +9807,7 @@ var ZincParser = class extends CstParser {
         { ALT: () => $.SUBRULE($[zinc_rule_default.loop_statement]) },
         { ALT: () => $.SUBRULE($[zinc_rule_default.exitwhen_statement]) },
         { ALT: () => $.SUBRULE($[zinc_rule_default.if_statement]) },
-        { ALT: () => $.SUBRULE($[zinc_rule_default.return_statement]) },
-        { ALT: () => $.CONSUME(zinc_tokens_default[zinc_rule_default.linebreak]) },
-        { ALT: () => $.CONSUME(zinc_tokens_default[zinc_rule_default.comment]) }
-      ]);
-    });
-    $.RULE(zinc_rule_default.end, () => {
-      $.OPTION(() => $.CONSUME(zinc_tokens_default[zinc_rule_default.comment]));
-      $.OR([
-        { ALT: () => $.CONSUME(zinc_tokens_default[zinc_rule_default.linebreak]) },
-        { ALT: () => $.CONSUME2(EOF) }
+        { ALT: () => $.SUBRULE($[zinc_rule_default.return_statement]) }
       ]);
     });
     this.performSelfAnalysis();

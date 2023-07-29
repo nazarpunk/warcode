@@ -4,7 +4,7 @@ import {
     CharCode,
     CharCodeBreakList,
     CharCodeDigitList,
-    CharCodeLetterList,
+    CharCodeLetterList, CharCodeWhitespaceBreakList,
     CharCodeWhitespaceList
 } from "../utils/char-code";
 
@@ -30,9 +30,7 @@ const parenColor = '#e1d132';
 
 const ZincTokens: Record<Exclude<ZincRule,
     ZincRule.zinc |
-    ZincRule.root |
     ZincRule.variable_declare |
-    ZincRule.native_declare |
     ZincRule.function_declare |
     ZincRule.function_locals |
     ZincRule.function_returns |
@@ -52,14 +50,13 @@ const ZincTokens: Record<Exclude<ZincRule,
     ZincRule.multiplication |
     ZincRule.primary |
     ZincRule.set_statement |
-    ZincRule.statement |
-    ZincRule.end
+    ZincRule.statement
 >, TokenType> = {
     [ZincRule.whitespace]: add({
         name: ZincRule.whitespace,
-        pattern: /[^\S\r\n]+/,
-        line_breaks: false,
-        start_chars_hint: CharCodeWhitespaceList,
+        pattern: /\s+/,
+        line_breaks: true,
+        start_chars_hint: CharCodeWhitespaceBreakList,
         group: Lexer.SKIPPED,
     }),
     [ZincRule.comment]: add({
@@ -77,6 +74,7 @@ const ZincTokens: Record<Exclude<ZincRule,
         line_breaks: true,
     }),
     // keyword
+    [ZincRule.library]: keyword(ZincRule.library),
     [ZincRule.and]: keyword(ZincRule.and),
     [ZincRule.array]: keyword(ZincRule.array),
     [ZincRule.call]: keyword(ZincRule.call),

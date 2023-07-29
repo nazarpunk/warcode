@@ -1,9 +1,8 @@
 const enum ZincRule {
     // rules
     zinc = 'zinc',
-    root = 'root',
+    library = 'library',
     variable_declare = 'variable_declare',
-    native_declare = 'native_declare',
     function_declare = 'function_declare',
     function_locals = 'function_locals',
     function_returns = 'function_returns',
@@ -24,7 +23,6 @@ const enum ZincRule {
     primary = 'primary',
     set_statement = 'set_statement',
     statement = 'statement',
-    end = 'end',
     // tokens
     whitespace = 'whitespace',
     comment = 'comment',

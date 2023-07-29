@@ -30,7 +30,6 @@ const parenColor = '#e1d132';
 
 const JassTokens: Record<Exclude<JassRule,
     JassRule.jass |
-    JassRule.root |
     JassRule.type_declare |
     JassRule.globals_declare |
     JassRule.variable_declare |
@@ -69,7 +68,8 @@ const JassTokens: Record<Exclude<JassRule,
         pattern: /\/\/[^\r\n]*/,
         line_breaks: false,
         start_chars_hint: [CharCode.Slash],
-        color: '#308030'
+        color: '#308030',
+        group: 'comments'
     }),
     [JassRule.linebreak]: add({
         name: JassRule.linebreak,

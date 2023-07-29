@@ -9237,7 +9237,6 @@ function createSyntaxDiagramsCode(grammar, { resourceBase = `https://unpkg.com/c
 // src/jass/jass-rule.ts
 var JassRule = /* @__PURE__ */ ((JassRule2) => {
   JassRule2["jass"] = "jass";
-  JassRule2["root"] = "root";
   JassRule2["type_declare"] = "type_declare";
   JassRule2["globals_declare"] = "globals_declare";
   JassRule2["variable_declare"] = "variable_declare";
@@ -9365,7 +9364,8 @@ var JassTokens = {
     pattern: /\/\/[^\r\n]*/,
     line_breaks: false,
     start_chars_hint: [47 /* Slash */],
-    color: "#308030"
+    color: "#308030",
+    group: "comments"
   }),
   [jass_rule_default.linebreak]: add({
     name: jass_rule_default.linebreak,
@@ -9578,16 +9578,16 @@ var JassParser = class extends CstParser {
   constructor(config) {
     super(jass_tokens_list_default, config);
     const $ = this;
-    $.RULE(jass_rule_default.jass, () => $.MANY(() => $.SUBRULE($[jass_rule_default.root])));
-    $.RULE(jass_rule_default.root, () => {
-      $.OR([
-        { ALT: () => $.SUBRULE($[jass_rule_default.type_declare]) },
-        { ALT: () => $.SUBRULE($[jass_rule_default.native_declare]) },
-        { ALT: () => $.SUBRULE($[jass_rule_default.function_declare]) },
-        { ALT: () => $.SUBRULE($[jass_rule_default.globals_declare]) },
-        { ALT: () => $.CONSUME(jass_tokens_default[jass_rule_default.linebreak]) },
-        { ALT: () => $.CONSUME(jass_tokens_default[jass_rule_default.comment]) }
-      ]);
+    $.RULE(jass_rule_default.jass, () => {
+      $.MANY(() => {
+        $.OR([
+          { ALT: () => $.SUBRULE($[jass_rule_default.type_declare]) },
+          { ALT: () => $.SUBRULE($[jass_rule_default.native_declare]) },
+          { ALT: () => $.SUBRULE($[jass_rule_default.function_declare]) },
+          { ALT: () => $.SUBRULE($[jass_rule_default.globals_declare]) },
+          { ALT: () => $.CONSUME(jass_tokens_default[jass_rule_default.linebreak]) }
+        ]);
+      });
     });
     $.RULE(jass_rule_default.type_declare, () => {
       $.CONSUME(jass_tokens_default[jass_rule_default.type]);
@@ -9637,8 +9637,7 @@ var JassParser = class extends CstParser {
       $.SUBRULE($[jass_rule_default.end]);
       $.MANY(() => $.OR([
         { ALT: () => $.SUBRULE($[jass_rule_default.variable_declare]) },
-        { ALT: () => $.CONSUME(jass_tokens_default[jass_rule_default.linebreak]) },
-        { ALT: () => $.CONSUME(jass_tokens_default[jass_rule_default.comment]) }
+        { ALT: () => $.CONSUME(jass_tokens_default[jass_rule_default.linebreak]) }
       ]));
       $.CONSUME3(jass_tokens_default[jass_rule_default.endglobals]);
       $.SUBRULE2($[jass_rule_default.end]);
@@ -9723,7 +9722,6 @@ var JassParser = class extends CstParser {
     });
     $.RULE(jass_rule_default.function_locals, () => {
       $.OR([
-        { ALT: () => $.CONSUME(jass_tokens_default[jass_rule_default.comment]) },
         { ALT: () => $.CONSUME(jass_tokens_default[jass_rule_default.linebreak]) },
         { ALT: () => $.SUBRULE($[jass_rule_default.variable_declare]) }
       ]);
@@ -9859,12 +9857,10 @@ var JassParser = class extends CstParser {
         { ALT: () => $.SUBRULE($[jass_rule_default.exitwhen_statement]) },
         { ALT: () => $.SUBRULE($[jass_rule_default.if_statement]) },
         { ALT: () => $.SUBRULE($[jass_rule_default.return_statement]) },
-        { ALT: () => $.CONSUME(jass_tokens_default[jass_rule_default.linebreak]) },
-        { ALT: () => $.CONSUME(jass_tokens_default[jass_rule_default.comment]) }
+        { ALT: () => $.CONSUME(jass_tokens_default[jass_rule_default.linebreak]) }
       ]);
     });
     $.RULE(jass_rule_default.end, () => {
-      $.OPTION(() => $.CONSUME(jass_tokens_default[jass_rule_default.comment]));
       $.OR([
         { ALT: () => $.CONSUME(jass_tokens_default[jass_rule_default.linebreak]) },
         { ALT: () => $.CONSUME2(EOF) }
@@ -12435,37 +12431,23 @@ instance.init({
 // src/jass/jass-visitor.ts
 var parser = new JassParser();
 var ParserVisitor = parser.getBaseCstVisitorConstructor();
-var _comment, comment_fn, _string, string_fn;
+var _string, string_fn;
 var JassVisitor = class extends ParserVisitor {
   constructor() {
     super();
-    __privateAdd(this, _comment);
     __privateAdd(this, _string);
     this.validateVisitor();
   }
   [jass_rule_default.jass](ctx) {
-    return ctx[jass_rule_default.root]?.map((item) => this.visit(item));
-  }
-  [jass_rule_default.root](ctx) {
-    __privateMethod(this, _comment, comment_fn).call(this, ctx);
-    const type = ctx[jass_rule_default.type_declare];
-    if (type)
-      return this.visit(type);
-    const native = ctx[jass_rule_default.native_declare];
-    if (native)
-      return this.visit(native);
-    const func = ctx[jass_rule_default.function_declare];
-    if (func)
-      return this.visit(func);
-    const globals = ctx[jass_rule_default.globals_declare];
-    if (globals)
-      return this.visit(globals);
+    ctx[jass_rule_default.type_declare]?.map((item) => this.visit(item));
+    ctx[jass_rule_default.native_declare]?.map((item) => this.visit(item));
+    ctx[jass_rule_default.function_declare]?.map((item) => this.visit(item));
+    ctx[jass_rule_default.globals_declare]?.map((item) => this.visit(item));
   }
   [jass_rule_default.end](ctx) {
-    __privateMethod(this, _comment, comment_fn).call(this, ctx);
+    return ctx;
   }
   [jass_rule_default.globals_declare](ctx) {
-    __privateMethod(this, _comment, comment_fn).call(this, ctx);
     const b = this?.bridge;
     if (b) {
       b.mark(ctx[jass_rule_default.globals]?.[0], token_legend_default.jass_globals);
@@ -12513,7 +12495,6 @@ var JassVisitor = class extends ParserVisitor {
     };
   }
   [jass_rule_default.native_declare](ctx) {
-    __privateMethod(this, _comment, comment_fn).call(this, ctx);
     const b = this?.bridge;
     if (b) {
       b.mark(ctx[jass_rule_default.constant]?.[0], token_legend_default.jass_constant);
@@ -12527,7 +12508,6 @@ var JassVisitor = class extends ParserVisitor {
   }
   [jass_rule_default.function_declare](ctx) {
     var _a;
-    __privateMethod(this, _comment, comment_fn).call(this, ctx);
     const b = this?.bridge;
     if (b) {
       b.mark(ctx[jass_rule_default.constant]?.[0], token_legend_default.jass_constant);
@@ -12608,7 +12588,6 @@ var JassVisitor = class extends ParserVisitor {
     return {};
   }
   [jass_rule_default.function_locals](ctx) {
-    __privateMethod(this, _comment, comment_fn).call(this, ctx);
     const variableDeclare = ctx[jass_rule_default.variable_declare];
     if (!variableDeclare)
       return null;
@@ -12724,7 +12703,6 @@ var JassVisitor = class extends ParserVisitor {
     return null;
   }
   [jass_rule_default.variable_declare](ctx) {
-    __privateMethod(this, _comment, comment_fn).call(this, ctx);
     const equals = ctx[jass_rule_default.assign]?.[0];
     const typedname = this.visit(ctx[jass_rule_default.typedname]);
     const array = typedname[jass_rule_default.array];
@@ -12758,7 +12736,6 @@ var JassVisitor = class extends ParserVisitor {
     };
   }
   [jass_rule_default.statement](ctx) {
-    __privateMethod(this, _comment, comment_fn).call(this, ctx);
     for (const statement of [
       ctx[jass_rule_default.if_statement],
       ctx[jass_rule_default.set_statement],
@@ -12772,14 +12749,12 @@ var JassVisitor = class extends ParserVisitor {
     return null;
   }
   [jass_rule_default.call_statement](ctx) {
-    __privateMethod(this, _comment, comment_fn).call(this, ctx);
     this?.bridge?.mark(ctx[jass_rule_default.debug]?.[0], token_legend_default.jass_debug);
     this?.bridge?.mark(ctx[jass_rule_default.call]?.[0], token_legend_default.jass_call);
     this.visit(ctx[jass_rule_default.function_call]);
     return null;
   }
   [jass_rule_default.set_statement](ctx) {
-    __privateMethod(this, _comment, comment_fn).call(this, ctx);
     this?.bridge?.mark(ctx[jass_rule_default.set]?.[0], token_legend_default.jass_set);
     this?.bridge?.mark(ctx[jass_rule_default.identifier]?.[0], token_legend_default.jass_variable);
     this?.bridge?.mark(ctx[jass_rule_default.assign]?.[0], token_legend_default.jass_assign);
@@ -12788,26 +12763,22 @@ var JassVisitor = class extends ParserVisitor {
     return null;
   }
   [jass_rule_default.loop_statement](ctx) {
-    __privateMethod(this, _comment, comment_fn).call(this, ctx);
     this?.bridge?.mark(ctx[jass_rule_default.loop]?.[0], token_legend_default.jass_loop);
     this?.bridge?.mark(ctx[jass_rule_default.endloop]?.[0], token_legend_default.jass_endloop);
     ctx[jass_rule_default.statement]?.map((item) => this.visit(item));
     return ctx;
   }
   [jass_rule_default.exitwhen_statement](ctx) {
-    __privateMethod(this, _comment, comment_fn).call(this, ctx);
     this?.bridge?.mark(ctx[jass_rule_default.exitwhen]?.[0], token_legend_default.jass_loop);
     this.visit(ctx[jass_rule_default.expression]);
     return ctx;
   }
   [jass_rule_default.return_statement](ctx) {
-    __privateMethod(this, _comment, comment_fn).call(this, ctx);
     this?.bridge?.mark(ctx[jass_rule_default.return]?.[0], token_legend_default.jass_return);
     this.visit(ctx[jass_rule_default.expression]);
     return null;
   }
   [jass_rule_default.if_statement](ctx) {
-    __privateMethod(this, _comment, comment_fn).call(this, ctx);
     this?.bridge?.mark(ctx[jass_rule_default.if]?.[0], token_legend_default.jass_if);
     this?.bridge?.mark(ctx[jass_rule_default.then]?.[0], token_legend_default.jass_then);
     this?.bridge?.mark(ctx[jass_rule_default.endif]?.[0], token_legend_default.jass_endif);
@@ -12818,7 +12789,6 @@ var JassVisitor = class extends ParserVisitor {
     return null;
   }
   [jass_rule_default.elseif_statement](ctx) {
-    __privateMethod(this, _comment, comment_fn).call(this, ctx);
     this.visit(ctx[jass_rule_default.expression]);
     this?.bridge?.mark(ctx[jass_rule_default.elseif]?.[0], token_legend_default.jass_elseif);
     this?.bridge?.mark(ctx[jass_rule_default.then]?.[0], token_legend_default.jass_then);
@@ -12826,7 +12796,6 @@ var JassVisitor = class extends ParserVisitor {
     return null;
   }
   [jass_rule_default.else_statement](ctx) {
-    __privateMethod(this, _comment, comment_fn).call(this, ctx);
     this?.bridge?.mark(ctx[jass_rule_default.else]?.[0], token_legend_default.jass_else);
     ctx[jass_rule_default.statement]?.map((item) => this.visit(item));
     return null;
@@ -12888,11 +12857,6 @@ var JassVisitor = class extends ParserVisitor {
     this.visit(ctx[jass_rule_default.expression]);
     return null;
   }
-};
-_comment = new WeakSet();
-comment_fn = function(ctx) {
-  ctx[jass_rule_default.end]?.map((item) => this.visit(item));
-  ctx[jass_rule_default.comment]?.map((item) => this?.bridge?.mark(item, token_legend_default.jass_comment));
 };
 _string = new WeakSet();
 string_fn = function(ctx) {

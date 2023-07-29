@@ -19,6 +19,7 @@ import VscodeBridge from "./vscode-bridge";
 import {IParserConfig, TokenType} from "@chevrotain/types";
 import i18next from "i18next";
 import {i18n} from "./i18n";
+import TokenLegend from "../semantic/token-legend";
 
 interface IParserConstructor {
     new(config?: IParserConfig): CstParser;
@@ -94,6 +95,9 @@ export default class ExtProvider implements DocumentSemanticTokensProvider, Docu
                     severity: DiagnosticSeverity.Error,
                 });
             }
+
+            const comments = lexing.groups['comments'];
+            if (comments) for (const comment of comments) bridge.mark(comment, TokenLegend.jass_comment);
 
             //=== parsing
             const parser = this.#parsers[path] ??= new this.#parser({

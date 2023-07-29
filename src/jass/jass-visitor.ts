@@ -1,3 +1,5 @@
+// noinspection DuplicatedCode
+
 import {DiagnosticSeverity, Range} from 'vscode';
 import type VscodeBridge from '../utils/vscode-bridge';
 import TokenLegend from '../semantic/token-legend';
@@ -18,11 +20,6 @@ export class JassVisitor extends ParserVisitor {
     }
 
     bridge?: VscodeBridge;
-
-    #comment(ctx: JassCstNode) {
-        ctx[JassRule.end]?.map(item => this.visit(item));
-        ctx[JassRule.comment]?.map(item => this?.bridge?.mark(item, TokenLegend.jass_comment));
-    }
 
     #string(ctx: JassCstNode) {
         const strings = ctx[JassRule.stringliteral];
@@ -53,32 +50,17 @@ export class JassVisitor extends ParserVisitor {
 
     [JassRule.jass](ctx: JassCstNode) {
         //console.log(JassRule.jass, ctx);
-        return ctx[JassRule.root]?.map(item => this.visit(item));
-    }
-
-    [JassRule.root](ctx: JassCstNode) {
-        this.#comment(ctx);
-
-        const type = ctx[JassRule.type_declare];
-        if (type) return this.visit(type);
-
-        const native = ctx[JassRule.native_declare];
-        if (native) return this.visit(native);
-
-        const func = ctx[JassRule.function_declare];
-        if (func) return this.visit(func);
-
-        const globals = ctx[JassRule.globals_declare];
-        if (globals) return this.visit(globals);
+        ctx[JassRule.type_declare]?.map(item => this.visit(item));
+        ctx[JassRule.native_declare]?.map(item => this.visit(item));
+        ctx[JassRule.function_declare]?.map(item => this.visit(item));
+        ctx[JassRule.globals_declare]?.map(item => this.visit(item));
     }
 
     [JassRule.end](ctx: JassCstNode) {
-        this.#comment(ctx);
+        return ctx;
     }
 
     [JassRule.globals_declare](ctx: JassCstNode) {
-        this.#comment(ctx);
-
         const b = this?.bridge;
 
         if (b) {
@@ -138,8 +120,6 @@ export class JassVisitor extends ParserVisitor {
     }
 
     [JassRule.native_declare](ctx: JassCstNode) {
-        this.#comment(ctx);
-
         const b = this?.bridge;
         if (b) {
             //console.log(ctx[JassRule.takes]?.[0].startColumn);
@@ -156,8 +136,6 @@ export class JassVisitor extends ParserVisitor {
     }
 
     [JassRule.function_declare](ctx: JassCstNode) {
-        this.#comment(ctx);
-
         const b = this?.bridge;
 
         if (b) {
@@ -252,8 +230,6 @@ export class JassVisitor extends ParserVisitor {
     }
 
     [JassRule.function_locals](ctx: JassCstNode) {
-        this.#comment(ctx);
-
         const variableDeclare = ctx[JassRule.variable_declare];
         if (!variableDeclare) return null;
         const variable = this.visit(variableDeclare);
@@ -385,8 +361,6 @@ export class JassVisitor extends ParserVisitor {
 
     [JassRule.variable_declare](ctx: JassCstNode) {
         //console.log(JassRule.variable_declare, ctx);
-        this.#comment(ctx);
-
         const equals = ctx[JassRule.assign]?.[0];
         const typedname = this.visit(ctx[JassRule.typedname]!);
         const array = typedname[JassRule.array];
@@ -424,8 +398,6 @@ export class JassVisitor extends ParserVisitor {
     }
 
     [JassRule.statement](ctx: JassCstNode) {
-        this.#comment(ctx);
-
         for (const statement of [
             ctx[JassRule.if_statement],
             ctx[JassRule.set_statement],
@@ -440,7 +412,6 @@ export class JassVisitor extends ParserVisitor {
 
     [JassRule.call_statement](ctx: JassCstNode) {
         //console.log(JassRule.call_statement, ctx)
-        this.#comment(ctx);
         this?.bridge?.mark(ctx[JassRule.debug]?.[0], TokenLegend.jass_debug);
         this?.bridge?.mark(ctx[JassRule.call]?.[0], TokenLegend.jass_call);
         this.visit(ctx[JassRule.function_call]!);
@@ -449,8 +420,6 @@ export class JassVisitor extends ParserVisitor {
 
     [JassRule.set_statement](ctx: JassCstNode) {
         // console.log(JassRule.set_statement, ctx);
-
-        this.#comment(ctx);
         this?.bridge?.mark(ctx[JassRule.set]?.[0], TokenLegend.jass_set);
         this?.bridge?.mark(ctx[JassRule.identifier]?.[0], TokenLegend.jass_variable);
         this?.bridge?.mark(ctx[JassRule.assign]?.[0], TokenLegend.jass_assign);
@@ -461,7 +430,6 @@ export class JassVisitor extends ParserVisitor {
     }
 
     [JassRule.loop_statement](ctx: JassCstNode) {
-        this.#comment(ctx);
         this?.bridge?.mark(ctx[JassRule.loop]?.[0], TokenLegend.jass_loop);
         this?.bridge?.mark(ctx[JassRule.endloop]?.[0], TokenLegend.jass_endloop);
         ctx[JassRule.statement]?.map(item => this.visit(item));
@@ -469,7 +437,6 @@ export class JassVisitor extends ParserVisitor {
     }
 
     [JassRule.exitwhen_statement](ctx: JassCstNode) {
-        this.#comment(ctx);
         this?.bridge?.mark(ctx[JassRule.exitwhen]?.[0], TokenLegend.jass_loop);
 
         this.visit(ctx[JassRule.expression]!);
@@ -477,7 +444,6 @@ export class JassVisitor extends ParserVisitor {
     }
 
     [JassRule.return_statement](ctx: JassCstNode) {
-        this.#comment(ctx);
         this?.bridge?.mark(ctx[JassRule.return]?.[0], TokenLegend.jass_return);
 
         this.visit(ctx[JassRule.expression]!);
@@ -486,8 +452,6 @@ export class JassVisitor extends ParserVisitor {
 
     [JassRule.if_statement](ctx: JassCstNode) {
         // console.log(JassRule.if_statement, ctx);
-        this.#comment(ctx);
-
         this?.bridge?.mark(ctx[JassRule.if]?.[0], TokenLegend.jass_if);
         this?.bridge?.mark(ctx[JassRule.then]?.[0], TokenLegend.jass_then);
         this?.bridge?.mark(ctx[JassRule.endif]?.[0], TokenLegend.jass_endif);
@@ -500,8 +464,6 @@ export class JassVisitor extends ParserVisitor {
     }
 
     [JassRule.elseif_statement](ctx: JassCstNode) {
-        this.#comment(ctx);
-
         this.visit(ctx[JassRule.expression]!);
         this?.bridge?.mark(ctx[JassRule.elseif]?.[0], TokenLegend.jass_elseif);
         this?.bridge?.mark(ctx[JassRule.then]?.[0], TokenLegend.jass_then);
@@ -510,7 +472,6 @@ export class JassVisitor extends ParserVisitor {
     }
 
     [JassRule.else_statement](ctx: JassCstNode) {
-        this.#comment(ctx);
         this?.bridge?.mark(ctx[JassRule.else]?.[0], TokenLegend.jass_else);
         ctx[JassRule.statement]?.map(item => this.visit(item));
         return null;

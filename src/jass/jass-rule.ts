@@ -1,7 +1,6 @@
 const enum JassRule {
     // rules
     jass = 'jass',
-    root = 'root',
     type_declare = 'type_declare',
     globals_declare = 'globals_declare',
     variable_declare = 'variable_declare',
