@@ -9234,90 +9234,90 @@ function createSyntaxDiagramsCode(grammar, { resourceBase = `https://unpkg.com/c
   return header + cssHtml + scripts + diagramsDiv + serializedGrammar + initLogic;
 }
 
-// src/jass/jass-rule.ts
-var JassRule = /* @__PURE__ */ ((JassRule2) => {
-  JassRule2["jass"] = "jass";
-  JassRule2["root"] = "root";
-  JassRule2["type_declare"] = "type_declare";
-  JassRule2["globals_declare"] = "globals_declare";
-  JassRule2["variable_declare"] = "variable_declare";
-  JassRule2["native_declare"] = "native_declare";
-  JassRule2["function_declare"] = "function_declare";
-  JassRule2["function_locals"] = "function_locals";
-  JassRule2["function_returns"] = "function_returns";
-  JassRule2["function_args"] = "function_args";
-  JassRule2["function_call"] = "function_call";
-  JassRule2["return_statement"] = "return_statement";
-  JassRule2["if_statement"] = "if_statement";
-  JassRule2["else_statement"] = "else_statement";
-  JassRule2["elseif_statement"] = "elseif_statement";
-  JassRule2["addition"] = "addition";
-  JassRule2["arrayaccess"] = "arrayaccess";
-  JassRule2["call_statement"] = "call_statement";
-  JassRule2["exitwhen_statement"] = "exitwhen_statement";
-  JassRule2["expression"] = "expression";
-  JassRule2["typedname"] = "typedname";
-  JassRule2["loop_statement"] = "loop_statement";
-  JassRule2["multiplication"] = "multiplication";
-  JassRule2["primary"] = "primary";
-  JassRule2["set_statement"] = "set_statement";
-  JassRule2["statement"] = "statement";
-  JassRule2["end"] = "end";
-  JassRule2["whitespace"] = "whitespace";
-  JassRule2["comment"] = "comment";
-  JassRule2["and"] = "and";
-  JassRule2["array"] = "array";
-  JassRule2["call"] = "call";
-  JassRule2["constant"] = "constant";
-  JassRule2["debug"] = "debug";
-  JassRule2["else"] = "else";
-  JassRule2["elseif"] = "elseif";
-  JassRule2["endfunction"] = "endfunction";
-  JassRule2["endglobals"] = "endglobals";
-  JassRule2["endif"] = "endif";
-  JassRule2["endloop"] = "endloop";
-  JassRule2["exitwhen"] = "exitwhen";
-  JassRule2["extends"] = "extends";
-  JassRule2["function"] = "function";
-  JassRule2["globals"] = "globals";
-  JassRule2["if"] = "if";
-  JassRule2["local"] = "local";
-  JassRule2["loop"] = "loop";
-  JassRule2["native"] = "native";
-  JassRule2["not"] = "not";
-  JassRule2["nothing"] = "nothing";
-  JassRule2["or"] = "or";
-  JassRule2["returns"] = "returns";
-  JassRule2["return"] = "return";
-  JassRule2["set"] = "set";
-  JassRule2["takes"] = "takes";
-  JassRule2["then"] = "then";
-  JassRule2["type"] = "type";
-  JassRule2["comma"] = "comma";
-  JassRule2["equals"] = "equals";
-  JassRule2["assign"] = "assign";
-  JassRule2["notequals"] = "notequals";
-  JassRule2["lessorequal"] = "lessorequal";
-  JassRule2["less"] = "less";
-  JassRule2["greatorequal"] = "greatorequal";
-  JassRule2["great"] = "great";
-  JassRule2["add"] = "add";
-  JassRule2["sub"] = "sub";
-  JassRule2["mult"] = "mult";
-  JassRule2["div"] = "div";
-  JassRule2["lparen"] = "lparen";
-  JassRule2["rparen"] = "rparen";
-  JassRule2["lsquareparen"] = "lsquareparen";
-  JassRule2["rsquareparen"] = "rsquareparen";
-  JassRule2["real"] = "real";
-  JassRule2["integer"] = "integer";
-  JassRule2["linebreak"] = "linebreak";
-  JassRule2["idliteral"] = "idliteral";
-  JassRule2["stringliteral"] = "stringliteral";
-  JassRule2["identifier"] = "identifier";
-  return JassRule2;
-})(JassRule || {});
-var jass_rule_default = JassRule;
+// src/zinc/zinc-rule.ts
+var ZincRule = /* @__PURE__ */ ((ZincRule2) => {
+  ZincRule2["zinc"] = "zinc";
+  ZincRule2["root"] = "root";
+  ZincRule2["type_declare"] = "type_declare";
+  ZincRule2["globals_declare"] = "globals_declare";
+  ZincRule2["variable_declare"] = "variable_declare";
+  ZincRule2["native_declare"] = "native_declare";
+  ZincRule2["function_declare"] = "function_declare";
+  ZincRule2["function_locals"] = "function_locals";
+  ZincRule2["function_returns"] = "function_returns";
+  ZincRule2["function_args"] = "function_args";
+  ZincRule2["function_call"] = "function_call";
+  ZincRule2["return_statement"] = "return_statement";
+  ZincRule2["if_statement"] = "if_statement";
+  ZincRule2["else_statement"] = "else_statement";
+  ZincRule2["elseif_statement"] = "elseif_statement";
+  ZincRule2["addition"] = "addition";
+  ZincRule2["arrayaccess"] = "arrayaccess";
+  ZincRule2["call_statement"] = "call_statement";
+  ZincRule2["exitwhen_statement"] = "exitwhen_statement";
+  ZincRule2["expression"] = "expression";
+  ZincRule2["typedname"] = "typedname";
+  ZincRule2["loop_statement"] = "loop_statement";
+  ZincRule2["multiplication"] = "multiplication";
+  ZincRule2["primary"] = "primary";
+  ZincRule2["set_statement"] = "set_statement";
+  ZincRule2["statement"] = "statement";
+  ZincRule2["end"] = "end";
+  ZincRule2["whitespace"] = "whitespace";
+  ZincRule2["comment"] = "comment";
+  ZincRule2["and"] = "and";
+  ZincRule2["array"] = "array";
+  ZincRule2["call"] = "call";
+  ZincRule2["constant"] = "constant";
+  ZincRule2["debug"] = "debug";
+  ZincRule2["else"] = "else";
+  ZincRule2["elseif"] = "elseif";
+  ZincRule2["endfunction"] = "endfunction";
+  ZincRule2["endglobals"] = "endglobals";
+  ZincRule2["endif"] = "endif";
+  ZincRule2["endloop"] = "endloop";
+  ZincRule2["exitwhen"] = "exitwhen";
+  ZincRule2["extends"] = "extends";
+  ZincRule2["function"] = "function";
+  ZincRule2["globals"] = "globals";
+  ZincRule2["if"] = "if";
+  ZincRule2["local"] = "local";
+  ZincRule2["loop"] = "loop";
+  ZincRule2["native"] = "native";
+  ZincRule2["not"] = "not";
+  ZincRule2["nothing"] = "nothing";
+  ZincRule2["or"] = "or";
+  ZincRule2["returns"] = "returns";
+  ZincRule2["return"] = "return";
+  ZincRule2["set"] = "set";
+  ZincRule2["takes"] = "takes";
+  ZincRule2["then"] = "then";
+  ZincRule2["type"] = "type";
+  ZincRule2["comma"] = "comma";
+  ZincRule2["equals"] = "equals";
+  ZincRule2["assign"] = "assign";
+  ZincRule2["notequals"] = "notequals";
+  ZincRule2["lessorequal"] = "lessorequal";
+  ZincRule2["less"] = "less";
+  ZincRule2["greatorequal"] = "greatorequal";
+  ZincRule2["great"] = "great";
+  ZincRule2["add"] = "add";
+  ZincRule2["sub"] = "sub";
+  ZincRule2["mult"] = "mult";
+  ZincRule2["div"] = "div";
+  ZincRule2["lparen"] = "lparen";
+  ZincRule2["rparen"] = "rparen";
+  ZincRule2["lsquareparen"] = "lsquareparen";
+  ZincRule2["rsquareparen"] = "rsquareparen";
+  ZincRule2["real"] = "real";
+  ZincRule2["integer"] = "integer";
+  ZincRule2["linebreak"] = "linebreak";
+  ZincRule2["idliteral"] = "idliteral";
+  ZincRule2["stringliteral"] = "stringliteral";
+  ZincRule2["identifier"] = "identifier";
+  return ZincRule2;
+})(ZincRule || {});
+var zinc_rule_default = ZincRule;
 
 // src/utils/char-code.ts
 var CharCodeWhitespaceList = [
@@ -9337,7 +9337,7 @@ for (let i = 65 /* A */; i <= 90 /* Z */; i++)
 for (let i = 97 /* a */; i <= 122 /* z */; i++)
   CharCodeLetterList.push(i);
 
-// src/jass/jass-tokens.ts
+// src/zinc/zinc-tokens.ts
 var add = (config) => {
   return createToken(config);
 };
@@ -9352,180 +9352,180 @@ var keyword = (k) => {
 var numberColor = "#e760cc";
 var operatorColor = "#e7be60";
 var parenColor = "#e1d132";
-var JassTokens = {
-  [jass_rule_default.whitespace]: add({
-    name: jass_rule_default.whitespace,
+var ZincTokens = {
+  [zinc_rule_default.whitespace]: add({
+    name: zinc_rule_default.whitespace,
     pattern: /[^\S\r\n]+/,
     line_breaks: false,
     start_chars_hint: CharCodeWhitespaceList,
     group: Lexer.SKIPPED
   }),
-  [jass_rule_default.comment]: add({
-    name: jass_rule_default.comment,
+  [zinc_rule_default.comment]: add({
+    name: zinc_rule_default.comment,
     pattern: /\/\/[^\r\n]*/,
     line_breaks: false,
     start_chars_hint: [47 /* Slash */],
     color: "#308030"
   }),
-  [jass_rule_default.linebreak]: add({
-    name: jass_rule_default.linebreak,
+  [zinc_rule_default.linebreak]: add({
+    name: zinc_rule_default.linebreak,
     pattern: /\n|\r\n?/,
     label: "\\n",
     start_chars_hint: CharCodeBreakList,
     line_breaks: true
   }),
   // keyword
-  [jass_rule_default.and]: keyword(jass_rule_default.and),
-  [jass_rule_default.array]: keyword(jass_rule_default.array),
-  [jass_rule_default.call]: keyword(jass_rule_default.call),
-  [jass_rule_default.constant]: keyword(jass_rule_default.constant),
-  [jass_rule_default.debug]: keyword(jass_rule_default.debug),
-  [jass_rule_default.else]: keyword(jass_rule_default.else),
-  [jass_rule_default.elseif]: keyword(jass_rule_default.elseif),
-  [jass_rule_default.endfunction]: keyword(jass_rule_default.endfunction),
-  [jass_rule_default.endglobals]: keyword(jass_rule_default.endglobals),
-  [jass_rule_default.endif]: keyword(jass_rule_default.endif),
-  [jass_rule_default.endloop]: keyword(jass_rule_default.endloop),
-  [jass_rule_default.exitwhen]: keyword(jass_rule_default.exitwhen),
-  [jass_rule_default.extends]: keyword(jass_rule_default.extends),
-  [jass_rule_default.function]: keyword(jass_rule_default.function),
-  [jass_rule_default.globals]: keyword(jass_rule_default.globals),
-  [jass_rule_default.if]: keyword(jass_rule_default.if),
-  [jass_rule_default.local]: keyword(jass_rule_default.local),
-  [jass_rule_default.loop]: keyword(jass_rule_default.loop),
-  [jass_rule_default.native]: keyword(jass_rule_default.native),
-  [jass_rule_default.not]: keyword(jass_rule_default.not),
-  [jass_rule_default.nothing]: keyword(jass_rule_default.nothing),
-  [jass_rule_default.or]: keyword(jass_rule_default.or),
-  [jass_rule_default.returns]: keyword(jass_rule_default.returns),
-  [jass_rule_default.return]: keyword(jass_rule_default.return),
-  [jass_rule_default.set]: keyword(jass_rule_default.set),
-  [jass_rule_default.takes]: keyword(jass_rule_default.takes),
-  [jass_rule_default.then]: keyword(jass_rule_default.then),
-  [jass_rule_default.type]: keyword(jass_rule_default.type),
+  [zinc_rule_default.and]: keyword(zinc_rule_default.and),
+  [zinc_rule_default.array]: keyword(zinc_rule_default.array),
+  [zinc_rule_default.call]: keyword(zinc_rule_default.call),
+  [zinc_rule_default.constant]: keyword(zinc_rule_default.constant),
+  [zinc_rule_default.debug]: keyword(zinc_rule_default.debug),
+  [zinc_rule_default.else]: keyword(zinc_rule_default.else),
+  [zinc_rule_default.elseif]: keyword(zinc_rule_default.elseif),
+  [zinc_rule_default.endfunction]: keyword(zinc_rule_default.endfunction),
+  [zinc_rule_default.endglobals]: keyword(zinc_rule_default.endglobals),
+  [zinc_rule_default.endif]: keyword(zinc_rule_default.endif),
+  [zinc_rule_default.endloop]: keyword(zinc_rule_default.endloop),
+  [zinc_rule_default.exitwhen]: keyword(zinc_rule_default.exitwhen),
+  [zinc_rule_default.extends]: keyword(zinc_rule_default.extends),
+  [zinc_rule_default.function]: keyword(zinc_rule_default.function),
+  [zinc_rule_default.globals]: keyword(zinc_rule_default.globals),
+  [zinc_rule_default.if]: keyword(zinc_rule_default.if),
+  [zinc_rule_default.local]: keyword(zinc_rule_default.local),
+  [zinc_rule_default.loop]: keyword(zinc_rule_default.loop),
+  [zinc_rule_default.native]: keyword(zinc_rule_default.native),
+  [zinc_rule_default.not]: keyword(zinc_rule_default.not),
+  [zinc_rule_default.nothing]: keyword(zinc_rule_default.nothing),
+  [zinc_rule_default.or]: keyword(zinc_rule_default.or),
+  [zinc_rule_default.returns]: keyword(zinc_rule_default.returns),
+  [zinc_rule_default.return]: keyword(zinc_rule_default.return),
+  [zinc_rule_default.set]: keyword(zinc_rule_default.set),
+  [zinc_rule_default.takes]: keyword(zinc_rule_default.takes),
+  [zinc_rule_default.then]: keyword(zinc_rule_default.then),
+  [zinc_rule_default.type]: keyword(zinc_rule_default.type),
   // operator
-  [jass_rule_default.comma]: add({
-    name: jass_rule_default.comma,
+  [zinc_rule_default.comma]: add({
+    name: zinc_rule_default.comma,
     pattern: /,/,
     start_chars_hint: [44 /* Comma */],
     label: ",",
     line_breaks: false,
     color: "#FFFFFF"
   }),
-  [jass_rule_default.equals]: add({
-    name: jass_rule_default.equals,
+  [zinc_rule_default.equals]: add({
+    name: zinc_rule_default.equals,
     pattern: /==/,
     start_chars_hint: [61 /* Equal */],
     line_breaks: false,
     label: "==",
     color: operatorColor
   }),
-  [jass_rule_default.assign]: add({
-    name: jass_rule_default.assign,
+  [zinc_rule_default.assign]: add({
+    name: zinc_rule_default.assign,
     pattern: /=/,
     start_chars_hint: [61 /* Equal */],
     line_breaks: false,
     label: "=",
     color: operatorColor
   }),
-  [jass_rule_default.notequals]: add({
-    name: jass_rule_default.notequals,
+  [zinc_rule_default.notequals]: add({
+    name: zinc_rule_default.notequals,
     pattern: /!=/,
     start_chars_hint: [33 /* Exclamation */],
     line_breaks: false,
     label: "!=",
     color: operatorColor
   }),
-  [jass_rule_default.lessorequal]: add({
-    name: jass_rule_default.lessorequal,
+  [zinc_rule_default.lessorequal]: add({
+    name: zinc_rule_default.lessorequal,
     pattern: /<=/,
     start_chars_hint: [60 /* Less */],
     line_breaks: false,
     label: "<=",
     color: operatorColor
   }),
-  [jass_rule_default.less]: add({
-    name: jass_rule_default.less,
+  [zinc_rule_default.less]: add({
+    name: zinc_rule_default.less,
     pattern: /</,
     start_chars_hint: [60 /* Less */],
     line_breaks: false,
     label: "<",
     color: operatorColor
   }),
-  [jass_rule_default.greatorequal]: add({
-    name: jass_rule_default.greatorequal,
+  [zinc_rule_default.greatorequal]: add({
+    name: zinc_rule_default.greatorequal,
     pattern: />=/,
     start_chars_hint: [62 /* Greater */],
     line_breaks: false,
     label: ">=",
     color: operatorColor
   }),
-  [jass_rule_default.great]: add({
-    name: jass_rule_default.great,
+  [zinc_rule_default.great]: add({
+    name: zinc_rule_default.great,
     pattern: />/,
     start_chars_hint: [62 /* Greater */],
     line_breaks: false,
     label: ">",
     color: operatorColor
   }),
-  [jass_rule_default.add]: add({
-    name: jass_rule_default.add,
+  [zinc_rule_default.add]: add({
+    name: zinc_rule_default.add,
     pattern: /\+/,
     start_chars_hint: [43 /* Plus */],
     line_breaks: false,
     label: "+",
     color: operatorColor
   }),
-  [jass_rule_default.sub]: add({
-    name: jass_rule_default.sub,
+  [zinc_rule_default.sub]: add({
+    name: zinc_rule_default.sub,
     pattern: /-/,
     start_chars_hint: [45 /* Minus */],
     line_breaks: false,
     label: "-",
     color: operatorColor
   }),
-  [jass_rule_default.mult]: add({
-    name: jass_rule_default.mult,
+  [zinc_rule_default.mult]: add({
+    name: zinc_rule_default.mult,
     pattern: /\*/,
     start_chars_hint: [42 /* Asterisk */],
     line_breaks: false,
     label: "*",
     color: operatorColor
   }),
-  [jass_rule_default.div]: add({
-    name: jass_rule_default.div,
+  [zinc_rule_default.div]: add({
+    name: zinc_rule_default.div,
     pattern: /\//,
     start_chars_hint: [47 /* Slash */],
     line_breaks: false,
     label: "/",
     color: operatorColor
   }),
-  [jass_rule_default.lparen]: add({
-    name: jass_rule_default.lparen,
+  [zinc_rule_default.lparen]: add({
+    name: zinc_rule_default.lparen,
     pattern: /\(/,
     start_chars_hint: [40 /* LeftParenthesis */],
     line_breaks: false,
     label: "(",
     color: parenColor
   }),
-  [jass_rule_default.rparen]: add({
-    name: jass_rule_default.rparen,
+  [zinc_rule_default.rparen]: add({
+    name: zinc_rule_default.rparen,
     pattern: /\)/,
     start_chars_hint: [41 /* RightParenthesis */],
     line_breaks: false,
     label: ")",
     color: parenColor
   }),
-  [jass_rule_default.lsquareparen]: add({
-    name: jass_rule_default.lsquareparen,
+  [zinc_rule_default.lsquareparen]: add({
+    name: zinc_rule_default.lsquareparen,
     pattern: /\[/,
     start_chars_hint: [91 /* LeftSquareBracket */],
     line_breaks: false,
     label: "[",
     color: parenColor
   }),
-  [jass_rule_default.rsquareparen]: add({
-    name: jass_rule_default.rsquareparen,
+  [zinc_rule_default.rsquareparen]: add({
+    name: zinc_rule_default.rsquareparen,
     pattern: /]/,
     start_chars_hint: [93 /* RightSquareBracket */],
     line_breaks: false,
@@ -9533,340 +9533,340 @@ var JassTokens = {
     color: parenColor
   }),
   //
-  [jass_rule_default.idliteral]: add({
-    name: jass_rule_default.idliteral,
+  [zinc_rule_default.idliteral]: add({
+    name: zinc_rule_default.idliteral,
     pattern: /'[^']*'/,
     line_breaks: true,
     start_chars_hint: [39 /* Apostrophe */],
     color: numberColor
   }),
-  [jass_rule_default.stringliteral]: add({
-    name: jass_rule_default.stringliteral,
+  [zinc_rule_default.stringliteral]: add({
+    name: zinc_rule_default.stringliteral,
     pattern: /"[^"\\]*(?:\\.[^"\\]*)*"/,
     start_chars_hint: [34 /* Quotation */],
     line_breaks: true,
     color: "#CE9178"
   }),
-  [jass_rule_default.real]: add({
-    name: jass_rule_default.real,
+  [zinc_rule_default.real]: add({
+    name: zinc_rule_default.real,
     pattern: /\d+\.\d*|\.\d+/,
     line_breaks: false,
     start_chars_hint: [46 /* Dot */, ...CharCodeDigitList],
     color: numberColor
   }),
-  [jass_rule_default.integer]: add({
-    name: jass_rule_default.integer,
+  [zinc_rule_default.integer]: add({
+    name: zinc_rule_default.integer,
     pattern: /\b0x[0-9a-z]+|\$[0-9a-z]+|\d+\b/i,
     start_chars_hint: [36 /* Dollar */, ...CharCodeDigitList],
     line_breaks: false,
     color: numberColor
   }),
-  [jass_rule_default.identifier]: add({
-    name: jass_rule_default.identifier,
+  [zinc_rule_default.identifier]: add({
+    name: zinc_rule_default.identifier,
     pattern: /\b[a-zA-Z][a-zA-Z0-9_]*\b/,
     line_breaks: false,
     start_chars_hint: CharCodeLetterList
   })
 };
-var jass_tokens_default = JassTokens;
+var zinc_tokens_default = ZincTokens;
 
-// src/jass/jass-tokens-list.ts
-var jass_tokens_list_default = Object.values(jass_tokens_default);
+// src/zinc/zinc-tokens-list.ts
+var zinc_tokens_list_default = Object.values(zinc_tokens_default);
 
-// src/jass/jass-parser.ts
-var JassParser = class extends CstParser {
+// src/zinc/zinc-parser.ts
+var ZincParser = class extends CstParser {
   constructor(config) {
-    super(jass_tokens_list_default, config);
+    super(zinc_tokens_list_default, config);
     const $ = this;
-    $.RULE(jass_rule_default.jass, () => $.MANY(() => $.SUBRULE($[jass_rule_default.root])));
-    $.RULE(jass_rule_default.root, () => {
+    $.RULE(zinc_rule_default.zinc, () => $.MANY(() => $.SUBRULE($[zinc_rule_default.root])));
+    $.RULE(zinc_rule_default.root, () => {
       $.OR([
-        { ALT: () => $.SUBRULE($[jass_rule_default.type_declare]) },
-        { ALT: () => $.SUBRULE($[jass_rule_default.native_declare]) },
-        { ALT: () => $.SUBRULE($[jass_rule_default.function_declare]) },
-        { ALT: () => $.SUBRULE($[jass_rule_default.globals_declare]) },
-        { ALT: () => $.CONSUME(jass_tokens_default[jass_rule_default.linebreak]) },
-        { ALT: () => $.CONSUME(jass_tokens_default[jass_rule_default.comment]) }
+        { ALT: () => $.SUBRULE($[zinc_rule_default.type_declare]) },
+        { ALT: () => $.SUBRULE($[zinc_rule_default.native_declare]) },
+        { ALT: () => $.SUBRULE($[zinc_rule_default.function_declare]) },
+        { ALT: () => $.SUBRULE($[zinc_rule_default.globals_declare]) },
+        { ALT: () => $.CONSUME(zinc_tokens_default[zinc_rule_default.linebreak]) },
+        { ALT: () => $.CONSUME(zinc_tokens_default[zinc_rule_default.comment]) }
       ]);
     });
-    $.RULE(jass_rule_default.type_declare, () => {
-      $.CONSUME(jass_tokens_default[jass_rule_default.type]);
-      $.CONSUME(jass_tokens_default[jass_rule_default.identifier]);
-      $.CONSUME(jass_tokens_default[jass_rule_default.extends]);
-      $.CONSUME2(jass_tokens_default[jass_rule_default.identifier]);
-      $.SUBRULE($[jass_rule_default.end]);
+    $.RULE(zinc_rule_default.type_declare, () => {
+      $.CONSUME(zinc_tokens_default[zinc_rule_default.type]);
+      $.CONSUME(zinc_tokens_default[zinc_rule_default.identifier]);
+      $.CONSUME(zinc_tokens_default[zinc_rule_default.extends]);
+      $.CONSUME2(zinc_tokens_default[zinc_rule_default.identifier]);
+      $.SUBRULE($[zinc_rule_default.end]);
     });
-    $.RULE(jass_rule_default.native_declare, () => {
-      $.OPTION(() => $.CONSUME(jass_tokens_default[jass_rule_default.constant]));
-      $.CONSUME(jass_tokens_default[jass_rule_default.native]);
-      $.CONSUME2(jass_tokens_default[jass_rule_default.identifier]);
-      $.CONSUME3(jass_tokens_default[jass_rule_default.takes]);
-      $.SUBRULE($[jass_rule_default.function_args]);
-      $.CONSUME4(jass_tokens_default[jass_rule_default.returns]);
-      $.SUBRULE($[jass_rule_default.function_returns]);
-      $.SUBRULE($[jass_rule_default.end]);
+    $.RULE(zinc_rule_default.native_declare, () => {
+      $.OPTION(() => $.CONSUME(zinc_tokens_default[zinc_rule_default.constant]));
+      $.CONSUME(zinc_tokens_default[zinc_rule_default.native]);
+      $.CONSUME2(zinc_tokens_default[zinc_rule_default.identifier]);
+      $.CONSUME3(zinc_tokens_default[zinc_rule_default.takes]);
+      $.SUBRULE($[zinc_rule_default.function_args]);
+      $.CONSUME4(zinc_tokens_default[zinc_rule_default.returns]);
+      $.SUBRULE($[zinc_rule_default.function_returns]);
+      $.SUBRULE($[zinc_rule_default.end]);
     });
-    $.RULE(jass_rule_default.function_declare, () => {
-      $.OPTION(() => $.CONSUME(jass_tokens_default[jass_rule_default.constant]));
-      $.CONSUME(jass_tokens_default[jass_rule_default.function]);
-      $.CONSUME2(jass_tokens_default[jass_rule_default.identifier]);
-      $.CONSUME3(jass_tokens_default[jass_rule_default.takes]);
-      $.SUBRULE($[jass_rule_default.function_args]);
-      $.CONSUME4(jass_tokens_default[jass_rule_default.returns]);
-      $.SUBRULE($[jass_rule_default.function_returns]);
-      $.SUBRULE($[jass_rule_default.end]);
-      $.MANY1(() => $.SUBRULE($[jass_rule_default.function_locals]));
-      $.MANY2(() => $.SUBRULE($[jass_rule_default.statement]));
-      $.CONSUME(jass_tokens_default[jass_rule_default.endfunction]);
-      $.SUBRULE2($[jass_rule_default.end]);
+    $.RULE(zinc_rule_default.function_declare, () => {
+      $.OPTION(() => $.CONSUME(zinc_tokens_default[zinc_rule_default.constant]));
+      $.CONSUME(zinc_tokens_default[zinc_rule_default.function]);
+      $.CONSUME2(zinc_tokens_default[zinc_rule_default.identifier]);
+      $.CONSUME3(zinc_tokens_default[zinc_rule_default.takes]);
+      $.SUBRULE($[zinc_rule_default.function_args]);
+      $.CONSUME4(zinc_tokens_default[zinc_rule_default.returns]);
+      $.SUBRULE($[zinc_rule_default.function_returns]);
+      $.SUBRULE($[zinc_rule_default.end]);
+      $.MANY1(() => $.SUBRULE($[zinc_rule_default.function_locals]));
+      $.MANY2(() => $.SUBRULE($[zinc_rule_default.statement]));
+      $.CONSUME(zinc_tokens_default[zinc_rule_default.endfunction]);
+      $.SUBRULE2($[zinc_rule_default.end]);
     });
-    $.RULE(jass_rule_default.variable_declare, () => {
+    $.RULE(zinc_rule_default.variable_declare, () => {
       $.OPTION(() => $.OR([
-        { ALT: () => $.CONSUME(jass_tokens_default[jass_rule_default.constant]) },
-        { ALT: () => $.CONSUME(jass_tokens_default[jass_rule_default.local]) }
+        { ALT: () => $.CONSUME(zinc_tokens_default[zinc_rule_default.constant]) },
+        { ALT: () => $.CONSUME(zinc_tokens_default[zinc_rule_default.local]) }
       ]));
-      $.SUBRULE($[jass_rule_default.typedname]);
+      $.SUBRULE($[zinc_rule_default.typedname]);
       $.OPTION2(() => {
-        $.CONSUME(jass_tokens_default[jass_rule_default.assign]);
-        $.SUBRULE($[jass_rule_default.expression]);
+        $.CONSUME(zinc_tokens_default[zinc_rule_default.assign]);
+        $.SUBRULE($[zinc_rule_default.expression]);
       });
-      $.SUBRULE($[jass_rule_default.end]);
+      $.SUBRULE($[zinc_rule_default.end]);
     });
-    $.RULE(jass_rule_default.globals_declare, () => {
-      $.CONSUME(jass_tokens_default[jass_rule_default.globals]);
-      $.SUBRULE($[jass_rule_default.end]);
+    $.RULE(zinc_rule_default.globals_declare, () => {
+      $.CONSUME(zinc_tokens_default[zinc_rule_default.globals]);
+      $.SUBRULE($[zinc_rule_default.end]);
       $.MANY(() => $.OR([
-        { ALT: () => $.SUBRULE($[jass_rule_default.variable_declare]) },
-        { ALT: () => $.CONSUME(jass_tokens_default[jass_rule_default.linebreak]) },
-        { ALT: () => $.CONSUME(jass_tokens_default[jass_rule_default.comment]) }
+        { ALT: () => $.SUBRULE($[zinc_rule_default.variable_declare]) },
+        { ALT: () => $.CONSUME(zinc_tokens_default[zinc_rule_default.linebreak]) },
+        { ALT: () => $.CONSUME(zinc_tokens_default[zinc_rule_default.comment]) }
       ]));
-      $.CONSUME3(jass_tokens_default[jass_rule_default.endglobals]);
-      $.SUBRULE2($[jass_rule_default.end]);
+      $.CONSUME3(zinc_tokens_default[zinc_rule_default.endglobals]);
+      $.SUBRULE2($[zinc_rule_default.end]);
     });
-    $.RULE(jass_rule_default.if_statement, () => {
-      $.CONSUME(jass_tokens_default[jass_rule_default.if]);
-      $.SUBRULE($[jass_rule_default.expression]);
-      $.CONSUME(jass_tokens_default[jass_rule_default.then]);
-      $.SUBRULE($[jass_rule_default.end]);
-      $.MANY(() => $.SUBRULE($[jass_rule_default.statement]));
-      $.MANY2(() => $.SUBRULE($[jass_rule_default.elseif_statement]));
-      $.OPTION(() => $.SUBRULE($[jass_rule_default.else_statement]));
-      $.CONSUME(jass_tokens_default[jass_rule_default.endif]);
-      $.SUBRULE2($[jass_rule_default.end]);
+    $.RULE(zinc_rule_default.if_statement, () => {
+      $.CONSUME(zinc_tokens_default[zinc_rule_default.if]);
+      $.SUBRULE($[zinc_rule_default.expression]);
+      $.CONSUME(zinc_tokens_default[zinc_rule_default.then]);
+      $.SUBRULE($[zinc_rule_default.end]);
+      $.MANY(() => $.SUBRULE($[zinc_rule_default.statement]));
+      $.MANY2(() => $.SUBRULE($[zinc_rule_default.elseif_statement]));
+      $.OPTION(() => $.SUBRULE($[zinc_rule_default.else_statement]));
+      $.CONSUME(zinc_tokens_default[zinc_rule_default.endif]);
+      $.SUBRULE2($[zinc_rule_default.end]);
     });
-    $.RULE(jass_rule_default.elseif_statement, () => {
-      $.CONSUME(jass_tokens_default[jass_rule_default.elseif]);
-      $.SUBRULE($[jass_rule_default.expression]);
-      $.CONSUME(jass_tokens_default[jass_rule_default.then]);
-      $.SUBRULE($[jass_rule_default.end]);
-      $.MANY(() => $.SUBRULE($[jass_rule_default.statement]));
+    $.RULE(zinc_rule_default.elseif_statement, () => {
+      $.CONSUME(zinc_tokens_default[zinc_rule_default.elseif]);
+      $.SUBRULE($[zinc_rule_default.expression]);
+      $.CONSUME(zinc_tokens_default[zinc_rule_default.then]);
+      $.SUBRULE($[zinc_rule_default.end]);
+      $.MANY(() => $.SUBRULE($[zinc_rule_default.statement]));
     });
-    $.RULE(jass_rule_default.else_statement, () => {
-      $.CONSUME(jass_tokens_default[jass_rule_default.else]);
-      $.SUBRULE($[jass_rule_default.end]);
-      $.MANY(() => $.SUBRULE($[jass_rule_default.statement]));
+    $.RULE(zinc_rule_default.else_statement, () => {
+      $.CONSUME(zinc_tokens_default[zinc_rule_default.else]);
+      $.SUBRULE($[zinc_rule_default.end]);
+      $.MANY(() => $.SUBRULE($[zinc_rule_default.statement]));
     });
-    $.RULE(jass_rule_default.call_statement, () => {
-      $.OPTION(() => $.CONSUME(jass_tokens_default[jass_rule_default.debug]));
-      $.CONSUME(jass_tokens_default[jass_rule_default.call]);
-      $.SUBRULE($[jass_rule_default.function_call]);
-      $.SUBRULE($[jass_rule_default.end]);
+    $.RULE(zinc_rule_default.call_statement, () => {
+      $.OPTION(() => $.CONSUME(zinc_tokens_default[zinc_rule_default.debug]));
+      $.CONSUME(zinc_tokens_default[zinc_rule_default.call]);
+      $.SUBRULE($[zinc_rule_default.function_call]);
+      $.SUBRULE($[zinc_rule_default.end]);
     });
-    $.RULE(jass_rule_default.return_statement, () => {
-      $.CONSUME(jass_tokens_default[jass_rule_default.return]);
-      $.OPTION(() => $.SUBRULE($[jass_rule_default.expression]));
-      $.SUBRULE($[jass_rule_default.end]);
+    $.RULE(zinc_rule_default.return_statement, () => {
+      $.CONSUME(zinc_tokens_default[zinc_rule_default.return]);
+      $.OPTION(() => $.SUBRULE($[zinc_rule_default.expression]));
+      $.SUBRULE($[zinc_rule_default.end]);
     });
-    $.RULE(jass_rule_default.set_statement, () => {
-      $.CONSUME(jass_tokens_default[jass_rule_default.set]);
-      $.CONSUME(jass_tokens_default[jass_rule_default.identifier]);
-      $.OPTION(() => $.SUBRULE($[jass_rule_default.arrayaccess]));
-      $.CONSUME(jass_tokens_default[jass_rule_default.assign]);
-      $.SUBRULE($[jass_rule_default.expression]);
-      $.SUBRULE($[jass_rule_default.end]);
+    $.RULE(zinc_rule_default.set_statement, () => {
+      $.CONSUME(zinc_tokens_default[zinc_rule_default.set]);
+      $.CONSUME(zinc_tokens_default[zinc_rule_default.identifier]);
+      $.OPTION(() => $.SUBRULE($[zinc_rule_default.arrayaccess]));
+      $.CONSUME(zinc_tokens_default[zinc_rule_default.assign]);
+      $.SUBRULE($[zinc_rule_default.expression]);
+      $.SUBRULE($[zinc_rule_default.end]);
     });
-    $.RULE(jass_rule_default.loop_statement, () => {
-      $.CONSUME(jass_tokens_default[jass_rule_default.loop]);
-      $.SUBRULE($[jass_rule_default.end]);
-      $.MANY(() => $.SUBRULE($[jass_rule_default.statement]));
-      $.CONSUME(jass_tokens_default[jass_rule_default.endloop]);
-      $.SUBRULE2($[jass_rule_default.end]);
+    $.RULE(zinc_rule_default.loop_statement, () => {
+      $.CONSUME(zinc_tokens_default[zinc_rule_default.loop]);
+      $.SUBRULE($[zinc_rule_default.end]);
+      $.MANY(() => $.SUBRULE($[zinc_rule_default.statement]));
+      $.CONSUME(zinc_tokens_default[zinc_rule_default.endloop]);
+      $.SUBRULE2($[zinc_rule_default.end]);
     });
-    $.RULE(jass_rule_default.exitwhen_statement, () => {
-      $.CONSUME(jass_tokens_default[jass_rule_default.exitwhen]);
-      $.SUBRULE($[jass_rule_default.expression]);
-      $.SUBRULE($[jass_rule_default.end]);
+    $.RULE(zinc_rule_default.exitwhen_statement, () => {
+      $.CONSUME(zinc_tokens_default[zinc_rule_default.exitwhen]);
+      $.SUBRULE($[zinc_rule_default.expression]);
+      $.SUBRULE($[zinc_rule_default.end]);
     });
-    $.RULE(jass_rule_default.function_args, () => {
+    $.RULE(zinc_rule_default.function_args, () => {
       $.OR([
-        { ALT: () => $.CONSUME(jass_tokens_default[jass_rule_default.nothing]) },
+        { ALT: () => $.CONSUME(zinc_tokens_default[zinc_rule_default.nothing]) },
         {
           ALT: () => {
             $.AT_LEAST_ONE_SEP({
-              SEP: jass_tokens_default[jass_rule_default.comma],
-              DEF: () => $.SUBRULE($[jass_rule_default.typedname])
+              SEP: zinc_tokens_default[zinc_rule_default.comma],
+              DEF: () => $.SUBRULE($[zinc_rule_default.typedname])
             });
           }
         }
       ]);
     });
-    $.RULE(jass_rule_default.typedname, () => {
-      $.CONSUME(jass_tokens_default[jass_rule_default.identifier]);
-      $.OPTION2(() => $.CONSUME(jass_tokens_default[jass_rule_default.array]));
-      $.CONSUME2(jass_tokens_default[jass_rule_default.identifier]);
+    $.RULE(zinc_rule_default.typedname, () => {
+      $.CONSUME(zinc_tokens_default[zinc_rule_default.identifier]);
+      $.OPTION2(() => $.CONSUME(zinc_tokens_default[zinc_rule_default.array]));
+      $.CONSUME2(zinc_tokens_default[zinc_rule_default.identifier]);
     });
-    $.RULE(jass_rule_default.function_returns, () => {
+    $.RULE(zinc_rule_default.function_returns, () => {
       $.OR([
-        { ALT: () => $.CONSUME(jass_tokens_default[jass_rule_default.nothing]) },
-        { ALT: () => $.CONSUME(jass_tokens_default[jass_rule_default.identifier]) }
+        { ALT: () => $.CONSUME(zinc_tokens_default[zinc_rule_default.nothing]) },
+        { ALT: () => $.CONSUME(zinc_tokens_default[zinc_rule_default.identifier]) }
       ]);
     });
-    $.RULE(jass_rule_default.function_locals, () => {
+    $.RULE(zinc_rule_default.function_locals, () => {
       $.OR([
-        { ALT: () => $.CONSUME(jass_tokens_default[jass_rule_default.comment]) },
-        { ALT: () => $.CONSUME(jass_tokens_default[jass_rule_default.linebreak]) },
-        { ALT: () => $.SUBRULE($[jass_rule_default.variable_declare]) }
+        { ALT: () => $.CONSUME(zinc_tokens_default[zinc_rule_default.comment]) },
+        { ALT: () => $.CONSUME(zinc_tokens_default[zinc_rule_default.linebreak]) },
+        { ALT: () => $.SUBRULE($[zinc_rule_default.variable_declare]) }
       ]);
     });
-    $.RULE(jass_rule_default.expression, () => {
+    $.RULE(zinc_rule_default.expression, () => {
       $.OR([
         {
           ALT: () => {
-            $.SUBRULE($[jass_rule_default.addition]);
+            $.SUBRULE($[zinc_rule_default.addition]);
             $.MANY(() => {
               $.OR2([
-                { ALT: () => $.CONSUME(jass_tokens_default[jass_rule_default.and]) },
-                { ALT: () => $.CONSUME(jass_tokens_default[jass_rule_default.or]) },
-                { ALT: () => $.CONSUME(jass_tokens_default[jass_rule_default.equals]) },
-                { ALT: () => $.CONSUME(jass_tokens_default[jass_rule_default.notequals]) },
-                { ALT: () => $.CONSUME(jass_tokens_default[jass_rule_default.less]) },
-                { ALT: () => $.CONSUME(jass_tokens_default[jass_rule_default.lessorequal]) },
-                { ALT: () => $.CONSUME(jass_tokens_default[jass_rule_default.great]) },
-                { ALT: () => $.CONSUME(jass_tokens_default[jass_rule_default.greatorequal]) }
+                { ALT: () => $.CONSUME(zinc_tokens_default[zinc_rule_default.and]) },
+                { ALT: () => $.CONSUME(zinc_tokens_default[zinc_rule_default.or]) },
+                { ALT: () => $.CONSUME(zinc_tokens_default[zinc_rule_default.equals]) },
+                { ALT: () => $.CONSUME(zinc_tokens_default[zinc_rule_default.notequals]) },
+                { ALT: () => $.CONSUME(zinc_tokens_default[zinc_rule_default.less]) },
+                { ALT: () => $.CONSUME(zinc_tokens_default[zinc_rule_default.lessorequal]) },
+                { ALT: () => $.CONSUME(zinc_tokens_default[zinc_rule_default.great]) },
+                { ALT: () => $.CONSUME(zinc_tokens_default[zinc_rule_default.greatorequal]) }
               ]);
-              $.SUBRULE2($[jass_rule_default.addition]);
+              $.SUBRULE2($[zinc_rule_default.addition]);
             });
           }
         }
       ]);
     });
-    $.RULE(jass_rule_default.addition, () => {
+    $.RULE(zinc_rule_default.addition, () => {
       $.OR([
         {
           ALT: () => {
-            $.SUBRULE($[jass_rule_default.multiplication]);
+            $.SUBRULE($[zinc_rule_default.multiplication]);
             $.MANY(() => {
               $.OR2([
-                { ALT: () => $.CONSUME2(jass_tokens_default[jass_rule_default.add]) },
-                { ALT: () => $.CONSUME3(jass_tokens_default[jass_rule_default.sub]) }
+                { ALT: () => $.CONSUME2(zinc_tokens_default[zinc_rule_default.add]) },
+                { ALT: () => $.CONSUME3(zinc_tokens_default[zinc_rule_default.sub]) }
               ]);
-              $.SUBRULE2($[jass_rule_default.multiplication]);
+              $.SUBRULE2($[zinc_rule_default.multiplication]);
             });
           }
         }
       ]);
     });
-    $.RULE(jass_rule_default.multiplication, () => {
+    $.RULE(zinc_rule_default.multiplication, () => {
       $.OR([
         {
           ALT: () => {
-            $.SUBRULE($[jass_rule_default.primary]);
+            $.SUBRULE($[zinc_rule_default.primary]);
             $.MANY(() => {
               $.OR2([
-                { ALT: () => $.CONSUME2(jass_tokens_default[jass_rule_default.mult]) },
-                { ALT: () => $.CONSUME3(jass_tokens_default[jass_rule_default.div]) }
+                { ALT: () => $.CONSUME2(zinc_tokens_default[zinc_rule_default.mult]) },
+                { ALT: () => $.CONSUME3(zinc_tokens_default[zinc_rule_default.div]) }
               ]);
-              $.SUBRULE2($[jass_rule_default.primary]);
+              $.SUBRULE2($[zinc_rule_default.primary]);
             });
           }
         }
       ]);
     });
-    $.RULE(jass_rule_default.primary, () => {
+    $.RULE(zinc_rule_default.primary, () => {
       $.OR([
         {
           ALT: () => {
-            $.OPTION(() => $.CONSUME(jass_tokens_default[jass_rule_default.sub]));
-            $.CONSUME(jass_tokens_default[jass_rule_default.integer]);
+            $.OPTION(() => $.CONSUME(zinc_tokens_default[zinc_rule_default.sub]));
+            $.CONSUME(zinc_tokens_default[zinc_rule_default.integer]);
           }
         },
         {
           ALT: () => {
-            $.CONSUME(jass_tokens_default[jass_rule_default.not]);
-            $.SUBRULE($[jass_rule_default.primary]);
+            $.CONSUME(zinc_tokens_default[zinc_rule_default.not]);
+            $.SUBRULE($[zinc_rule_default.primary]);
           }
         },
         {
           ALT: () => {
-            $.OPTION5(() => $.CONSUME3(jass_tokens_default[jass_rule_default.sub]));
-            $.SUBRULE($[jass_rule_default.function_call]);
+            $.OPTION5(() => $.CONSUME3(zinc_tokens_default[zinc_rule_default.sub]));
+            $.SUBRULE($[zinc_rule_default.function_call]);
           }
         },
         {
           ALT: () => {
-            $.OPTION6(() => $.CONSUME6(jass_tokens_default[jass_rule_default.sub]));
-            $.CONSUME(jass_tokens_default[jass_rule_default.lparen]);
-            $.SUBRULE2($[jass_rule_default.expression]);
-            $.CONSUME(jass_tokens_default[jass_rule_default.rparen]);
+            $.OPTION6(() => $.CONSUME6(zinc_tokens_default[zinc_rule_default.sub]));
+            $.CONSUME(zinc_tokens_default[zinc_rule_default.lparen]);
+            $.SUBRULE2($[zinc_rule_default.expression]);
+            $.CONSUME(zinc_tokens_default[zinc_rule_default.rparen]);
           }
         },
         {
           ALT: () => {
-            $.OPTION3(() => $.CONSUME5(jass_tokens_default[jass_rule_default.sub]));
-            $.CONSUME3(jass_tokens_default[jass_rule_default.identifier]);
-            $.OPTION4(() => $.SUBRULE($[jass_rule_default.arrayaccess]));
+            $.OPTION3(() => $.CONSUME5(zinc_tokens_default[zinc_rule_default.sub]));
+            $.CONSUME3(zinc_tokens_default[zinc_rule_default.identifier]);
+            $.OPTION4(() => $.SUBRULE($[zinc_rule_default.arrayaccess]));
           }
         },
         {
           ALT: () => {
-            $.CONSUME(jass_tokens_default[jass_rule_default.function]);
-            $.CONSUME4(jass_tokens_default[jass_rule_default.identifier]);
+            $.CONSUME(zinc_tokens_default[zinc_rule_default.function]);
+            $.CONSUME4(zinc_tokens_default[zinc_rule_default.identifier]);
           }
         },
         {
           ALT: () => {
-            $.OPTION2(() => $.CONSUME2(jass_tokens_default[jass_rule_default.sub]));
-            $.CONSUME3(jass_tokens_default[jass_rule_default.real]);
+            $.OPTION2(() => $.CONSUME2(zinc_tokens_default[zinc_rule_default.sub]));
+            $.CONSUME3(zinc_tokens_default[zinc_rule_default.real]);
           }
         },
         {
-          ALT: () => $.CONSUME3(jass_tokens_default[jass_rule_default.idliteral])
+          ALT: () => $.CONSUME3(zinc_tokens_default[zinc_rule_default.idliteral])
         },
         {
-          ALT: () => $.CONSUME3(jass_tokens_default[jass_rule_default.stringliteral])
+          ALT: () => $.CONSUME3(zinc_tokens_default[zinc_rule_default.stringliteral])
         }
       ]);
     });
-    $.RULE(jass_rule_default.arrayaccess, () => {
-      $.CONSUME(jass_tokens_default[jass_rule_default.lsquareparen]);
-      $.SUBRULE3($[jass_rule_default.expression]);
-      $.CONSUME(jass_tokens_default[jass_rule_default.rsquareparen]);
+    $.RULE(zinc_rule_default.arrayaccess, () => {
+      $.CONSUME(zinc_tokens_default[zinc_rule_default.lsquareparen]);
+      $.SUBRULE3($[zinc_rule_default.expression]);
+      $.CONSUME(zinc_tokens_default[zinc_rule_default.rsquareparen]);
     });
-    $.RULE(jass_rule_default.function_call, () => {
-      $.CONSUME(jass_tokens_default[jass_rule_default.identifier]);
-      $.CONSUME2(jass_tokens_default[jass_rule_default.lparen]);
+    $.RULE(zinc_rule_default.function_call, () => {
+      $.CONSUME(zinc_tokens_default[zinc_rule_default.identifier]);
+      $.CONSUME2(zinc_tokens_default[zinc_rule_default.lparen]);
       $.MANY_SEP({
-        SEP: jass_tokens_default[jass_rule_default.comma],
-        DEF: () => $.SUBRULE($[jass_rule_default.expression])
+        SEP: zinc_tokens_default[zinc_rule_default.comma],
+        DEF: () => $.SUBRULE($[zinc_rule_default.expression])
       });
-      $.CONSUME3(jass_tokens_default[jass_rule_default.rparen]);
+      $.CONSUME3(zinc_tokens_default[zinc_rule_default.rparen]);
     });
-    $.RULE(jass_rule_default.statement, () => {
+    $.RULE(zinc_rule_default.statement, () => {
       $.OR4([
-        { ALT: () => $.SUBRULE($[jass_rule_default.call_statement]) },
-        { ALT: () => $.SUBRULE($[jass_rule_default.set_statement]) },
-        { ALT: () => $.SUBRULE($[jass_rule_default.loop_statement]) },
-        { ALT: () => $.SUBRULE($[jass_rule_default.exitwhen_statement]) },
-        { ALT: () => $.SUBRULE($[jass_rule_default.if_statement]) },
-        { ALT: () => $.SUBRULE($[jass_rule_default.return_statement]) },
-        { ALT: () => $.CONSUME(jass_tokens_default[jass_rule_default.linebreak]) },
-        { ALT: () => $.CONSUME(jass_tokens_default[jass_rule_default.comment]) }
+        { ALT: () => $.SUBRULE($[zinc_rule_default.call_statement]) },
+        { ALT: () => $.SUBRULE($[zinc_rule_default.set_statement]) },
+        { ALT: () => $.SUBRULE($[zinc_rule_default.loop_statement]) },
+        { ALT: () => $.SUBRULE($[zinc_rule_default.exitwhen_statement]) },
+        { ALT: () => $.SUBRULE($[zinc_rule_default.if_statement]) },
+        { ALT: () => $.SUBRULE($[zinc_rule_default.return_statement]) },
+        { ALT: () => $.CONSUME(zinc_tokens_default[zinc_rule_default.linebreak]) },
+        { ALT: () => $.CONSUME(zinc_tokens_default[zinc_rule_default.comment]) }
       ]);
     });
-    $.RULE(jass_rule_default.end, () => {
-      $.OPTION(() => $.CONSUME(jass_tokens_default[jass_rule_default.comment]));
+    $.RULE(zinc_rule_default.end, () => {
+      $.OPTION(() => $.CONSUME(zinc_tokens_default[zinc_rule_default.comment]));
       $.OR([
-        { ALT: () => $.CONSUME(jass_tokens_default[jass_rule_default.linebreak]) },
+        { ALT: () => $.CONSUME(zinc_tokens_default[zinc_rule_default.linebreak]) },
         { ALT: () => $.CONSUME2(EOF) }
       ]);
     });
@@ -9874,7 +9874,7 @@ var JassParser = class extends CstParser {
   }
 };
 
-// src/jass/jass-visitor.ts
+// src/zinc/zinc-visitor.ts
 var import_vscode2 = require("vscode");
 
 // src/semantic/token-legend.ts
@@ -12432,51 +12432,51 @@ instance.init({
   }
 }).then();
 
-// src/jass/jass-visitor.ts
-var parser = new JassParser();
+// src/zinc/zinc-visitor.ts
+var parser = new ZincParser();
 var ParserVisitor = parser.getBaseCstVisitorConstructor();
 var _comment, comment_fn, _string, string_fn;
-var JassVisitor = class extends ParserVisitor {
+var ZincVisitor = class extends ParserVisitor {
   constructor() {
     super();
     __privateAdd(this, _comment);
     __privateAdd(this, _string);
     this.validateVisitor();
   }
-  [jass_rule_default.jass](ctx) {
-    return ctx[jass_rule_default.root]?.map((item) => this.visit(item));
+  [zinc_rule_default.Zinc](ctx) {
+    return ctx[zinc_rule_default.root]?.map((item) => this.visit(item));
   }
-  [jass_rule_default.root](ctx) {
+  [zinc_rule_default.root](ctx) {
     __privateMethod(this, _comment, comment_fn).call(this, ctx);
-    const type = ctx[jass_rule_default.type_declare];
+    const type = ctx[zinc_rule_default.type_declare];
     if (type)
       return this.visit(type);
-    const native = ctx[jass_rule_default.native_declare];
+    const native = ctx[zinc_rule_default.native_declare];
     if (native)
       return this.visit(native);
-    const func = ctx[jass_rule_default.function_declare];
+    const func = ctx[zinc_rule_default.function_declare];
     if (func)
       return this.visit(func);
-    const globals = ctx[jass_rule_default.globals_declare];
+    const globals = ctx[zinc_rule_default.globals_declare];
     if (globals)
       return this.visit(globals);
   }
-  [jass_rule_default.end](ctx) {
+  [zinc_rule_default.end](ctx) {
     __privateMethod(this, _comment, comment_fn).call(this, ctx);
   }
-  [jass_rule_default.globals_declare](ctx) {
+  [zinc_rule_default.globals_declare](ctx) {
     __privateMethod(this, _comment, comment_fn).call(this, ctx);
     const b = this?.bridge;
     if (b) {
-      b.mark(ctx[jass_rule_default.globals]?.[0], token_legend_default.jass_globals);
-      b.mark(ctx[jass_rule_default.endglobals]?.[0], token_legend_default.jass_endglobals);
+      b.mark(ctx[zinc_rule_default.globals]?.[0], token_legend_default.jass_globals);
+      b.mark(ctx[zinc_rule_default.endglobals]?.[0], token_legend_default.jass_endglobals);
     }
-    const vardecl = ctx[jass_rule_default.variable_declare];
+    const vardecl = ctx[zinc_rule_default.variable_declare];
     if (vardecl) {
       for (const vd of vardecl) {
         const variable = this.visit(vd);
-        const typedname = variable?.[jass_rule_default.typedname];
-        const local = variable?.[jass_rule_default.local];
+        const typedname = variable?.[zinc_rule_default.typedname];
+        const local = variable?.[zinc_rule_default.local];
         if (b && local) {
           b.diagnostics.push({
             message: instance.t("localInGlobalsError" /* localInGlobalsError */),
@@ -12499,48 +12499,48 @@ var JassVisitor = class extends ParserVisitor {
     }
     return ctx;
   }
-  [jass_rule_default.type_declare](ctx) {
-    ctx[jass_rule_default.end]?.map((item) => this.visit(item));
-    const name = ctx[jass_rule_default.identifier]?.[0];
-    const base = ctx[jass_rule_default.identifier]?.[1];
+  [zinc_rule_default.type_declare](ctx) {
+    ctx[zinc_rule_default.end]?.map((item) => this.visit(item));
+    const name = ctx[zinc_rule_default.identifier]?.[0];
+    const base = ctx[zinc_rule_default.identifier]?.[1];
     this?.bridge?.mark(name, token_legend_default.jass_type_name);
     this?.bridge?.mark(base, token_legend_default.jass_type_name);
-    this?.bridge?.mark(ctx[jass_rule_default.type]?.[0], token_legend_default.jass_type);
-    this?.bridge?.mark(ctx[jass_rule_default.extends]?.[0], token_legend_default.jass_extends);
+    this?.bridge?.mark(ctx[zinc_rule_default.type]?.[0], token_legend_default.jass_type);
+    this?.bridge?.mark(ctx[zinc_rule_default.extends]?.[0], token_legend_default.jass_extends);
     return {
       name: name?.image,
       base: base?.image
     };
   }
-  [jass_rule_default.native_declare](ctx) {
+  [zinc_rule_default.native_declare](ctx) {
     __privateMethod(this, _comment, comment_fn).call(this, ctx);
     const b = this?.bridge;
     if (b) {
-      b.mark(ctx[jass_rule_default.constant]?.[0], token_legend_default.jass_constant);
-      b.mark(ctx[jass_rule_default.identifier]?.[0], token_legend_default.jass_function_native);
-      b.mark(ctx[jass_rule_default.native]?.[0], token_legend_default.jass_native);
-      b.mark(ctx[jass_rule_default.takes]?.[0], token_legend_default.jass_takes);
-      b.mark(ctx[jass_rule_default.returns]?.[0], token_legend_default.jass_returns);
+      b.mark(ctx[zinc_rule_default.constant]?.[0], token_legend_default.jass_constant);
+      b.mark(ctx[zinc_rule_default.identifier]?.[0], token_legend_default.jass_function_native);
+      b.mark(ctx[zinc_rule_default.native]?.[0], token_legend_default.jass_native);
+      b.mark(ctx[zinc_rule_default.takes]?.[0], token_legend_default.jass_takes);
+      b.mark(ctx[zinc_rule_default.returns]?.[0], token_legend_default.jass_returns);
     }
-    this.visit(ctx[jass_rule_default.function_args]);
-    this.visit(ctx[jass_rule_default.function_returns]);
+    this.visit(ctx[zinc_rule_default.function_args]);
+    this.visit(ctx[zinc_rule_default.function_returns]);
   }
-  [jass_rule_default.function_declare](ctx) {
+  [zinc_rule_default.function_declare](ctx) {
     var _a;
     __privateMethod(this, _comment, comment_fn).call(this, ctx);
     const b = this?.bridge;
     if (b) {
-      b.mark(ctx[jass_rule_default.constant]?.[0], token_legend_default.jass_constant);
-      b.mark(ctx[jass_rule_default.function]?.[0], token_legend_default.jass_function);
-      b.mark(ctx[jass_rule_default.identifier]?.[0], token_legend_default.jass_function_user);
-      b.mark(ctx[jass_rule_default.takes]?.[0], token_legend_default.jass_takes);
-      b.mark(ctx[jass_rule_default.returns]?.[0], token_legend_default.jass_returns);
-      b.mark(ctx[jass_rule_default.endfunction]?.[0], token_legend_default.jass_endfunction);
+      b.mark(ctx[zinc_rule_default.constant]?.[0], token_legend_default.jass_constant);
+      b.mark(ctx[zinc_rule_default.function]?.[0], token_legend_default.jass_function);
+      b.mark(ctx[zinc_rule_default.identifier]?.[0], token_legend_default.jass_function_user);
+      b.mark(ctx[zinc_rule_default.takes]?.[0], token_legend_default.jass_takes);
+      b.mark(ctx[zinc_rule_default.returns]?.[0], token_legend_default.jass_returns);
+      b.mark(ctx[zinc_rule_default.endfunction]?.[0], token_legend_default.jass_endfunction);
     }
-    const args = this.visit(ctx[jass_rule_default.function_args]);
+    const args = this.visit(ctx[zinc_rule_default.function_args]);
     if (b && args?.list) {
       for (const arg of args.list) {
-        const array = arg[jass_rule_default.array];
+        const array = arg[zinc_rule_default.array];
         if (array) {
           b.diagnostics.push({
             message: instance.t("arrayInFunctionArgumentError" /* arrayInFunctionArgumentError */),
@@ -12553,11 +12553,11 @@ var JassVisitor = class extends ParserVisitor {
         }
       }
     }
-    const locals = ctx?.[jass_rule_default.function_locals];
+    const locals = ctx?.[zinc_rule_default.function_locals];
     if (locals) {
       const localMap = {};
       for (const local of locals) {
-        const typedname = this.visit(local)?.[jass_rule_default.typedname];
+        const typedname = this.visit(local)?.[zinc_rule_default.typedname];
         if (!typedname)
           continue;
         const { type, name } = typedname;
@@ -12598,24 +12598,24 @@ var JassVisitor = class extends ParserVisitor {
           }
         }
     }
-    const statements = ctx[jass_rule_default.statement];
+    const statements = ctx[zinc_rule_default.statement];
     if (statements) {
       for (const statement of statements) {
         this.visit(statement);
       }
     }
-    this.visit(ctx[jass_rule_default.function_returns]);
+    this.visit(ctx[zinc_rule_default.function_returns]);
     return {};
   }
-  [jass_rule_default.function_locals](ctx) {
+  [zinc_rule_default.function_locals](ctx) {
     __privateMethod(this, _comment, comment_fn).call(this, ctx);
-    const variableDeclare = ctx[jass_rule_default.variable_declare];
+    const variableDeclare = ctx[zinc_rule_default.variable_declare];
     if (!variableDeclare)
       return null;
     const variable = this.visit(variableDeclare);
     const b = this.bridge;
     if (b) {
-      const constant2 = variable?.[jass_rule_default.constant];
+      const constant2 = variable?.[zinc_rule_default.constant];
       if (constant2) {
         b.diagnostics.push({
           message: instance.t("constantInFunctionError" /* constantInFunctionError */),
@@ -12626,9 +12626,9 @@ var JassVisitor = class extends ParserVisitor {
           severity: import_vscode2.DiagnosticSeverity.Error
         });
       }
-      const local = variable?.[jass_rule_default.local];
+      const local = variable?.[zinc_rule_default.local];
       if (!local) {
-        const { type } = variable?.[jass_rule_default.typedname];
+        const { type } = variable?.[zinc_rule_default.typedname];
         if (type) {
           b.diagnostics.push({
             message: instance.t("misssingLocalKeywordError" /* misssingLocalKeywordError */),
@@ -12643,10 +12643,10 @@ var JassVisitor = class extends ParserVisitor {
     }
     return variable;
   }
-  [jass_rule_default.typedname](ctx) {
-    const array = ctx[jass_rule_default.array]?.[0];
+  [zinc_rule_default.typedname](ctx) {
+    const array = ctx[zinc_rule_default.array]?.[0];
     this?.bridge?.mark(array, token_legend_default.jass_array);
-    const list = ctx[jass_rule_default.identifier];
+    const list = ctx[zinc_rule_default.identifier];
     if (!list)
       return {};
     const [type, name] = list;
@@ -12656,31 +12656,31 @@ var JassVisitor = class extends ParserVisitor {
       array
     };
   }
-  [jass_rule_default.function_call](ctx) {
+  [zinc_rule_default.function_call](ctx) {
     const b = this.bridge;
     if (b) {
-      b.mark(ctx[jass_rule_default.identifier]?.[0], token_legend_default.jass_function_user);
-      b.mark(ctx[jass_rule_default.lparen]?.[0], token_legend_default.jass_lparen);
-      b.mark(ctx[jass_rule_default.rparen]?.[0], token_legend_default.jass_rparen);
-      ctx[jass_rule_default.comma]?.map((item) => this?.bridge?.mark(item, token_legend_default.jass_comma));
+      b.mark(ctx[zinc_rule_default.identifier]?.[0], token_legend_default.jass_function_user);
+      b.mark(ctx[zinc_rule_default.lparen]?.[0], token_legend_default.jass_lparen);
+      b.mark(ctx[zinc_rule_default.rparen]?.[0], token_legend_default.jass_rparen);
+      ctx[zinc_rule_default.comma]?.map((item) => this?.bridge?.mark(item, token_legend_default.jass_comma));
     }
-    ctx[jass_rule_default.expression]?.map((item) => this.visit(item));
+    ctx[zinc_rule_default.expression]?.map((item) => this.visit(item));
     return ctx;
   }
-  [jass_rule_default.function_args](ctx) {
+  [zinc_rule_default.function_args](ctx) {
     var _a;
     const b = this?.bridge;
-    const nothing = ctx?.[jass_rule_default.nothing]?.[0];
+    const nothing = ctx?.[zinc_rule_default.nothing]?.[0];
     if (nothing) {
       b?.mark(nothing, token_legend_default.jass_type_name);
       return { map: {}, list: [] };
     }
-    const commas = ctx[jass_rule_default.comma];
+    const commas = ctx[zinc_rule_default.comma];
     if (b && commas)
       for (const comma of commas) {
         this?.bridge?.mark(comma, token_legend_default.jass_comma);
       }
-    const args = ctx?.[jass_rule_default.typedname]?.map((item) => this.visit(item));
+    const args = ctx?.[zinc_rule_default.typedname]?.map((item) => this.visit(item));
     const argMap = {};
     if (args) {
       for (const arg of args) {
@@ -12711,10 +12711,10 @@ var JassVisitor = class extends ParserVisitor {
       list: args
     };
   }
-  [jass_rule_default.function_returns](ctx) {
+  [zinc_rule_default.function_returns](ctx) {
     const b = this?.bridge;
-    const nothing = ctx[jass_rule_default.nothing]?.[0];
-    const type = ctx[jass_rule_default.identifier]?.[0];
+    const nothing = ctx[zinc_rule_default.nothing]?.[0];
+    const type = ctx[zinc_rule_default.identifier]?.[0];
     if (b) {
       if (nothing)
         b.mark(nothing, token_legend_default.jass_type_name);
@@ -12723,11 +12723,11 @@ var JassVisitor = class extends ParserVisitor {
     }
     return null;
   }
-  [jass_rule_default.variable_declare](ctx) {
+  [zinc_rule_default.variable_declare](ctx) {
     __privateMethod(this, _comment, comment_fn).call(this, ctx);
-    const equals = ctx[jass_rule_default.assign]?.[0];
-    const typedname = this.visit(ctx[jass_rule_default.typedname]);
-    const array = typedname[jass_rule_default.array];
+    const equals = ctx[zinc_rule_default.assign]?.[0];
+    const typedname = this.visit(ctx[zinc_rule_default.typedname]);
+    const array = typedname[zinc_rule_default.array];
     const b = this.bridge;
     if (b && equals && array) {
       b.diagnostics.push({
@@ -12739,120 +12739,120 @@ var JassVisitor = class extends ParserVisitor {
         severity: import_vscode2.DiagnosticSeverity.Error
       });
     }
-    const local = ctx[jass_rule_default.local]?.[0];
-    const constant2 = ctx[jass_rule_default.constant]?.[0];
+    const local = ctx[zinc_rule_default.local]?.[0];
+    const constant2 = ctx[zinc_rule_default.constant]?.[0];
     if (b) {
       if (local)
         b.mark(local, token_legend_default.jass_local);
       if (constant2)
         b.mark(constant2, token_legend_default.jass_constant);
-      b.mark(ctx[jass_rule_default.assign]?.[0], token_legend_default.jass_equals);
+      b.mark(ctx[zinc_rule_default.assign]?.[0], token_legend_default.jass_equals);
     }
-    const exp = ctx[jass_rule_default.expression];
+    const exp = ctx[zinc_rule_default.expression];
     if (exp)
       this.visit(exp);
     return {
-      [jass_rule_default.typedname]: typedname,
-      [jass_rule_default.local]: local,
-      [jass_rule_default.constant]: constant2
+      [zinc_rule_default.typedname]: typedname,
+      [zinc_rule_default.local]: local,
+      [zinc_rule_default.constant]: constant2
     };
   }
-  [jass_rule_default.statement](ctx) {
+  [zinc_rule_default.statement](ctx) {
     __privateMethod(this, _comment, comment_fn).call(this, ctx);
     for (const statement of [
-      ctx[jass_rule_default.if_statement],
-      ctx[jass_rule_default.set_statement],
-      ctx[jass_rule_default.call_statement],
-      ctx[jass_rule_default.loop_statement],
-      ctx[jass_rule_default.exitwhen_statement],
-      ctx[jass_rule_default.return_statement]
+      ctx[zinc_rule_default.if_statement],
+      ctx[zinc_rule_default.set_statement],
+      ctx[zinc_rule_default.call_statement],
+      ctx[zinc_rule_default.loop_statement],
+      ctx[zinc_rule_default.exitwhen_statement],
+      ctx[zinc_rule_default.return_statement]
     ])
       if (statement)
         return this.visit(statement);
     return null;
   }
-  [jass_rule_default.call_statement](ctx) {
+  [zinc_rule_default.call_statement](ctx) {
     __privateMethod(this, _comment, comment_fn).call(this, ctx);
-    this?.bridge?.mark(ctx[jass_rule_default.debug]?.[0], token_legend_default.jass_debug);
-    this?.bridge?.mark(ctx[jass_rule_default.call]?.[0], token_legend_default.jass_call);
-    this.visit(ctx[jass_rule_default.function_call]);
+    this?.bridge?.mark(ctx[zinc_rule_default.debug]?.[0], token_legend_default.jass_debug);
+    this?.bridge?.mark(ctx[zinc_rule_default.call]?.[0], token_legend_default.jass_call);
+    this.visit(ctx[zinc_rule_default.function_call]);
     return null;
   }
-  [jass_rule_default.set_statement](ctx) {
+  [zinc_rule_default.set_statement](ctx) {
     __privateMethod(this, _comment, comment_fn).call(this, ctx);
-    this?.bridge?.mark(ctx[jass_rule_default.set]?.[0], token_legend_default.jass_set);
-    this?.bridge?.mark(ctx[jass_rule_default.identifier]?.[0], token_legend_default.jass_variable);
-    this?.bridge?.mark(ctx[jass_rule_default.assign]?.[0], token_legend_default.jass_assign);
-    this.visit(ctx[jass_rule_default.expression]);
-    this.visit(ctx[jass_rule_default.arrayaccess]);
+    this?.bridge?.mark(ctx[zinc_rule_default.set]?.[0], token_legend_default.jass_set);
+    this?.bridge?.mark(ctx[zinc_rule_default.identifier]?.[0], token_legend_default.jass_variable);
+    this?.bridge?.mark(ctx[zinc_rule_default.assign]?.[0], token_legend_default.jass_assign);
+    this.visit(ctx[zinc_rule_default.expression]);
+    this.visit(ctx[zinc_rule_default.arrayaccess]);
     return null;
   }
-  [jass_rule_default.loop_statement](ctx) {
+  [zinc_rule_default.loop_statement](ctx) {
     __privateMethod(this, _comment, comment_fn).call(this, ctx);
-    this?.bridge?.mark(ctx[jass_rule_default.loop]?.[0], token_legend_default.jass_loop);
-    this?.bridge?.mark(ctx[jass_rule_default.endloop]?.[0], token_legend_default.jass_endloop);
-    ctx[jass_rule_default.statement]?.map((item) => this.visit(item));
+    this?.bridge?.mark(ctx[zinc_rule_default.loop]?.[0], token_legend_default.jass_loop);
+    this?.bridge?.mark(ctx[zinc_rule_default.endloop]?.[0], token_legend_default.jass_endloop);
+    ctx[zinc_rule_default.statement]?.map((item) => this.visit(item));
     return ctx;
   }
-  [jass_rule_default.exitwhen_statement](ctx) {
+  [zinc_rule_default.exitwhen_statement](ctx) {
     __privateMethod(this, _comment, comment_fn).call(this, ctx);
-    this?.bridge?.mark(ctx[jass_rule_default.exitwhen]?.[0], token_legend_default.jass_loop);
-    this.visit(ctx[jass_rule_default.expression]);
+    this?.bridge?.mark(ctx[zinc_rule_default.exitwhen]?.[0], token_legend_default.jass_loop);
+    this.visit(ctx[zinc_rule_default.expression]);
     return ctx;
   }
-  [jass_rule_default.return_statement](ctx) {
+  [zinc_rule_default.return_statement](ctx) {
     __privateMethod(this, _comment, comment_fn).call(this, ctx);
-    this?.bridge?.mark(ctx[jass_rule_default.return]?.[0], token_legend_default.jass_return);
-    this.visit(ctx[jass_rule_default.expression]);
+    this?.bridge?.mark(ctx[zinc_rule_default.return]?.[0], token_legend_default.jass_return);
+    this.visit(ctx[zinc_rule_default.expression]);
     return null;
   }
-  [jass_rule_default.if_statement](ctx) {
+  [zinc_rule_default.if_statement](ctx) {
     __privateMethod(this, _comment, comment_fn).call(this, ctx);
-    this?.bridge?.mark(ctx[jass_rule_default.if]?.[0], token_legend_default.jass_if);
-    this?.bridge?.mark(ctx[jass_rule_default.then]?.[0], token_legend_default.jass_then);
-    this?.bridge?.mark(ctx[jass_rule_default.endif]?.[0], token_legend_default.jass_endif);
-    this.visit(ctx[jass_rule_default.expression]);
-    ctx[jass_rule_default.statement]?.map((item) => this.visit(item));
-    ctx[jass_rule_default.elseif_statement]?.map((item) => this.visit(item));
-    this.visit(ctx[jass_rule_default.else_statement]);
+    this?.bridge?.mark(ctx[zinc_rule_default.if]?.[0], token_legend_default.jass_if);
+    this?.bridge?.mark(ctx[zinc_rule_default.then]?.[0], token_legend_default.jass_then);
+    this?.bridge?.mark(ctx[zinc_rule_default.endif]?.[0], token_legend_default.jass_endif);
+    this.visit(ctx[zinc_rule_default.expression]);
+    ctx[zinc_rule_default.statement]?.map((item) => this.visit(item));
+    ctx[zinc_rule_default.elseif_statement]?.map((item) => this.visit(item));
+    this.visit(ctx[zinc_rule_default.else_statement]);
     return null;
   }
-  [jass_rule_default.elseif_statement](ctx) {
+  [zinc_rule_default.elseif_statement](ctx) {
     __privateMethod(this, _comment, comment_fn).call(this, ctx);
-    this.visit(ctx[jass_rule_default.expression]);
-    this?.bridge?.mark(ctx[jass_rule_default.elseif]?.[0], token_legend_default.jass_elseif);
-    this?.bridge?.mark(ctx[jass_rule_default.then]?.[0], token_legend_default.jass_then);
-    ctx[jass_rule_default.statement]?.map((item) => this.visit(item));
+    this.visit(ctx[zinc_rule_default.expression]);
+    this?.bridge?.mark(ctx[zinc_rule_default.elseif]?.[0], token_legend_default.jass_elseif);
+    this?.bridge?.mark(ctx[zinc_rule_default.then]?.[0], token_legend_default.jass_then);
+    ctx[zinc_rule_default.statement]?.map((item) => this.visit(item));
     return null;
   }
-  [jass_rule_default.else_statement](ctx) {
+  [zinc_rule_default.else_statement](ctx) {
     __privateMethod(this, _comment, comment_fn).call(this, ctx);
-    this?.bridge?.mark(ctx[jass_rule_default.else]?.[0], token_legend_default.jass_else);
-    ctx[jass_rule_default.statement]?.map((item) => this.visit(item));
+    this?.bridge?.mark(ctx[zinc_rule_default.else]?.[0], token_legend_default.jass_else);
+    ctx[zinc_rule_default.statement]?.map((item) => this.visit(item));
     return null;
   }
-  [jass_rule_default.expression](ctx) {
-    ctx[jass_rule_default.and]?.map((item) => this?.bridge?.mark(item, token_legend_default.jass_and));
-    ctx[jass_rule_default.or]?.map((item) => this?.bridge?.mark(item, token_legend_default.jass_or));
-    ctx[jass_rule_default.equals]?.map((item) => this?.bridge?.mark(item, token_legend_default.jass_equals));
-    ctx[jass_rule_default.notequals]?.map((item) => this?.bridge?.mark(item, token_legend_default.jass_notequals));
-    ctx[jass_rule_default.lessorequal]?.map((item) => this?.bridge?.mark(item, token_legend_default.jass_lessorequal));
-    ctx[jass_rule_default.great]?.map((item) => this?.bridge?.mark(item, token_legend_default.jass_great));
-    ctx[jass_rule_default.greatorequal]?.map((item) => this?.bridge?.mark(item, token_legend_default.jass_greatorequal));
-    ctx[jass_rule_default.addition]?.map((item) => this.visit(item));
+  [zinc_rule_default.expression](ctx) {
+    ctx[zinc_rule_default.and]?.map((item) => this?.bridge?.mark(item, token_legend_default.jass_and));
+    ctx[zinc_rule_default.or]?.map((item) => this?.bridge?.mark(item, token_legend_default.jass_or));
+    ctx[zinc_rule_default.equals]?.map((item) => this?.bridge?.mark(item, token_legend_default.jass_equals));
+    ctx[zinc_rule_default.notequals]?.map((item) => this?.bridge?.mark(item, token_legend_default.jass_notequals));
+    ctx[zinc_rule_default.lessorequal]?.map((item) => this?.bridge?.mark(item, token_legend_default.jass_lessorequal));
+    ctx[zinc_rule_default.great]?.map((item) => this?.bridge?.mark(item, token_legend_default.jass_great));
+    ctx[zinc_rule_default.greatorequal]?.map((item) => this?.bridge?.mark(item, token_legend_default.jass_greatorequal));
+    ctx[zinc_rule_default.addition]?.map((item) => this.visit(item));
     return null;
   }
-  [jass_rule_default.primary](ctx) {
+  [zinc_rule_default.primary](ctx) {
     __privateMethod(this, _string, string_fn).call(this, ctx);
     const b = this?.bridge;
     if (b) {
-      b.mark(ctx[jass_rule_default.sub]?.[0], token_legend_default.jass_sub);
-      b.mark(ctx[jass_rule_default.integer]?.[0], token_legend_default.jass_integer);
-      b.mark(ctx[jass_rule_default.real]?.[0], token_legend_default.jass_real);
-      b.mark(ctx[jass_rule_default.idliteral]?.[0], token_legend_default.jass_idliteral);
-      b.mark(ctx[jass_rule_default.function]?.[0], token_legend_default.jass_function);
-      b.mark(ctx[jass_rule_default.not]?.[0], token_legend_default.jass_function);
-      const identifier = ctx[jass_rule_default.identifier]?.[0];
+      b.mark(ctx[zinc_rule_default.sub]?.[0], token_legend_default.jass_sub);
+      b.mark(ctx[zinc_rule_default.integer]?.[0], token_legend_default.jass_integer);
+      b.mark(ctx[zinc_rule_default.real]?.[0], token_legend_default.jass_real);
+      b.mark(ctx[zinc_rule_default.idliteral]?.[0], token_legend_default.jass_idliteral);
+      b.mark(ctx[zinc_rule_default.function]?.[0], token_legend_default.jass_function);
+      b.mark(ctx[zinc_rule_default.not]?.[0], token_legend_default.jass_function);
+      const identifier = ctx[zinc_rule_default.identifier]?.[0];
       if (identifier) {
         if (["null", "true", "false"].indexOf(identifier.image) < 0) {
           b.mark(identifier, token_legend_default.jass_variable);
@@ -12861,42 +12861,42 @@ var JassVisitor = class extends ParserVisitor {
         }
       }
     }
-    this.visit(ctx[jass_rule_default.arrayaccess]);
-    this.visit(ctx[jass_rule_default.function_call]);
-    this.visit(ctx[jass_rule_default.expression]);
-    this.visit(ctx[jass_rule_default.primary]);
+    this.visit(ctx[zinc_rule_default.arrayaccess]);
+    this.visit(ctx[zinc_rule_default.function_call]);
+    this.visit(ctx[zinc_rule_default.expression]);
+    this.visit(ctx[zinc_rule_default.primary]);
     return null;
   }
-  [jass_rule_default.addition](ctx) {
-    ctx[jass_rule_default.add]?.map((item) => this?.bridge?.mark(item, token_legend_default.jass_add));
-    ctx[jass_rule_default.sub]?.map((item) => this?.bridge?.mark(item, token_legend_default.jass_sub));
-    ctx[jass_rule_default.multiplication]?.map((item) => this.visit(item));
+  [zinc_rule_default.addition](ctx) {
+    ctx[zinc_rule_default.add]?.map((item) => this?.bridge?.mark(item, token_legend_default.jass_add));
+    ctx[zinc_rule_default.sub]?.map((item) => this?.bridge?.mark(item, token_legend_default.jass_sub));
+    ctx[zinc_rule_default.multiplication]?.map((item) => this.visit(item));
     return null;
   }
-  [jass_rule_default.multiplication](ctx) {
+  [zinc_rule_default.multiplication](ctx) {
     const b = this?.bridge;
     if (b) {
-      ctx[jass_rule_default.mult]?.map((item) => b.mark(item, token_legend_default.jass_mult));
-      ctx[jass_rule_default.div]?.map((item) => b.mark(item, token_legend_default.jass_div));
+      ctx[zinc_rule_default.mult]?.map((item) => b.mark(item, token_legend_default.jass_mult));
+      ctx[zinc_rule_default.div]?.map((item) => b.mark(item, token_legend_default.jass_div));
     }
-    ctx[jass_rule_default.primary]?.map((item) => this.visit(item));
+    ctx[zinc_rule_default.primary]?.map((item) => this.visit(item));
     return null;
   }
-  [jass_rule_default.arrayaccess](ctx) {
-    this?.bridge?.mark(ctx[jass_rule_default.lsquareparen]?.[0], token_legend_default.jass_lsquareparen);
-    this?.bridge?.mark(ctx[jass_rule_default.rsquareparen]?.[0], token_legend_default.jass_rsquareparen);
-    this.visit(ctx[jass_rule_default.expression]);
+  [zinc_rule_default.arrayaccess](ctx) {
+    this?.bridge?.mark(ctx[zinc_rule_default.lsquareparen]?.[0], token_legend_default.jass_lsquareparen);
+    this?.bridge?.mark(ctx[zinc_rule_default.rsquareparen]?.[0], token_legend_default.jass_rsquareparen);
+    this.visit(ctx[zinc_rule_default.expression]);
     return null;
   }
 };
 _comment = new WeakSet();
 comment_fn = function(ctx) {
-  ctx[jass_rule_default.end]?.map((item) => this.visit(item));
-  ctx[jass_rule_default.comment]?.map((item) => this?.bridge?.mark(item, token_legend_default.jass_comment));
+  ctx[zinc_rule_default.end]?.map((item) => this.visit(item));
+  ctx[zinc_rule_default.comment]?.map((item) => this?.bridge?.mark(item, token_legend_default.jass_comment));
 };
 _string = new WeakSet();
 string_fn = function(ctx) {
-  const strings = ctx[jass_rule_default.stringliteral];
+  const strings = ctx[zinc_rule_default.stringliteral];
   if (!strings)
     return;
   const b = this.bridge;
@@ -12922,15 +12922,15 @@ string_fn = function(ctx) {
   }
 };
 
-// docs/main.ts
-var parser2 = new JassParser();
+// docs/zinc/main.ts
+var parser2 = new ZincParser();
 var iframe = document.createElement("iframe");
 iframe.src = "data:text/html;charset=utf-8," + encodeURI(createSyntaxDiagramsCode(parser2.getSerializedGastProductions()));
 document.body.appendChild(iframe);
 (async () => {
   const request = await fetch("test.txt");
   const text = await request.text();
-  const lexer = new Lexer(jass_tokens_list_default, {
+  const lexer = new Lexer(zinc_tokens_list_default, {
     recoveryEnabled: true,
     positionTracking: "onlyOffset",
     deferDefinitionErrorsHandling: true,
@@ -12938,8 +12938,8 @@ document.body.appendChild(iframe);
   });
   const result = lexer.tokenize(text);
   parser2.input = result.tokens;
-  const nodes = parser2[jass_rule_default.jass]();
-  const visitor = new JassVisitor();
+  const nodes = parser2[zinc_rule_default.zinc]();
+  const visitor = new ZincVisitor();
   visitor.visit(nodes);
 })();
 /*! Bundled license information:

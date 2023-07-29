@@ -12,7 +12,8 @@
     "ecmaVersion": "latest",
     "sourceType": "module",
     "project": [
-      "src/tsconfig.json"
+      "src/tsconfig.json",
+      "docs/tsconfig.json"
     ]
   },
   "rules": {

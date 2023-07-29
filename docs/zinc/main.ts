@@ -1,10 +1,12 @@
-import {createSyntaxDiagramsCode, Lexer} from 'chevrotain';
-import JassParser from "../src/jass/jass-parser";
-import {JassVisitor} from "../src/jass/jass-visitor";
-import JassRule from "../src/jass/jass-rule";
-import JassTokensList from "../src/jass/jass-tokens-list";
+// noinspection DuplicatedCode
 
-const parser = new JassParser();
+import {createSyntaxDiagramsCode, Lexer} from 'chevrotain';
+import ZincParser from "../../src/zinc/zinc-parser";
+import ZincTokensList from "../../src/zinc/zinc-tokens-list";
+import ZincRule from "../../src/zinc/zinc-rule";
+import {ZincVisitor} from "../../src/zinc/zinc-visitor";
+
+const parser = new ZincParser();
 
 const iframe = document.createElement('iframe');
 iframe.src = 'data:text/html;charset=utf-8,' + encodeURI(createSyntaxDiagramsCode(parser.getSerializedGastProductions()));
@@ -14,7 +16,7 @@ document.body.appendChild(iframe);
     const request = await fetch('test.txt');
     const text = await request.text();
 
-    const lexer = new Lexer(JassTokensList, {
+    const lexer = new Lexer(ZincTokensList, {
         recoveryEnabled: true,
         positionTracking: 'onlyOffset',
         deferDefinitionErrorsHandling: true,
@@ -23,9 +25,9 @@ document.body.appendChild(iframe);
     const result = lexer.tokenize(text);
 
     parser.input = result.tokens;
-    const nodes = parser[JassRule.jass]();
+    const nodes = parser[ZincRule.zinc]();
 
-    const visitor = new JassVisitor();
+    const visitor = new ZincVisitor();
     // @ts-ignore
     //visitor.bridge = new VscodeBridge(_document, [], []);
 

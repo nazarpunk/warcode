@@ -35,6 +35,7 @@
   "scripts": {
     "esbuild-docs-calculator": "esbuild docs/calculator/main.mjs --outfile=docs/calculator/out/main.mjs --target=es2020 --bundle --external:vscode --format=cjs --platform=browser --tree-shaking=true --sourcemap --watch",
     "esbuild-docs-wts": "esbuild docs/wts/main.ts --outfile=docs/wts/out/main.mjs --target=es2020 --bundle --external:vscode --format=cjs --platform=browser --tree-shaking=true --sourcemap --watch",
+    "esbuild-docs-zinc": "esbuild docs/zinc/main.ts --outfile=docs/zinc/out/main.mjs --target=es2020 --bundle --external:vscode --format=cjs --platform=browser --tree-shaking=true --sourcemap --watch",
     "esbuild-docs-jass": "esbuild docs/main.ts --outfile=docs/out/main.mjs --target=es2020 --bundle --external:vscode --format=cjs --platform=browser --tree-shaking=true --sourcemap --watch",
     "esbuild-base": "esbuild src/extension.ts --outfile=out/extension.js --target=es2020 --bundle --external:vscode --format=cjs --platform=node --tree-shaking=true --sourcemap",
     "esbuild": "npm run esbuild-base",

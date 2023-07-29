@@ -571,8 +571,12 @@ export class JassVisitor extends ParserVisitor {
 
     [JassRule.multiplication](ctx: JassCstNode) {
         // console.log(JassRule.multiplication, ctx);
-        ctx[JassRule.mult]?.map(item => this?.bridge?.mark(item, TokenLegend.jass_mult));
-        ctx[JassRule.div]?.map(item => this?.bridge?.mark(item, TokenLegend.jass_div));
+        const b = this?.bridge;
+
+        if (b) {
+            ctx[JassRule.mult]?.map(item => b.mark(item, TokenLegend.jass_mult));
+            ctx[JassRule.div]?.map(item => b.mark(item, TokenLegend.jass_div));
+        }
 
         ctx[JassRule.primary]?.map(item => this.visit(item));
         return null;

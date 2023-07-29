@@ -1,0 +1,4 @@
+library a requires b optional c {
+
+
+}
