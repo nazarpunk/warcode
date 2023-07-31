@@ -1,5 +1,5 @@
-import i18next from 'i18next';
-import {env} from 'vscode';
+import i18next from 'i18next'
+import {env} from 'vscode'
 
 export const enum i18n {
     // lexer
@@ -17,8 +17,8 @@ export const enum i18n {
     localInGlobalsError = 'localInGlobalsError',
     multilineStringError = 'multilineStringError',
     arrayInFunctionArgumentError = 'arrayInFunctionArgumentError',
-    localRedeclareArgumentError = 'localRedeclareArgumentError',
-    localRedeclaredError = 'localRedeclaredError',
+    localRedeclareArgError = 'localRedeclareArgError',
+    localRedeclareLocalError = 'localRedeclareLocalError',
     constantInFunctionError = 'constantInFunctionError',
     misssingLocalKeywordError = 'misssingLocalKeywordError',
     sameNameArgumentError = 'sameNameArgumentError',
@@ -41,13 +41,13 @@ const en: Record<i18n, string> = {
     [i18n.localInGlobalsError]: 'Local variable not allowed in globals block.',
     [i18n.multilineStringError]: 'Avoid multiline strings. Use |n or \\n to linebreak.',
     [i18n.arrayInFunctionArgumentError]: 'Array not allowed in function argument.',
-    [i18n.localRedeclareArgumentError]: 'Local variable `{{name}}` redeclare argument.',
-    [i18n.localRedeclaredError]: 'Local variable `{{name}}` redeclared.',
+    [i18n.localRedeclareArgError]: 'Local variable `{{name}}` redeclare argument.',
+    [i18n.localRedeclareLocalError]: 'Local variable `{{name}}` redeclared.',
     [i18n.constantInFunctionError]: 'Constant not allowed in function.',
     [i18n.misssingLocalKeywordError]: 'Missing local keyword.',
     [i18n.sameNameArgumentError]: 'Arguments with same name `{{name}}`.',
     [i18n.arrayInitializeError]: 'Array varriables can\'t be initialised.',
-};
+}
 
 const ru: Record<i18n, string> = {
     // lexer
@@ -65,13 +65,13 @@ const ru: Record<i18n, string> = {
     [i18n.localInGlobalsError]: 'Локальные переменные нельзя объявлять в блоке globals.',
     [i18n.multilineStringError]: 'Избегайте многострочных строк. Используйте |n или \\n для переноса строки.',
     [i18n.arrayInFunctionArgumentError]: 'Запрешено использовать массивы в аргументах функции.',
-    [i18n.localRedeclareArgumentError]: 'Локальная переменная `{{name}}` переопределяет аргумент.',
-    [i18n.localRedeclaredError]: 'Локальная переменная `{{name}}` объявлена повторно.',
+    [i18n.localRedeclareArgError]: 'Локальная переменная `{{name}}` переопределяет аргумент.',
+    [i18n.localRedeclareLocalError]: 'Локальная переменная `{{name}}` объявлена повторно.',
     [i18n.constantInFunctionError]: 'Обявление констант в функции запрещено.',
     [i18n.misssingLocalKeywordError]: 'Не достаёт ключевого слова `local`.',
     [i18n.sameNameArgumentError]: 'Аргументы с одинаковым именем `{{name}}`.',
     [i18n.arrayInitializeError]: 'Массивы нельзя инициализировать.',
-};
+}
 
 i18next.init({
     lng: env.language,
@@ -81,4 +81,4 @@ i18next.init({
         en: {translation: en},
         ru: {translation: ru}
     }
-}).then();
+}).then()

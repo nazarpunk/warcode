@@ -1,14 +1,10 @@
-function Test takes real ad, d ad returns nothing //fdfdfdfdf
+function a takes nothing returns nothing
+    local real ad = 111 //
 
+    local d r = 22
 
+    if true then
 
-    //
-    local real a = 111 //
-endfunction //
+    endif
 
-native t takes nothing returns nothing
-
-
-constant function PolarProjectionBJ takes location source, real dist, real angle returns location
-    local real x = not not not not not not(null + true + end + someone)
 endfunction

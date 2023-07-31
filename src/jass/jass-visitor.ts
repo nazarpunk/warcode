@@ -13,6 +13,16 @@ import {i18n} from '../utils/i18n'
 const parser = new JassParser()
 const ParserVisitor = parser.getBaseCstVisitorConstructor()
 
+interface TypedName {
+    type: IToken,
+    name: IToken,
+    array?: IToken
+}
+
+interface Variable {
+    typedname: TypedName
+}
+
 export class JassVisitor extends ParserVisitor {
     constructor() {
         super()
@@ -49,15 +59,218 @@ export class JassVisitor extends ParserVisitor {
     }
 
     [JassRule.jass](ctx: JassCstNode) {
-        //console.log(JassRule.jass, ctx);
+        //delete ctx[JassRule.linebreak]
+        //console.log(JassRule.jass, ctx)
+        ctx[JassRule.jass_constant]?.map(item => this.visit(item))
         ctx[JassRule.type_declare]?.map(item => this.visit(item))
-        ctx[JassRule.native_declare]?.map(item => this.visit(item))
-        ctx[JassRule.function_declare]?.map(item => this.visit(item))
         ctx[JassRule.globals_declare]?.map(item => this.visit(item))
+        return null
     }
 
-    [JassRule.end](ctx: JassCstNode) {
-        return ctx
+    [JassRule.jass_constant](ctx: JassCstNode) {
+        //console.log(JassRule.jass_constant, ctx)
+        const b = this.bridge
+        const constant = ctx[JassRule.constant]?.[0]
+
+        if (b) b.mark(constant, TokenLegend.jass_takes)
+
+        this.visit(ctx[JassRule.function_declare]!, {constant: constant})
+        this.visit(ctx[JassRule.native_declare]!, {constant: constant})
+        return null
+    }
+
+    [JassRule.native_declare](ctx: JassCstNode) {
+        //console.log(JassRule.native_declare, ctx)
+        this.visit(ctx[JassRule.function_head]!, {native: true})
+        const b = this?.bridge
+        if (b) b.mark(ctx[JassRule.native]?.[0], TokenLegend.jass_native)
+    }
+
+    [JassRule.function_declare](ctx: JassCstNode) {
+        //console.log(JassRule.function_declare, ctx)
+        const b = this?.bridge
+        if (b) {
+            b.mark(ctx[JassRule.function]?.[0], TokenLegend.jass_function)
+            b.mark(ctx[JassRule.endfunction]?.[0], TokenLegend.jass_endfunction)
+        }
+
+        // --- head
+        const head = this.visit(ctx[JassRule.function_head]!) as {
+            argMap: Record<string, IToken[]>
+        }
+
+        const {argMap} = head
+        const localMap: Record<string, IToken[]> = {}
+
+        // --- locals
+        const localDeclares = ctx[JassRule.local_declare]!
+        if (localDeclares) {
+            for (const localDeclare of localDeclares) {
+                const local = this.visit(localDeclare) as Variable | null
+                if (!local) continue
+                const {type, name} = local.typedname
+                if (b) {
+                    b.mark(type, TokenLegend.jass_type_name)
+                    b.mark(name, TokenLegend.jass_variable)
+                }
+                // local check: local redeclare arg
+                if (name) {
+                    (localMap[name.image] ??= []).push(name)
+                    const argList = argMap[name.image]
+                    if (b && argList) {
+                        for (const t of [name, ...argList]) {
+                            this.bridge?.diagnostics.push({
+                                message: i18next.t(i18n.localRedeclareArgError, {name: t.image}),
+                                range: new Range(
+                                    b.document.positionAt(t.startOffset),
+                                    b.document.positionAt(t.startOffset + t.image.length)
+                                ),
+                                severity: DiagnosticSeverity.Warning
+                            })
+                        }
+                    }
+                }
+            }
+
+            // local check: local redeclare arg
+            if (b) for (const locals of Object.values(localMap)) {
+                if (locals.length < 2) continue
+                for (const local of locals) {
+                    b.diagnostics.push({
+                        message: i18next.t(i18n.localRedeclareLocalError, {name: local.image}),
+                        range: new Range(
+                            b.document.positionAt(local.startOffset),
+                            b.document.positionAt(local.startOffset + local.image.length)
+                        ),
+                        severity: DiagnosticSeverity.Warning
+                    })
+                }
+            }
+        }
+
+        // --- statement
+        const statements = ctx[JassRule.statement]
+        if (statements) {
+            for (const statement of statements) {
+                this.visit(statement)
+            }
+        }
+    }
+
+    [JassRule.function_head](ctx: JassCstNode, opts: {
+        native?: boolean
+    }) {
+        //console.log(JassRule.function_head, ctx)
+        // --- keywords
+        const b = this?.bridge
+        if (b) {
+            b.mark(ctx[JassRule.takes]?.[0], TokenLegend.jass_takes)
+            b.mark(ctx[JassRule.returns]?.[0], TokenLegend.jass_returns)
+        }
+
+        // --- name
+        const name = ctx[JassRule.identifier_name]?.[0]
+        if (name && b) b.mark(name, opts?.native ? TokenLegend.jass_function_native : TokenLegend.jass_function_user)
+
+        // --- arguments
+        const argMap: Record<string, IToken[]> = {}
+        const takesNothing = ctx[JassRule.takes_nothing]?.[0]
+        if (takesNothing) {
+            b?.mark(takesNothing, TokenLegend.jass_type_name)
+        } else {
+            // commas
+            const commas = ctx[JassRule.comma]
+            if (b && commas) for (const comma of commas) b.mark(comma, TokenLegend.jass_comma)
+            // typename
+            const typednames = ctx?.[JassRule.typedname]
+            if (typednames) for (const typedname of typednames) {
+                const typename = this.visit(typedname) as TypedName
+                if (typename) {
+                    const {type, name, array} = typename
+                    if (name) (argMap[name.image] ??= []).push(name)
+                    if (b) {
+                        b.mark(type, TokenLegend.jass_type_name)
+                        b.mark(name, TokenLegend.jass_argument)
+                        if (array) {
+                            b.diagnostics.push({
+                                message: i18next.t(i18n.arrayInFunctionArgumentError),
+                                range: new Range(
+                                    b.document.positionAt(array.startOffset),
+                                    b.document.positionAt(array.startOffset + array.image.length)
+                                ),
+                                severity: DiagnosticSeverity.Error
+                            })
+                        }
+                    }
+                }
+            }
+
+            // arguments check: same name
+            if (b) for (const v of Object.values(argMap)) {
+                if (v.length < 2) continue
+                for (const t of v) {
+                    b.diagnostics.push({
+                        message: i18next.t(i18n.sameNameArgumentError, {name: t.image}),
+                        range: new Range(
+                            b.document.positionAt(t.startOffset),
+                            b.document.positionAt(t.startOffset + t.image.length)
+                        ),
+                        severity: DiagnosticSeverity.Warning
+                    })
+                }
+            }
+        }
+
+        // -- returns
+        const returnsNothing = ctx[JassRule.returns_nothing]?.[0]
+        if (returnsNothing) {
+            b?.mark(returnsNothing, TokenLegend.jass_type_name)
+        } else {
+            const identifierReturns = ctx[JassRule.identifier_returns]?.[0]
+            if (b) b.mark(identifierReturns, TokenLegend.jass_type_name)
+        }
+
+        // --- final
+        return {
+            argMap: argMap,
+        }
+    }
+
+    [JassRule.local_declare](ctx: JassCstNode): Variable {
+        //console.log(JassRule.local_declare, ctx)
+        this?.bridge?.mark(ctx[JassRule.local]?.[0], TokenLegend.jass_local)
+        return this.visit(ctx[JassRule.variable_declare]!)
+    }
+
+    [JassRule.variable_declare](ctx: JassCstNode): Variable | null {
+        //console.log(JassRule.variable_declare, ctx);
+        const equals = ctx[JassRule.assign]?.[0]
+        const typedname = this.visit(ctx[JassRule.typedname]!)
+        if (!typedname) return null
+
+        const array = typedname[JassRule.array]
+        const b = this.bridge
+
+        // check array assing
+        if (b && equals && array) {
+            b.diagnostics.push({
+                message: i18next.t(i18n.arrayInitializeError),
+                range: new Range(
+                    b.document.positionAt(array.startOffset),
+                    b.document.positionAt(array.startOffset + array.image.length)
+                ),
+                severity: DiagnosticSeverity.Error
+            })
+        }
+
+        b?.mark(ctx[JassRule.assign]?.[0], TokenLegend.jass_equals)
+
+        const exp = ctx[JassRule.expression]
+        if (exp) this.visit(exp)
+
+        return {
+            typedname: typedname,
+        }
     }
 
     [JassRule.globals_declare](ctx: JassCstNode) {
@@ -118,173 +331,20 @@ export class JassVisitor extends ParserVisitor {
         }
     }
 
-    [JassRule.native_declare](ctx: JassCstNode) {
-        this.visit(ctx[JassRule.function_head]!, {native: true})
-        const b = this?.bridge
-        if (b) {
-            b.mark(ctx[JassRule.constant]?.[0], TokenLegend.jass_constant)
-            b.mark(ctx[JassRule.native]?.[0], TokenLegend.jass_native)
-        }
-    }
-
-    [JassRule.function_declare](ctx: JassCstNode) {
-        const b = this?.bridge
-        if (b) {
-            b.mark(ctx[JassRule.constant]?.[0], TokenLegend.jass_constant)
-            b.mark(ctx[JassRule.function]?.[0], TokenLegend.jass_function)
-            b.mark(ctx[JassRule.endfunction]?.[0], TokenLegend.jass_endfunction)
-        }
-
-        const head = this.visit(ctx[JassRule.function_head]!)
-        if (head) {
-            // argument
-            const args = head.args
-
-            // check array in argument
-            if (b && args?.list) {
-                for (const arg of args.list) {
-                    const array = arg[JassRule.array]
-                    if (array) {
-                        b.diagnostics.push({
-                            message: i18next.t(i18n.arrayInFunctionArgumentError),
-                            range: new Range(
-                                b.document.positionAt(array.startOffset),
-                                b.document.positionAt(array.startOffset + array.image.length)
-                            ),
-                            severity: DiagnosticSeverity.Error
-                        })
-                    }
-                }
-            }
-
-            const locals = ctx?.[JassRule.function_locals]
-
-            // locals, check locals with same name, check local redeclare argument
-            if (locals) {
-                const localMap: Record<string, IToken[]> = {}
-
-                for (const local of locals) {
-                    const typedname = this.visit(local)?.[JassRule.typedname]
-                    if (!typedname) continue
-                    const {type, name} = typedname
-                    if (b) {
-                        b.mark(type, TokenLegend.jass_type_name)
-                        b.mark(name, TokenLegend.jass_variable)
-                    }
-                    if (name) {
-                        (localMap[name.image] ??= []).push(name)
-                        const argList = args.map[name.image]
-                        if (b && argList) {
-                            for (const t of [name, ...argList]) {
-                                this.bridge?.diagnostics.push({
-                                    message: i18next.t(i18n.localRedeclareArgumentError, {name: t.image}),
-                                    range: new Range(
-                                        b.document.positionAt(t.startOffset),
-                                        b.document.positionAt(t.startOffset + t.image.length)
-                                    ),
-                                    severity: DiagnosticSeverity.Warning
-                                })
-                            }
-                        }
-                    }
-                }
-
-                if (b) for (const v of Object.values(localMap)) {
-                    if (v.length < 2) continue
-                    for (const t of v) {
-                        b.diagnostics.push({
-                            message: i18next.t(i18n.localRedeclaredError, {name: t.image}),
-                            range: new Range(
-                                b.document.positionAt(t.startOffset),
-                                b.document.positionAt(t.startOffset + t.image.length)
-                            ),
-                            severity: DiagnosticSeverity.Warning
-                        })
-                    }
-                }
-            }
-
-            // statement
-            const statements = ctx[JassRule.statement]
-            if (statements) {
-                for (const statement of statements) {
-                    this.visit(statement)
-                }
-            }
-
-        }
-    }
-
-    [JassRule.function_head](ctx: JassCstNode, opts: {
-        native?: boolean
-    }) {
-        const b = this?.bridge
-
-        if (b) {
-            b.mark(ctx[JassRule.identifier]?.[0], opts?.native ? TokenLegend.jass_function_native : TokenLegend.jass_function_user)
-            b.mark(ctx[JassRule.takes]?.[0], TokenLegend.jass_takes)
-            b.mark(ctx[JassRule.returns]?.[0], TokenLegend.jass_returns)
-        }
-
-        // return
-        this.visit(ctx[JassRule.function_returns]!)
-
-        // final
-        return {
-            args: this.visit(ctx[JassRule.function_args]!)
-        }
-    }
-
-    [JassRule.function_locals](ctx: JassCstNode) {
-        const variableDeclare = ctx[JassRule.variable_declare]
-        if (!variableDeclare) return null
-        const variable = this.visit(variableDeclare)
-
-        const b = this.bridge
-        if (b) {
-            const constant = variable?.[JassRule.constant]
-            if (constant) {
-                b.diagnostics.push({
-                    message: i18next.t(i18n.constantInFunctionError),
-                    range: new Range(
-                        b.document.positionAt(constant.startOffset),
-                        b.document.positionAt(constant.startOffset + constant.image.length)
-                    ),
-                    severity: DiagnosticSeverity.Error
-                })
-            }
-
-            const local = variable?.[JassRule.local]
-            if (!local) {
-                const {type} = variable?.[JassRule.typedname]
-                if (type) {
-                    b.diagnostics.push({
-                        message: i18next.t(i18n.misssingLocalKeywordError),
-                        range: new Range(
-                            b.document.positionAt(type.startOffset),
-                            b.document.positionAt(type.startOffset + type.image.length)
-                        ),
-                        severity: DiagnosticSeverity.Error
-                    })
-                }
-            }
-        }
-
-        return variable
-    }
-
-    [JassRule.typedname](ctx: JassCstNode) {
+    [JassRule.typedname](ctx: JassCstNode): TypedName | null {
         const array = ctx[JassRule.array]?.[0]
         this?.bridge?.mark(array, TokenLegend.jass_array)
 
         const list = ctx[JassRule.identifier]
-        if (!list) return {}
+        if (!list || list.length != 2) return null
 
         const [type, name] = list
+        if (type.isInsertedInRecovery || name.isInsertedInRecovery) return null
+
         return {
-            type: type?.isInsertedInRecovery ?? false ? null : type,
-            name: name?.isInsertedInRecovery ?? false ? null : name,
-            array
+            type: type,
+            name: name,
+            array: array
         }
     }
 
@@ -299,108 +359,6 @@ export class JassVisitor extends ParserVisitor {
         }
         ctx[JassRule.expression]?.map(item => this.visit(item))
         return ctx
-    }
-
-    [JassRule.function_args](ctx: JassCstNode) {
-        const b = this?.bridge
-
-        // nothing
-        const nothing = ctx?.[JassRule.nothing]?.[0]
-        if (nothing) {
-            b?.mark(nothing, TokenLegend.jass_type_name)
-            return {map: {}, list: []}
-        }
-
-        // commas
-        const commas = ctx[JassRule.comma]
-        if (b && commas) for (const comma of commas) {
-            this?.bridge?.mark(comma, TokenLegend.jass_comma)
-        }
-
-        // args
-        const args = ctx?.[JassRule.typedname]?.map(item => this.visit(item))
-        const argMap: Record<string, IToken[]> = {}
-
-        // typedname, check type same name
-        if (args) {
-            for (const arg of args) {
-                const {type, name} = arg
-                this?.bridge?.mark(type, TokenLegend.jass_type_name)
-                this?.bridge?.mark(name, TokenLegend.jass_argument)
-                if (name) (argMap[name.image] ??= []).push(name)
-            }
-
-            if (b) for (const v of Object.values(argMap)) {
-                if (v.length < 2) continue
-                for (const t of v) {
-                    b.diagnostics.push({
-                        message: i18next.t(i18n.sameNameArgumentError, {name: t.image}),
-                        range: new Range(
-                            b.document.positionAt(t.startOffset),
-                            b.document.positionAt(t.startOffset + t.image.length)
-                        ),
-                        severity: DiagnosticSeverity.Warning
-                    })
-                }
-            }
-        }
-
-        // return
-        return {
-            map: argMap,
-            list: args
-        }
-    }
-
-    [JassRule.function_returns](ctx: JassCstNode) {
-        const b = this?.bridge
-        const nothing = ctx[JassRule.nothing]?.[0]
-        const type = ctx[JassRule.identifier]?.[0]
-
-        if (b) {
-            if (nothing) b.mark(nothing, TokenLegend.jass_type_name)
-            if (type) b.mark(type, TokenLegend.jass_type_name)
-        }
-
-        return null
-    }
-
-    [JassRule.variable_declare](ctx: JassCstNode) {
-        //console.log(JassRule.variable_declare, ctx);
-        const equals = ctx[JassRule.assign]?.[0]
-        const typedname = this.visit(ctx[JassRule.typedname]!)
-        const array = typedname[JassRule.array]
-        const b = this.bridge
-
-        // check array assing
-        if (b && equals && array) {
-            b.diagnostics.push({
-                message: i18next.t(i18n.arrayInitializeError),
-                range: new Range(
-                    b.document.positionAt(array.startOffset),
-                    b.document.positionAt(array.startOffset + array.image.length)
-                ),
-                severity: DiagnosticSeverity.Error
-            })
-        }
-
-        const local = ctx[JassRule.local]?.[0]
-        const constant = ctx[JassRule.constant]?.[0]
-
-        if (b) {
-            if (local) b.mark(local, TokenLegend.jass_local)
-            if (constant) b.mark(constant, TokenLegend.jass_constant)
-            b.mark(ctx[JassRule.assign]?.[0], TokenLegend.jass_equals)
-        }
-
-        const exp = ctx[JassRule.expression]
-        if (exp) this.visit(exp)
-
-        return {
-            [JassRule.typedname]: typedname,
-            [JassRule.local]: local,
-            [JassRule.constant]: constant
-        }
     }
 
     [JassRule.statement](ctx: JassCstNode) {
@@ -556,5 +514,9 @@ export class JassVisitor extends ParserVisitor {
 
         this.visit(ctx[JassRule.expression]!)
         return null
+    }
+
+    [JassRule.end](ctx: JassCstNode) {
+        return ctx
     }
 }

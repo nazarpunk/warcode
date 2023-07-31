@@ -3,17 +3,22 @@ import JassRule from './jass-rule'
 import {IToken} from '@chevrotain/types'
 
 export default interface JassCstNode extends CstNode {
+    // generic
+    [JassRule.takes_nothing]?: IToken[],
+    [JassRule.returns_nothing]?: IToken[],
+    [JassRule.identifier_name]?: IToken[],
+    [JassRule.identifier_returns]?: IToken[],
+
     // node
     [JassRule.end]?: CstNode[],
     [JassRule.type_declare]?: CstNode[],
+    [JassRule.jass_constant]?: CstNode[],
     [JassRule.function_head]?: CstNode[],
     [JassRule.native_declare]?: CstNode[],
     [JassRule.function_declare]?: CstNode[],
+    [JassRule.local_declare]?: CstNode[],
     [JassRule.globals_declare]?: CstNode[],
     [JassRule.variable_declare]?: CstNode[],
-    [JassRule.function_args]?: CstNode[],
-    [JassRule.function_returns]?: CstNode[],
-    [JassRule.function_locals]?: CstNode[],
     [JassRule.function_call]?: CstNode[],
     [JassRule.statement]?: CstNode[],
     [JassRule.typedname]?: CstNode[],
@@ -80,4 +85,5 @@ export default interface JassCstNode extends CstNode {
     [JassRule.lessorequal]?: IToken[],
     [JassRule.great]?: IToken[],
     [JassRule.greatorequal]?: IToken[],
+    [JassRule.linebreak]?: IToken[] | null,
 }

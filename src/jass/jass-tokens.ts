@@ -30,16 +30,19 @@ const operatorColor = '#e7be60'
 const parenColor = '#e1d132'
 
 const JassTokens: Record<Exclude<JassRule,
+    JassRule.identifier_name |
+    JassRule.identifier_returns |
+    JassRule.takes_nothing |
+    JassRule.returns_nothing |
     JassRule.jass |
+    JassRule.jass_constant |
     JassRule.type_declare |
     JassRule.globals_declare |
     JassRule.variable_declare |
     JassRule.native_declare |
     JassRule.function_declare |
-    JassRule.function_returns |
     JassRule.function_head |
-    JassRule.function_locals |
-    JassRule.function_args |
+    JassRule.local_declare |
     JassRule.function_call |
     JassRule.return_statement |
     JassRule.if_statement |

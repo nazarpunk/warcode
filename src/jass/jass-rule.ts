@@ -1,15 +1,19 @@
 const enum JassRule {
+    // generic
+    takes_nothing = 'takes_nothing',
+    returns_nothing = 'returns_nothing',
+    identifier_name = 'identifier_name',
+    identifier_returns = 'identifier_returns',
     // rules
     jass = 'jass',
     type_declare = 'type_declare',
     globals_declare = 'globals_declare',
     variable_declare = 'variable_declare',
+    jass_constant = 'jass_constant',
     native_declare = 'native_declare',
     function_head = 'function_head',
     function_declare = 'function_declare',
-    function_locals = 'function_locals',
-    function_args = 'function_args',
-    function_returns = 'function_returns',
+    local_declare = 'local_declare',
     function_call = 'function_call',
     return_statement = 'return_statement',
     if_statement = 'if_statement',

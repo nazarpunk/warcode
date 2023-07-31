@@ -1,6 +1,6 @@
-import {CstNode} from "chevrotain";
-import WtsRule from "./wts-rule";
-import {IToken} from "@chevrotain/types";
+import {CstNode} from 'chevrotain'
+import WtsRule from './wts-rule'
+import {IToken} from '@chevrotain/types'
 
 export default interface WtsCstNode extends CstNode {
     // node

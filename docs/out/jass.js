@@ -9236,16 +9236,19 @@ function createSyntaxDiagramsCode(grammar, { resourceBase = `https://unpkg.com/c
 
 // src/jass/jass-rule.ts
 var JassRule = /* @__PURE__ */ ((JassRule2) => {
+  JassRule2["takes_nothing"] = "takes_nothing";
+  JassRule2["returns_nothing"] = "returns_nothing";
+  JassRule2["identifier_name"] = "identifier_name";
+  JassRule2["identifier_returns"] = "identifier_returns";
   JassRule2["jass"] = "jass";
   JassRule2["type_declare"] = "type_declare";
   JassRule2["globals_declare"] = "globals_declare";
   JassRule2["variable_declare"] = "variable_declare";
+  JassRule2["jass_constant"] = "jass_constant";
   JassRule2["native_declare"] = "native_declare";
   JassRule2["function_head"] = "function_head";
   JassRule2["function_declare"] = "function_declare";
-  JassRule2["function_locals"] = "function_locals";
-  JassRule2["function_args"] = "function_args";
-  JassRule2["function_returns"] = "function_returns";
+  JassRule2["local_declare"] = "local_declare";
   JassRule2["function_call"] = "function_call";
   JassRule2["return_statement"] = "return_statement";
   JassRule2["if_statement"] = "if_statement";
@@ -9581,12 +9584,62 @@ var JassParser = class extends CstParser {
     super(jass_tokens_list_default, config);
     const $ = this;
     $.RULE(jass_rule_default.jass, () => $.MANY(() => $.OR([
-      { ALT: () => $.SUBRULE($[jass_rule_default.type_declare]) },
-      { ALT: () => $.SUBRULE($[jass_rule_default.native_declare]) },
-      { ALT: () => $.SUBRULE($[jass_rule_default.function_declare]) },
+      { ALT: () => $.CONSUME(jass_tokens_default[jass_rule_default.linebreak]) },
+      { ALT: () => $.SUBRULE($[jass_rule_default.jass_constant]) },
       { ALT: () => $.SUBRULE($[jass_rule_default.globals_declare]) },
-      { ALT: () => $.CONSUME(jass_tokens_default[jass_rule_default.linebreak]) }
+      { ALT: () => $.SUBRULE($[jass_rule_default.type_declare]) }
     ])));
+    $.RULE(jass_rule_default.jass_constant, () => {
+      $.OPTION(() => $.CONSUME(jass_tokens_default[jass_rule_default.constant]));
+      $.OR([
+        { ALT: () => $.SUBRULE($[jass_rule_default.function_declare]) },
+        { ALT: () => $.SUBRULE($[jass_rule_default.native_declare]) }
+      ]);
+    });
+    $.RULE(jass_rule_default.native_declare, () => {
+      $.CONSUME(jass_tokens_default[jass_rule_default.native]);
+      $.SUBRULE($[jass_rule_default.function_head]);
+    });
+    $.RULE(jass_rule_default.function_declare, () => {
+      $.CONSUME(jass_tokens_default[jass_rule_default.function]);
+      $.SUBRULE($[jass_rule_default.function_head]);
+      $.MANY1(() => $.SUBRULE($[jass_rule_default.local_declare]));
+      $.MANY2(() => $.SUBRULE($[jass_rule_default.statement]));
+      $.CONSUME(jass_tokens_default[jass_rule_default.endfunction]);
+      $.SUBRULE2($[jass_rule_default.end]);
+    });
+    $.RULE(jass_rule_default.function_head, () => {
+      $.CONSUME(jass_tokens_default[jass_rule_default.identifier], { LABEL: jass_rule_default.identifier_name });
+      $.CONSUME(jass_tokens_default[jass_rule_default.takes]);
+      $.OR([
+        { ALT: () => $.CONSUME(jass_tokens_default[jass_rule_default.nothing], { LABEL: jass_rule_default.takes_nothing }) },
+        {
+          ALT: () => {
+            $.AT_LEAST_ONE_SEP({
+              SEP: jass_tokens_default[jass_rule_default.comma],
+              DEF: () => $.SUBRULE($[jass_rule_default.typedname])
+            });
+          }
+        }
+      ]);
+      $.CONSUME(jass_tokens_default[jass_rule_default.returns]);
+      $.OR1([
+        { ALT: () => $.CONSUME1(jass_tokens_default[jass_rule_default.nothing], { LABEL: jass_rule_default.returns_nothing }) },
+        { ALT: () => $.CONSUME1(jass_tokens_default[jass_rule_default.identifier], { LABEL: jass_rule_default.identifier_returns }) }
+      ]);
+      $.SUBRULE($[jass_rule_default.end]);
+    });
+    $.RULE(jass_rule_default.local_declare, () => {
+      $.OR([
+        { ALT: () => $.CONSUME(jass_tokens_default[jass_rule_default.linebreak]) },
+        {
+          ALT: () => {
+            $.CONSUME(jass_tokens_default[jass_rule_default.local]);
+            $.SUBRULE($[jass_rule_default.variable_declare]);
+          }
+        }
+      ]);
+    });
     $.RULE(jass_rule_default.type_declare, () => {
       $.CONSUME(jass_tokens_default[jass_rule_default.type]);
       $.CONSUME(jass_tokens_default[jass_rule_default.identifier]);
@@ -9594,33 +9647,7 @@ var JassParser = class extends CstParser {
       $.CONSUME2(jass_tokens_default[jass_rule_default.identifier]);
       $.SUBRULE($[jass_rule_default.end]);
     });
-    $.RULE(jass_rule_default.native_declare, () => {
-      $.OPTION(() => $.CONSUME(jass_tokens_default[jass_rule_default.constant]));
-      $.CONSUME(jass_tokens_default[jass_rule_default.native]);
-      $.SUBRULE($[jass_rule_default.function_head]);
-    });
-    $.RULE(jass_rule_default.function_declare, () => {
-      $.OPTION(() => $.CONSUME(jass_tokens_default[jass_rule_default.constant]));
-      $.CONSUME(jass_tokens_default[jass_rule_default.function]);
-      $.SUBRULE($[jass_rule_default.function_head]);
-      $.MANY1(() => $.SUBRULE($[jass_rule_default.function_locals]));
-      $.MANY2(() => $.SUBRULE($[jass_rule_default.statement]));
-      $.CONSUME(jass_tokens_default[jass_rule_default.endfunction]);
-      $.SUBRULE2($[jass_rule_default.end]);
-    });
-    $.RULE(jass_rule_default.function_head, () => {
-      $.CONSUME(jass_tokens_default[jass_rule_default.identifier]);
-      $.CONSUME(jass_tokens_default[jass_rule_default.takes]);
-      $.SUBRULE($[jass_rule_default.function_args]);
-      $.CONSUME(jass_tokens_default[jass_rule_default.returns]);
-      $.SUBRULE($[jass_rule_default.function_returns]);
-      $.SUBRULE($[jass_rule_default.end]);
-    });
     $.RULE(jass_rule_default.variable_declare, () => {
-      $.OPTION(() => $.OR([
-        { ALT: () => $.CONSUME(jass_tokens_default[jass_rule_default.constant]) },
-        { ALT: () => $.CONSUME(jass_tokens_default[jass_rule_default.local]) }
-      ]));
       $.SUBRULE($[jass_rule_default.typedname]);
       $.OPTION2(() => {
         $.CONSUME(jass_tokens_default[jass_rule_default.assign]);
@@ -9632,7 +9659,12 @@ var JassParser = class extends CstParser {
       $.CONSUME(jass_tokens_default[jass_rule_default.globals]);
       $.SUBRULE($[jass_rule_default.end]);
       $.MANY(() => $.OR([
-        { ALT: () => $.SUBRULE($[jass_rule_default.variable_declare]) },
+        {
+          ALT: () => {
+            $.OPTION(() => $.CONSUME(jass_tokens_default[jass_rule_default.constant]));
+            $.SUBRULE($[jass_rule_default.variable_declare]);
+          }
+        },
         { ALT: () => $.CONSUME(jass_tokens_default[jass_rule_default.linebreak]) }
       ]));
       $.CONSUME3(jass_tokens_default[jass_rule_default.endglobals]);
@@ -9692,35 +9724,10 @@ var JassParser = class extends CstParser {
       $.SUBRULE($[jass_rule_default.expression]);
       $.SUBRULE($[jass_rule_default.end]);
     });
-    $.RULE(jass_rule_default.function_args, () => {
-      $.OR([
-        { ALT: () => $.CONSUME(jass_tokens_default[jass_rule_default.nothing]) },
-        {
-          ALT: () => {
-            $.AT_LEAST_ONE_SEP({
-              SEP: jass_tokens_default[jass_rule_default.comma],
-              DEF: () => $.SUBRULE($[jass_rule_default.typedname])
-            });
-          }
-        }
-      ]);
-    });
     $.RULE(jass_rule_default.typedname, () => {
       $.CONSUME(jass_tokens_default[jass_rule_default.identifier]);
       $.OPTION2(() => $.CONSUME(jass_tokens_default[jass_rule_default.array]));
       $.CONSUME2(jass_tokens_default[jass_rule_default.identifier]);
-    });
-    $.RULE(jass_rule_default.function_returns, () => {
-      $.OR([
-        { ALT: () => $.CONSUME(jass_tokens_default[jass_rule_default.nothing]) },
-        { ALT: () => $.CONSUME(jass_tokens_default[jass_rule_default.identifier]) }
-      ]);
-    });
-    $.RULE(jass_rule_default.function_locals, () => {
-      $.OR([
-        { ALT: () => $.CONSUME(jass_tokens_default[jass_rule_default.linebreak]) },
-        { ALT: () => $.SUBRULE($[jass_rule_default.variable_declare]) }
-      ]);
     });
     $.RULE(jass_rule_default.expression, () => {
       $.OR([
@@ -12384,8 +12391,8 @@ var en = {
   ["localInGlobalsError" /* localInGlobalsError */]: "Local variable not allowed in globals block.",
   ["multilineStringError" /* multilineStringError */]: "Avoid multiline strings. Use |n or \\n to linebreak.",
   ["arrayInFunctionArgumentError" /* arrayInFunctionArgumentError */]: "Array not allowed in function argument.",
-  ["localRedeclareArgumentError" /* localRedeclareArgumentError */]: "Local variable `{{name}}` redeclare argument.",
-  ["localRedeclaredError" /* localRedeclaredError */]: "Local variable `{{name}}` redeclared.",
+  ["localRedeclareArgError" /* localRedeclareArgError */]: "Local variable `{{name}}` redeclare argument.",
+  ["localRedeclareLocalError" /* localRedeclareLocalError */]: "Local variable `{{name}}` redeclared.",
   ["constantInFunctionError" /* constantInFunctionError */]: "Constant not allowed in function.",
   ["misssingLocalKeywordError" /* misssingLocalKeywordError */]: "Missing local keyword.",
   ["sameNameArgumentError" /* sameNameArgumentError */]: "Arguments with same name `{{name}}`.",
@@ -12407,8 +12414,8 @@ var ru = {
   ["localInGlobalsError" /* localInGlobalsError */]: "\u041B\u043E\u043A\u0430\u043B\u044C\u043D\u044B\u0435 \u043F\u0435\u0440\u0435\u043C\u0435\u043D\u043D\u044B\u0435 \u043D\u0435\u043B\u044C\u0437\u044F \u043E\u0431\u044A\u044F\u0432\u043B\u044F\u0442\u044C \u0432 \u0431\u043B\u043E\u043A\u0435 globals.",
   ["multilineStringError" /* multilineStringError */]: "\u0418\u0437\u0431\u0435\u0433\u0430\u0439\u0442\u0435 \u043C\u043D\u043E\u0433\u043E\u0441\u0442\u0440\u043E\u0447\u043D\u044B\u0445 \u0441\u0442\u0440\u043E\u043A. \u0418\u0441\u043F\u043E\u043B\u044C\u0437\u0443\u0439\u0442\u0435 |n \u0438\u043B\u0438 \\n \u0434\u043B\u044F \u043F\u0435\u0440\u0435\u043D\u043E\u0441\u0430 \u0441\u0442\u0440\u043E\u043A\u0438.",
   ["arrayInFunctionArgumentError" /* arrayInFunctionArgumentError */]: "\u0417\u0430\u043F\u0440\u0435\u0448\u0435\u043D\u043E \u0438\u0441\u043F\u043E\u043B\u044C\u0437\u043E\u0432\u0430\u0442\u044C \u043C\u0430\u0441\u0441\u0438\u0432\u044B \u0432 \u0430\u0440\u0433\u0443\u043C\u0435\u043D\u0442\u0430\u0445 \u0444\u0443\u043D\u043A\u0446\u0438\u0438.",
-  ["localRedeclareArgumentError" /* localRedeclareArgumentError */]: "\u041B\u043E\u043A\u0430\u043B\u044C\u043D\u0430\u044F \u043F\u0435\u0440\u0435\u043C\u0435\u043D\u043D\u0430\u044F `{{name}}` \u043F\u0435\u0440\u0435\u043E\u043F\u0440\u0435\u0434\u0435\u043B\u044F\u0435\u0442 \u0430\u0440\u0433\u0443\u043C\u0435\u043D\u0442.",
-  ["localRedeclaredError" /* localRedeclaredError */]: "\u041B\u043E\u043A\u0430\u043B\u044C\u043D\u0430\u044F \u043F\u0435\u0440\u0435\u043C\u0435\u043D\u043D\u0430\u044F `{{name}}` \u043E\u0431\u044A\u044F\u0432\u043B\u0435\u043D\u0430 \u043F\u043E\u0432\u0442\u043E\u0440\u043D\u043E.",
+  ["localRedeclareArgError" /* localRedeclareArgError */]: "\u041B\u043E\u043A\u0430\u043B\u044C\u043D\u0430\u044F \u043F\u0435\u0440\u0435\u043C\u0435\u043D\u043D\u0430\u044F `{{name}}` \u043F\u0435\u0440\u0435\u043E\u043F\u0440\u0435\u0434\u0435\u043B\u044F\u0435\u0442 \u0430\u0440\u0433\u0443\u043C\u0435\u043D\u0442.",
+  ["localRedeclareLocalError" /* localRedeclareLocalError */]: "\u041B\u043E\u043A\u0430\u043B\u044C\u043D\u0430\u044F \u043F\u0435\u0440\u0435\u043C\u0435\u043D\u043D\u0430\u044F `{{name}}` \u043E\u0431\u044A\u044F\u0432\u043B\u0435\u043D\u0430 \u043F\u043E\u0432\u0442\u043E\u0440\u043D\u043E.",
   ["constantInFunctionError" /* constantInFunctionError */]: "\u041E\u0431\u044F\u0432\u043B\u0435\u043D\u0438\u0435 \u043A\u043E\u043D\u0441\u0442\u0430\u043D\u0442 \u0432 \u0444\u0443\u043D\u043A\u0446\u0438\u0438 \u0437\u0430\u043F\u0440\u0435\u0449\u0435\u043D\u043E.",
   ["misssingLocalKeywordError" /* misssingLocalKeywordError */]: "\u041D\u0435 \u0434\u043E\u0441\u0442\u0430\u0451\u0442 \u043A\u043B\u044E\u0447\u0435\u0432\u043E\u0433\u043E \u0441\u043B\u043E\u0432\u0430 `local`.",
   ["sameNameArgumentError" /* sameNameArgumentError */]: "\u0410\u0440\u0433\u0443\u043C\u0435\u043D\u0442\u044B \u0441 \u043E\u0434\u0438\u043D\u0430\u043A\u043E\u0432\u044B\u043C \u0438\u043C\u0435\u043D\u0435\u043C `{{name}}`.",
@@ -12435,13 +12442,186 @@ var JassVisitor = class extends ParserVisitor {
     this.validateVisitor();
   }
   [jass_rule_default.jass](ctx) {
+    ctx[jass_rule_default.jass_constant]?.map((item) => this.visit(item));
     ctx[jass_rule_default.type_declare]?.map((item) => this.visit(item));
-    ctx[jass_rule_default.native_declare]?.map((item) => this.visit(item));
-    ctx[jass_rule_default.function_declare]?.map((item) => this.visit(item));
     ctx[jass_rule_default.globals_declare]?.map((item) => this.visit(item));
+    return null;
   }
-  [jass_rule_default.end](ctx) {
-    return ctx;
+  [jass_rule_default.jass_constant](ctx) {
+    const b = this.bridge;
+    const constant2 = ctx[jass_rule_default.constant]?.[0];
+    if (b)
+      b.mark(constant2, token_legend_default.jass_takes);
+    this.visit(ctx[jass_rule_default.function_declare], { constant: constant2 });
+    this.visit(ctx[jass_rule_default.native_declare], { constant: constant2 });
+    return null;
+  }
+  [jass_rule_default.native_declare](ctx) {
+    this.visit(ctx[jass_rule_default.function_head], { native: true });
+    const b = this?.bridge;
+    if (b)
+      b.mark(ctx[jass_rule_default.native]?.[0], token_legend_default.jass_native);
+  }
+  [jass_rule_default.function_declare](ctx) {
+    var _a;
+    const b = this?.bridge;
+    if (b) {
+      b.mark(ctx[jass_rule_default.function]?.[0], token_legend_default.jass_function);
+      b.mark(ctx[jass_rule_default.endfunction]?.[0], token_legend_default.jass_endfunction);
+    }
+    const head2 = this.visit(ctx[jass_rule_default.function_head]);
+    const { argMap } = head2;
+    const localMap = {};
+    const localDeclares = ctx[jass_rule_default.local_declare];
+    if (localDeclares) {
+      for (const localDeclare of localDeclares) {
+        const local = this.visit(localDeclare);
+        if (!local)
+          continue;
+        const { type, name } = local.typedname;
+        if (b) {
+          b.mark(type, token_legend_default.jass_type_name);
+          b.mark(name, token_legend_default.jass_variable);
+        }
+        if (name) {
+          (localMap[_a = name.image] ?? (localMap[_a] = [])).push(name);
+          const argList = argMap[name.image];
+          if (b && argList) {
+            for (const t2 of [name, ...argList]) {
+              this.bridge?.diagnostics.push({
+                message: instance.t("localRedeclareArgError" /* localRedeclareArgError */, { name: t2.image }),
+                range: new import_vscode2.Range(
+                  b.document.positionAt(t2.startOffset),
+                  b.document.positionAt(t2.startOffset + t2.image.length)
+                ),
+                severity: import_vscode2.DiagnosticSeverity.Warning
+              });
+            }
+          }
+        }
+      }
+      if (b)
+        for (const locals of Object.values(localMap)) {
+          if (locals.length < 2)
+            continue;
+          for (const local of locals) {
+            b.diagnostics.push({
+              message: instance.t("localRedeclareLocalError" /* localRedeclareLocalError */, { name: local.image }),
+              range: new import_vscode2.Range(
+                b.document.positionAt(local.startOffset),
+                b.document.positionAt(local.startOffset + local.image.length)
+              ),
+              severity: import_vscode2.DiagnosticSeverity.Warning
+            });
+          }
+        }
+    }
+    const statements = ctx[jass_rule_default.statement];
+    if (statements) {
+      for (const statement of statements) {
+        this.visit(statement);
+      }
+    }
+  }
+  [jass_rule_default.function_head](ctx, opts) {
+    var _a;
+    const b = this?.bridge;
+    if (b) {
+      b.mark(ctx[jass_rule_default.takes]?.[0], token_legend_default.jass_takes);
+      b.mark(ctx[jass_rule_default.returns]?.[0], token_legend_default.jass_returns);
+    }
+    const name = ctx[jass_rule_default.identifier_name]?.[0];
+    if (name && b)
+      b.mark(name, opts?.native ? token_legend_default.jass_function_native : token_legend_default.jass_function_user);
+    const argMap = {};
+    const takesNothing = ctx[jass_rule_default.takes_nothing]?.[0];
+    if (takesNothing) {
+      b?.mark(takesNothing, token_legend_default.jass_type_name);
+    } else {
+      const commas = ctx[jass_rule_default.comma];
+      if (b && commas)
+        for (const comma of commas)
+          b.mark(comma, token_legend_default.jass_comma);
+      const typednames = ctx?.[jass_rule_default.typedname];
+      if (typednames)
+        for (const typedname of typednames) {
+          const typename = this.visit(typedname);
+          if (typename) {
+            const { type, name: name2, array } = typename;
+            if (name2)
+              (argMap[_a = name2.image] ?? (argMap[_a] = [])).push(name2);
+            if (b) {
+              b.mark(type, token_legend_default.jass_type_name);
+              b.mark(name2, token_legend_default.jass_argument);
+              if (array) {
+                b.diagnostics.push({
+                  message: instance.t("arrayInFunctionArgumentError" /* arrayInFunctionArgumentError */),
+                  range: new import_vscode2.Range(
+                    b.document.positionAt(array.startOffset),
+                    b.document.positionAt(array.startOffset + array.image.length)
+                  ),
+                  severity: import_vscode2.DiagnosticSeverity.Error
+                });
+              }
+            }
+          }
+        }
+      if (b)
+        for (const v of Object.values(argMap)) {
+          if (v.length < 2)
+            continue;
+          for (const t2 of v) {
+            b.diagnostics.push({
+              message: instance.t("sameNameArgumentError" /* sameNameArgumentError */, { name: t2.image }),
+              range: new import_vscode2.Range(
+                b.document.positionAt(t2.startOffset),
+                b.document.positionAt(t2.startOffset + t2.image.length)
+              ),
+              severity: import_vscode2.DiagnosticSeverity.Warning
+            });
+          }
+        }
+    }
+    const returnsNothing = ctx[jass_rule_default.returns_nothing]?.[0];
+    if (returnsNothing) {
+      b?.mark(returnsNothing, token_legend_default.jass_type_name);
+    } else {
+      const identifierReturns = ctx[jass_rule_default.identifier_returns]?.[0];
+      if (b)
+        b.mark(identifierReturns, token_legend_default.jass_type_name);
+    }
+    return {
+      argMap
+    };
+  }
+  [jass_rule_default.local_declare](ctx) {
+    this?.bridge?.mark(ctx[jass_rule_default.local]?.[0], token_legend_default.jass_local);
+    return this.visit(ctx[jass_rule_default.variable_declare]);
+  }
+  [jass_rule_default.variable_declare](ctx) {
+    const equals = ctx[jass_rule_default.assign]?.[0];
+    const typedname = this.visit(ctx[jass_rule_default.typedname]);
+    if (!typedname)
+      return null;
+    const array = typedname[jass_rule_default.array];
+    const b = this.bridge;
+    if (b && equals && array) {
+      b.diagnostics.push({
+        message: instance.t("arrayInitializeError" /* arrayInitializeError */),
+        range: new import_vscode2.Range(
+          b.document.positionAt(array.startOffset),
+          b.document.positionAt(array.startOffset + array.image.length)
+        ),
+        severity: import_vscode2.DiagnosticSeverity.Error
+      });
+    }
+    b?.mark(ctx[jass_rule_default.assign]?.[0], token_legend_default.jass_equals);
+    const exp = ctx[jass_rule_default.expression];
+    if (exp)
+      this.visit(exp);
+    return {
+      typedname
+    };
   }
   [jass_rule_default.globals_declare](ctx) {
     const b = this?.bridge;
@@ -12489,150 +12669,18 @@ var JassVisitor = class extends ParserVisitor {
       base: base?.image
     };
   }
-  [jass_rule_default.native_declare](ctx) {
-    this.visit(ctx[jass_rule_default.function_head], { native: true });
-    const b = this?.bridge;
-    if (b) {
-      b.mark(ctx[jass_rule_default.constant]?.[0], token_legend_default.jass_constant);
-      b.mark(ctx[jass_rule_default.native]?.[0], token_legend_default.jass_native);
-    }
-  }
-  [jass_rule_default.function_declare](ctx) {
-    var _a;
-    const b = this?.bridge;
-    if (b) {
-      b.mark(ctx[jass_rule_default.constant]?.[0], token_legend_default.jass_constant);
-      b.mark(ctx[jass_rule_default.function]?.[0], token_legend_default.jass_function);
-      b.mark(ctx[jass_rule_default.endfunction]?.[0], token_legend_default.jass_endfunction);
-    }
-    const head2 = this.visit(ctx[jass_rule_default.function_head]);
-    if (head2) {
-      const args = head2.args;
-      if (b && args?.list) {
-        for (const arg of args.list) {
-          const array = arg[jass_rule_default.array];
-          if (array) {
-            b.diagnostics.push({
-              message: instance.t("arrayInFunctionArgumentError" /* arrayInFunctionArgumentError */),
-              range: new import_vscode2.Range(
-                b.document.positionAt(array.startOffset),
-                b.document.positionAt(array.startOffset + array.image.length)
-              ),
-              severity: import_vscode2.DiagnosticSeverity.Error
-            });
-          }
-        }
-      }
-      const locals = ctx?.[jass_rule_default.function_locals];
-      if (locals) {
-        const localMap = {};
-        for (const local of locals) {
-          const typedname = this.visit(local)?.[jass_rule_default.typedname];
-          if (!typedname)
-            continue;
-          const { type, name } = typedname;
-          if (b) {
-            b.mark(type, token_legend_default.jass_type_name);
-            b.mark(name, token_legend_default.jass_variable);
-          }
-          if (name) {
-            (localMap[_a = name.image] ?? (localMap[_a] = [])).push(name);
-            const argList = args.map[name.image];
-            if (b && argList) {
-              for (const t2 of [name, ...argList]) {
-                this.bridge?.diagnostics.push({
-                  message: instance.t("localRedeclareArgumentError" /* localRedeclareArgumentError */, { name: t2.image }),
-                  range: new import_vscode2.Range(
-                    b.document.positionAt(t2.startOffset),
-                    b.document.positionAt(t2.startOffset + t2.image.length)
-                  ),
-                  severity: import_vscode2.DiagnosticSeverity.Warning
-                });
-              }
-            }
-          }
-        }
-        if (b)
-          for (const v of Object.values(localMap)) {
-            if (v.length < 2)
-              continue;
-            for (const t2 of v) {
-              b.diagnostics.push({
-                message: instance.t("localRedeclaredError" /* localRedeclaredError */, { name: t2.image }),
-                range: new import_vscode2.Range(
-                  b.document.positionAt(t2.startOffset),
-                  b.document.positionAt(t2.startOffset + t2.image.length)
-                ),
-                severity: import_vscode2.DiagnosticSeverity.Warning
-              });
-            }
-          }
-      }
-      const statements = ctx[jass_rule_default.statement];
-      if (statements) {
-        for (const statement of statements) {
-          this.visit(statement);
-        }
-      }
-    }
-  }
-  [jass_rule_default.function_head](ctx, opts) {
-    const b = this?.bridge;
-    if (b) {
-      b.mark(ctx[jass_rule_default.identifier]?.[0], opts?.native ? token_legend_default.jass_function_native : token_legend_default.jass_function_user);
-      b.mark(ctx[jass_rule_default.takes]?.[0], token_legend_default.jass_takes);
-      b.mark(ctx[jass_rule_default.returns]?.[0], token_legend_default.jass_returns);
-    }
-    this.visit(ctx[jass_rule_default.function_returns]);
-    return {
-      args: this.visit(ctx[jass_rule_default.function_args])
-    };
-  }
-  [jass_rule_default.function_locals](ctx) {
-    const variableDeclare = ctx[jass_rule_default.variable_declare];
-    if (!variableDeclare)
-      return null;
-    const variable = this.visit(variableDeclare);
-    const b = this.bridge;
-    if (b) {
-      const constant2 = variable?.[jass_rule_default.constant];
-      if (constant2) {
-        b.diagnostics.push({
-          message: instance.t("constantInFunctionError" /* constantInFunctionError */),
-          range: new import_vscode2.Range(
-            b.document.positionAt(constant2.startOffset),
-            b.document.positionAt(constant2.startOffset + constant2.image.length)
-          ),
-          severity: import_vscode2.DiagnosticSeverity.Error
-        });
-      }
-      const local = variable?.[jass_rule_default.local];
-      if (!local) {
-        const { type } = variable?.[jass_rule_default.typedname];
-        if (type) {
-          b.diagnostics.push({
-            message: instance.t("misssingLocalKeywordError" /* misssingLocalKeywordError */),
-            range: new import_vscode2.Range(
-              b.document.positionAt(type.startOffset),
-              b.document.positionAt(type.startOffset + type.image.length)
-            ),
-            severity: import_vscode2.DiagnosticSeverity.Error
-          });
-        }
-      }
-    }
-    return variable;
-  }
   [jass_rule_default.typedname](ctx) {
     const array = ctx[jass_rule_default.array]?.[0];
     this?.bridge?.mark(array, token_legend_default.jass_array);
     const list = ctx[jass_rule_default.identifier];
-    if (!list)
-      return {};
+    if (!list || list.length != 2)
+      return null;
     const [type, name] = list;
+    if (type.isInsertedInRecovery || name.isInsertedInRecovery)
+      return null;
     return {
-      type: type?.isInsertedInRecovery ?? false ? null : type,
-      name: name?.isInsertedInRecovery ?? false ? null : name,
+      type,
+      name,
       array
     };
   }
@@ -12646,95 +12694,6 @@ var JassVisitor = class extends ParserVisitor {
     }
     ctx[jass_rule_default.expression]?.map((item) => this.visit(item));
     return ctx;
-  }
-  [jass_rule_default.function_args](ctx) {
-    var _a;
-    const b = this?.bridge;
-    const nothing = ctx?.[jass_rule_default.nothing]?.[0];
-    if (nothing) {
-      b?.mark(nothing, token_legend_default.jass_type_name);
-      return { map: {}, list: [] };
-    }
-    const commas = ctx[jass_rule_default.comma];
-    if (b && commas)
-      for (const comma of commas) {
-        this?.bridge?.mark(comma, token_legend_default.jass_comma);
-      }
-    const args = ctx?.[jass_rule_default.typedname]?.map((item) => this.visit(item));
-    const argMap = {};
-    if (args) {
-      for (const arg of args) {
-        const { type, name } = arg;
-        this?.bridge?.mark(type, token_legend_default.jass_type_name);
-        this?.bridge?.mark(name, token_legend_default.jass_argument);
-        if (name)
-          (argMap[_a = name.image] ?? (argMap[_a] = [])).push(name);
-      }
-      if (b)
-        for (const v of Object.values(argMap)) {
-          if (v.length < 2)
-            continue;
-          for (const t2 of v) {
-            b.diagnostics.push({
-              message: instance.t("sameNameArgumentError" /* sameNameArgumentError */, { name: t2.image }),
-              range: new import_vscode2.Range(
-                b.document.positionAt(t2.startOffset),
-                b.document.positionAt(t2.startOffset + t2.image.length)
-              ),
-              severity: import_vscode2.DiagnosticSeverity.Warning
-            });
-          }
-        }
-    }
-    return {
-      map: argMap,
-      list: args
-    };
-  }
-  [jass_rule_default.function_returns](ctx) {
-    const b = this?.bridge;
-    const nothing = ctx[jass_rule_default.nothing]?.[0];
-    const type = ctx[jass_rule_default.identifier]?.[0];
-    if (b) {
-      if (nothing)
-        b.mark(nothing, token_legend_default.jass_type_name);
-      if (type)
-        b.mark(type, token_legend_default.jass_type_name);
-    }
-    return null;
-  }
-  [jass_rule_default.variable_declare](ctx) {
-    const equals = ctx[jass_rule_default.assign]?.[0];
-    const typedname = this.visit(ctx[jass_rule_default.typedname]);
-    const array = typedname[jass_rule_default.array];
-    const b = this.bridge;
-    if (b && equals && array) {
-      b.diagnostics.push({
-        message: instance.t("arrayInitializeError" /* arrayInitializeError */),
-        range: new import_vscode2.Range(
-          b.document.positionAt(array.startOffset),
-          b.document.positionAt(array.startOffset + array.image.length)
-        ),
-        severity: import_vscode2.DiagnosticSeverity.Error
-      });
-    }
-    const local = ctx[jass_rule_default.local]?.[0];
-    const constant2 = ctx[jass_rule_default.constant]?.[0];
-    if (b) {
-      if (local)
-        b.mark(local, token_legend_default.jass_local);
-      if (constant2)
-        b.mark(constant2, token_legend_default.jass_constant);
-      b.mark(ctx[jass_rule_default.assign]?.[0], token_legend_default.jass_equals);
-    }
-    const exp = ctx[jass_rule_default.expression];
-    if (exp)
-      this.visit(exp);
-    return {
-      [jass_rule_default.typedname]: typedname,
-      [jass_rule_default.local]: local,
-      [jass_rule_default.constant]: constant2
-    };
   }
   [jass_rule_default.statement](ctx) {
     for (const statement of [
@@ -12858,6 +12817,9 @@ var JassVisitor = class extends ParserVisitor {
     this.visit(ctx[jass_rule_default.expression]);
     return null;
   }
+  [jass_rule_default.end](ctx) {
+    return ctx;
+  }
 };
 _string = new WeakSet();
 string_fn = function(ctx) {
@@ -12888,7 +12850,11 @@ string_fn = function(ctx) {
 };
 
 // docs/main.ts
-var parser2 = new JassParser();
+var parser2 = new JassParser({
+  recoveryEnabled: true,
+  nodeLocationTracking: "none",
+  skipValidations: false
+});
 var iframe = document.createElement("iframe");
 iframe.src = "data:text/html;charset=utf-8," + encodeURI(createSyntaxDiagramsCode(parser2.getSerializedGastProductions()));
 document.body.appendChild(iframe);
@@ -12904,6 +12870,8 @@ document.body.appendChild(iframe);
   const result = lexer.tokenize(text);
   parser2.input = result.tokens;
   const nodes = parser2[jass_rule_default.jass]();
+  for (const error of parser2.errors)
+    console.error(error);
   const visitor = new JassVisitor();
   visitor.visit(nodes);
 })();

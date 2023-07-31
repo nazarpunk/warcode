@@ -12387,8 +12387,8 @@ var en = {
   ["localInGlobalsError" /* localInGlobalsError */]: "Local variable not allowed in globals block.",
   ["multilineStringError" /* multilineStringError */]: "Avoid multiline strings. Use |n or \\n to linebreak.",
   ["arrayInFunctionArgumentError" /* arrayInFunctionArgumentError */]: "Array not allowed in function argument.",
-  ["localRedeclareArgumentError" /* localRedeclareArgumentError */]: "Local variable `{{name}}` redeclare argument.",
-  ["localRedeclaredError" /* localRedeclaredError */]: "Local variable `{{name}}` redeclared.",
+  ["localRedeclareArgError" /* localRedeclareArgError */]: "Local variable `{{name}}` redeclare argument.",
+  ["localRedeclareLocalError" /* localRedeclareLocalError */]: "Local variable `{{name}}` redeclared.",
   ["constantInFunctionError" /* constantInFunctionError */]: "Constant not allowed in function.",
   ["misssingLocalKeywordError" /* misssingLocalKeywordError */]: "Missing local keyword.",
   ["sameNameArgumentError" /* sameNameArgumentError */]: "Arguments with same name `{{name}}`.",
@@ -12410,8 +12410,8 @@ var ru = {
   ["localInGlobalsError" /* localInGlobalsError */]: "\u041B\u043E\u043A\u0430\u043B\u044C\u043D\u044B\u0435 \u043F\u0435\u0440\u0435\u043C\u0435\u043D\u043D\u044B\u0435 \u043D\u0435\u043B\u044C\u0437\u044F \u043E\u0431\u044A\u044F\u0432\u043B\u044F\u0442\u044C \u0432 \u0431\u043B\u043E\u043A\u0435 globals.",
   ["multilineStringError" /* multilineStringError */]: "\u0418\u0437\u0431\u0435\u0433\u0430\u0439\u0442\u0435 \u043C\u043D\u043E\u0433\u043E\u0441\u0442\u0440\u043E\u0447\u043D\u044B\u0445 \u0441\u0442\u0440\u043E\u043A. \u0418\u0441\u043F\u043E\u043B\u044C\u0437\u0443\u0439\u0442\u0435 |n \u0438\u043B\u0438 \\n \u0434\u043B\u044F \u043F\u0435\u0440\u0435\u043D\u043E\u0441\u0430 \u0441\u0442\u0440\u043E\u043A\u0438.",
   ["arrayInFunctionArgumentError" /* arrayInFunctionArgumentError */]: "\u0417\u0430\u043F\u0440\u0435\u0448\u0435\u043D\u043E \u0438\u0441\u043F\u043E\u043B\u044C\u0437\u043E\u0432\u0430\u0442\u044C \u043C\u0430\u0441\u0441\u0438\u0432\u044B \u0432 \u0430\u0440\u0433\u0443\u043C\u0435\u043D\u0442\u0430\u0445 \u0444\u0443\u043D\u043A\u0446\u0438\u0438.",
-  ["localRedeclareArgumentError" /* localRedeclareArgumentError */]: "\u041B\u043E\u043A\u0430\u043B\u044C\u043D\u0430\u044F \u043F\u0435\u0440\u0435\u043C\u0435\u043D\u043D\u0430\u044F `{{name}}` \u043F\u0435\u0440\u0435\u043E\u043F\u0440\u0435\u0434\u0435\u043B\u044F\u0435\u0442 \u0430\u0440\u0433\u0443\u043C\u0435\u043D\u0442.",
-  ["localRedeclaredError" /* localRedeclaredError */]: "\u041B\u043E\u043A\u0430\u043B\u044C\u043D\u0430\u044F \u043F\u0435\u0440\u0435\u043C\u0435\u043D\u043D\u0430\u044F `{{name}}` \u043E\u0431\u044A\u044F\u0432\u043B\u0435\u043D\u0430 \u043F\u043E\u0432\u0442\u043E\u0440\u043D\u043E.",
+  ["localRedeclareArgError" /* localRedeclareArgError */]: "\u041B\u043E\u043A\u0430\u043B\u044C\u043D\u0430\u044F \u043F\u0435\u0440\u0435\u043C\u0435\u043D\u043D\u0430\u044F `{{name}}` \u043F\u0435\u0440\u0435\u043E\u043F\u0440\u0435\u0434\u0435\u043B\u044F\u0435\u0442 \u0430\u0440\u0433\u0443\u043C\u0435\u043D\u0442.",
+  ["localRedeclareLocalError" /* localRedeclareLocalError */]: "\u041B\u043E\u043A\u0430\u043B\u044C\u043D\u0430\u044F \u043F\u0435\u0440\u0435\u043C\u0435\u043D\u043D\u0430\u044F `{{name}}` \u043E\u0431\u044A\u044F\u0432\u043B\u0435\u043D\u0430 \u043F\u043E\u0432\u0442\u043E\u0440\u043D\u043E.",
   ["constantInFunctionError" /* constantInFunctionError */]: "\u041E\u0431\u044F\u0432\u043B\u0435\u043D\u0438\u0435 \u043A\u043E\u043D\u0441\u0442\u0430\u043D\u0442 \u0432 \u0444\u0443\u043D\u043A\u0446\u0438\u0438 \u0437\u0430\u043F\u0440\u0435\u0449\u0435\u043D\u043E.",
   ["misssingLocalKeywordError" /* misssingLocalKeywordError */]: "\u041D\u0435 \u0434\u043E\u0441\u0442\u0430\u0451\u0442 \u043A\u043B\u044E\u0447\u0435\u0432\u043E\u0433\u043E \u0441\u043B\u043E\u0432\u0430 `local`.",
   ["sameNameArgumentError" /* sameNameArgumentError */]: "\u0410\u0440\u0433\u0443\u043C\u0435\u043D\u0442\u044B \u0441 \u043E\u0434\u0438\u043D\u0430\u043A\u043E\u0432\u044B\u043C \u0438\u043C\u0435\u043D\u0435\u043C `{{name}}`.",
@@ -12523,7 +12523,7 @@ var ZincVisitor = class extends ParserVisitor {
           if (b && argList) {
             for (const t2 of [name, ...argList]) {
               this.bridge?.diagnostics.push({
-                message: instance.t("localRedeclareArgumentError" /* localRedeclareArgumentError */, { name: t2.image }),
+                message: instance.t("localRedeclareArgError" /* localRedeclareArgError */, { name: t2.image }),
                 range: new import_vscode2.Range(
                   b.document.positionAt(t2.startOffset),
                   b.document.positionAt(t2.startOffset + t2.image.length)
@@ -12540,7 +12540,7 @@ var ZincVisitor = class extends ParserVisitor {
             continue;
           for (const t2 of v) {
             b.diagnostics.push({
-              message: instance.t("localRedeclaredError" /* localRedeclaredError */, { name: t2.image }),
+              message: instance.t("localRedeclareLocalError" /* localRedeclareLocalError */, { name: t2.image }),
               range: new import_vscode2.Range(
                 b.document.positionAt(t2.startOffset),
                 b.document.positionAt(t2.startOffset + t2.image.length)

@@ -151,7 +151,7 @@ export class ZincVisitor extends ParserVisitor {
                     if (b && argList) {
                         for (const t of [name, ...argList]) {
                             this.bridge?.diagnostics.push({
-                                message: i18next.t(i18n.localRedeclareArgumentError, {name: t.image}),
+                                message: i18next.t(i18n.localRedeclareArgError, {name: t.image}),
                                 range: new Range(
                                     b.document.positionAt(t.startOffset),
                                     b.document.positionAt(t.startOffset + t.image.length)
@@ -167,7 +167,7 @@ export class ZincVisitor extends ParserVisitor {
                 if (v.length < 2) continue
                 for (const t of v) {
                     b.diagnostics.push({
-                        message: i18next.t(i18n.localRedeclaredError, {name: t.image}),
+                        message: i18next.t(i18n.localRedeclareLocalError, {name: t.image}),
                         range: new Range(
                             b.document.positionAt(t.startOffset),
                             b.document.positionAt(t.startOffset + t.image.length)

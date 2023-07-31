@@ -1,3 +1,3 @@
-import JassTokens from "./jass-tokens";
+import JassTokens from './jass-tokens'
 
-export default Object.values(JassTokens);
+export default Object.values(JassTokens)
