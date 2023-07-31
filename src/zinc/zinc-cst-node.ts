@@ -1,13 +1,13 @@
-import {CstNode} from "chevrotain";
-import ZincRule from "./zinc-rule";
-import {IToken} from "@chevrotain/types";
+import {CstNode} from 'chevrotain'
+import ZincRule from './zinc-rule'
+import {IToken} from '@chevrotain/types'
 
 export default interface ZincCstNode extends CstNode {
     // node
-    [ZincRule.end]?: CstNode[],
-    [ZincRule.native_declare]?: CstNode[],
+    [ZincRule.library_declare]?: CstNode[],
+    [ZincRule.library_root]?: CstNode[],
+    [ZincRule.access_scope]?: CstNode[],
     [ZincRule.function_declare]?: CstNode[],
-    [ZincRule.root]?: CstNode[],
     [ZincRule.variable_declare]?: CstNode[],
     [ZincRule.function_returns]?: CstNode[],
     [ZincRule.function_args]?: CstNode[],
@@ -29,6 +29,7 @@ export default interface ZincCstNode extends CstNode {
     [ZincRule.primary]?: CstNode[],
     [ZincRule.addition]?: CstNode[],
     // token
+    [ZincRule.library]?: IToken[],
     [ZincRule.endfunction]?: IToken[],
     [ZincRule.globals]?: IToken[],
     [ZincRule.endglobals]?: IToken[],
@@ -36,7 +37,8 @@ export default interface ZincCstNode extends CstNode {
     [ZincRule.type]?: IToken[],
     [ZincRule.extends]?: IToken[],
     [ZincRule.constant]?: IToken[],
-    [ZincRule.native]?: IToken[],
+    [ZincRule.public]?: IToken[],
+    [ZincRule.private]?: IToken[],
     [ZincRule.takes]?: IToken[],
     [ZincRule.returns]?: IToken[],
     [ZincRule.function]?: IToken[],
@@ -45,10 +47,12 @@ export default interface ZincCstNode extends CstNode {
     [ZincRule.array]?: IToken[],
     [ZincRule.lparen]?: IToken[],
     [ZincRule.rparen]?: IToken[],
+    [ZincRule.lcurlyparen]?: IToken[],
+    [ZincRule.rcurlyparen]?: IToken[],
     [ZincRule.comma]?: IToken[],
+    [ZincRule.semicolon]?: IToken[],
     [ZincRule.nothing]?: IToken[],
     [ZincRule.assign]?: IToken[],
-    [ZincRule.local]?: IToken[],
     [ZincRule.debug]?: IToken[],
     [ZincRule.call]?: IToken[],
     [ZincRule.set]?: IToken[],

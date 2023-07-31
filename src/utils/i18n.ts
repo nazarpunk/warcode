@@ -1,5 +1,5 @@
-import i18next from "i18next";
-import {env} from "vscode";
+import i18next from 'i18next';
+import {env} from 'vscode';
 
 export const enum i18n {
     // lexer

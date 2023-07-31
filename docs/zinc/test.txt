@@ -1,4 +1,8 @@
-library a requires b optional c {
+library a { // ddvdvdvdvdv
 
+    private unit a = 22;
+}
+
+library b {
 
 }

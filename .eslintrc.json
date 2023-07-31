@@ -21,6 +21,8 @@
     "no-eq-null": "warn",
     "no-undefined": "warn",
     "curly": "off",
+    "semi": ["error", "never"],
+    "quotes": ["error", "single"],
     "no-unsafe-optional-chaining": "off",
     "@typescript-eslint/ban-ts-comment": "off",
     "@typescript-eslint/no-explicit-any": "off",

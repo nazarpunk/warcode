@@ -20,6 +20,7 @@ export const enum CharCode {
     Slash = 0x2F, // /
     d0 = 0x30, // 0
     d9 = 0x39, // 9
+    Semicolon = 0x3B, // ;
     Less = 0x3C, // <
     Equal = 0x3D, // =
     Greater = 0x3E, // >

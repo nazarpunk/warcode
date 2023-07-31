@@ -1,32 +1,33 @@
-import {createToken, ITokenConfig, Lexer, TokenType} from "chevrotain";
-import JassRule from "./jass-rule";
+import {createToken, ITokenConfig, Lexer, TokenType} from 'chevrotain'
+import JassRule from './jass-rule'
 import {
     CharCode,
     CharCodeBreakList,
     CharCodeDigitList,
     CharCodeLetterList,
     CharCodeWhitespaceList
-} from "../utils/char-code";
+} from '../utils/char-code'
 
 const add = (config: ITokenConfig & {
     color?: string
 }): TokenType => {
-    return createToken(config);
-};
+    return createToken(config)
+}
 
 const keyword = (k: JassRule): TokenType => {
     // color: color ??= '#2C7AD6',
     return createToken({
         name: k,
         pattern: new RegExp(`\\b${k}\\b`),
+        //pattern: k,
         start_chars_hint: [k.charCodeAt(0)],
         line_breaks: false,
-    });
-};
+    })
+}
 
-const numberColor = '#e760cc';
-const operatorColor = '#e7be60';
-const parenColor = '#e1d132';
+const numberColor = '#e760cc'
+const operatorColor = '#e7be60'
+const parenColor = '#e1d132'
 
 const JassTokens: Record<Exclude<JassRule,
     JassRule.jass |
@@ -35,8 +36,9 @@ const JassTokens: Record<Exclude<JassRule,
     JassRule.variable_declare |
     JassRule.native_declare |
     JassRule.function_declare |
-    JassRule.function_locals |
     JassRule.function_returns |
+    JassRule.function_head |
+    JassRule.function_locals |
     JassRule.function_args |
     JassRule.function_call |
     JassRule.return_statement |
@@ -73,7 +75,7 @@ const JassTokens: Record<Exclude<JassRule,
     }),
     [JassRule.linebreak]: add({
         name: JassRule.linebreak,
-        pattern: /\n|\r\n?/,
+        pattern: /\n\r|\r|\n/,
         label: '\\n',
         start_chars_hint: CharCodeBreakList,
         line_breaks: true,
@@ -271,5 +273,5 @@ const JassTokens: Record<Exclude<JassRule,
         line_breaks: false,
         start_chars_hint: CharCodeLetterList,
     }),
-};
-export default JassTokens;
+}
+export default JassTokens

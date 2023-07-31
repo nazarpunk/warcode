@@ -1,18 +1,18 @@
-import {CstNode} from "chevrotain";
-import JassRule from "./jass-rule";
-import {IToken} from "@chevrotain/types";
+import {CstNode} from 'chevrotain'
+import JassRule from './jass-rule'
+import {IToken} from '@chevrotain/types'
 
 export default interface JassCstNode extends CstNode {
     // node
     [JassRule.end]?: CstNode[],
     [JassRule.type_declare]?: CstNode[],
+    [JassRule.function_head]?: CstNode[],
     [JassRule.native_declare]?: CstNode[],
     [JassRule.function_declare]?: CstNode[],
     [JassRule.globals_declare]?: CstNode[],
-    [JassRule.root]?: CstNode[],
     [JassRule.variable_declare]?: CstNode[],
-    [JassRule.function_returns]?: CstNode[],
     [JassRule.function_args]?: CstNode[],
+    [JassRule.function_returns]?: CstNode[],
     [JassRule.function_locals]?: CstNode[],
     [JassRule.function_call]?: CstNode[],
     [JassRule.statement]?: CstNode[],

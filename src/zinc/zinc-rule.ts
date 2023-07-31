@@ -2,6 +2,9 @@ const enum ZincRule {
     // rules
     zinc = 'zinc',
     library = 'library',
+    library_declare = 'library_declare',
+    library_root = 'library_root',
+    access_scope = 'access_scope',
     variable_declare = 'variable_declare',
     function_declare = 'function_declare',
     function_locals = 'function_locals',
@@ -31,6 +34,8 @@ const enum ZincRule {
     array = 'array',
     call = 'call',
     constant = 'constant',
+    public = 'public',
+    private = 'private',
     debug = 'debug',
     else = 'else',
     elseif = 'elseif',
@@ -43,9 +48,7 @@ const enum ZincRule {
     function = 'function',
     globals = 'globals',
     if = 'if',
-    local = 'local',
     loop = 'loop',
-    native = 'native',
     not = 'not',
     nothing = 'nothing',
     or = 'or',
@@ -68,8 +71,11 @@ const enum ZincRule {
     sub = 'sub',
     mult = 'mult',
     div = 'div',
+    semicolon = 'semicolon',
     lparen = 'lparen',
     rparen = 'rparen',
+    lcurlyparen = 'lcurlyparen',
+    rcurlyparen = 'rcurlyparen',
     lsquareparen = 'lsquareparen',
     rsquareparen = 'rsquareparen',
     real = 'real',
@@ -80,4 +86,4 @@ const enum ZincRule {
     identifier = 'identifier',
 }
 
-export default ZincRule;
+export default ZincRule

@@ -1,18 +1,18 @@
-import {createToken, ITokenConfig, Lexer, TokenType} from "chevrotain";
-import ZincRule from "./zinc-rule";
+import {createToken, ITokenConfig, Lexer, TokenType} from 'chevrotain'
+import ZincRule from './zinc-rule'
 import {
     CharCode,
     CharCodeBreakList,
     CharCodeDigitList,
-    CharCodeLetterList, CharCodeWhitespaceBreakList,
-    CharCodeWhitespaceList
-} from "../utils/char-code";
+    CharCodeLetterList,
+    CharCodeWhitespaceBreakList,
+} from '../utils/char-code'
 
 const add = (config: ITokenConfig & {
     color?: string
 }): TokenType => {
-    return createToken(config);
-};
+    return createToken(config)
+}
 
 const keyword = (k: ZincRule): TokenType => {
     // color: color ??= '#2C7AD6',
@@ -21,15 +21,18 @@ const keyword = (k: ZincRule): TokenType => {
         pattern: new RegExp(`\\b${k}\\b`),
         start_chars_hint: [k.charCodeAt(0)],
         line_breaks: false,
-    });
-};
+    })
+}
 
-const numberColor = '#e760cc';
-const operatorColor = '#e7be60';
-const parenColor = '#e1d132';
+const numberColor = '#e760cc'
+const operatorColor = '#e7be60'
+const parenColor = '#e1d132'
 
 const ZincTokens: Record<Exclude<ZincRule,
     ZincRule.zinc |
+    ZincRule.library_declare |
+    ZincRule.library_root |
+    ZincRule.access_scope |
     ZincRule.variable_declare |
     ZincRule.function_declare |
     ZincRule.function_locals |
@@ -64,7 +67,8 @@ const ZincTokens: Record<Exclude<ZincRule,
         pattern: /\/\/[^\r\n]*/,
         line_breaks: false,
         start_chars_hint: [CharCode.Slash],
-        color: '#308030'
+        color: '#308030',
+        group: 'comments'
     }),
     [ZincRule.linebreak]: add({
         name: ZincRule.linebreak,
@@ -78,6 +82,8 @@ const ZincTokens: Record<Exclude<ZincRule,
     [ZincRule.and]: keyword(ZincRule.and),
     [ZincRule.array]: keyword(ZincRule.array),
     [ZincRule.call]: keyword(ZincRule.call),
+    [ZincRule.public]: keyword(ZincRule.public),
+    [ZincRule.private]: keyword(ZincRule.private),
     [ZincRule.constant]: keyword(ZincRule.constant),
     [ZincRule.debug]: keyword(ZincRule.debug),
     [ZincRule.else]: keyword(ZincRule.else),
@@ -91,9 +97,7 @@ const ZincTokens: Record<Exclude<ZincRule,
     [ZincRule.function]: keyword(ZincRule.function),
     [ZincRule.globals]: keyword(ZincRule.globals),
     [ZincRule.if]: keyword(ZincRule.if),
-    [ZincRule.local]: keyword(ZincRule.local),
     [ZincRule.loop]: keyword(ZincRule.loop),
-    [ZincRule.native]: keyword(ZincRule.native),
     [ZincRule.not]: keyword(ZincRule.not),
     [ZincRule.nothing]: keyword(ZincRule.nothing),
     [ZincRule.or]: keyword(ZincRule.or),
@@ -200,6 +204,14 @@ const ZincTokens: Record<Exclude<ZincRule,
         label: '/',
         color: operatorColor,
     }),
+    [ZincRule.semicolon]: add({
+        name: ZincRule.semicolon,
+        pattern: /;/,
+        start_chars_hint: [CharCode.Semicolon],
+        line_breaks: false,
+        label: ';',
+        color: operatorColor,
+    }),
     [ZincRule.lparen]: add({
         name: ZincRule.lparen,
         pattern: /\(/,
@@ -214,6 +226,22 @@ const ZincTokens: Record<Exclude<ZincRule,
         start_chars_hint: [CharCode.RightParenthesis],
         line_breaks: false,
         label: ')',
+        color: parenColor,
+    }),
+    [ZincRule.lcurlyparen]: add({
+        name: ZincRule.lcurlyparen,
+        pattern: /\{/,
+        start_chars_hint: [CharCode.LeftCurlyBracket],
+        line_breaks: false,
+        label: '{',
+        color: parenColor,
+    }),
+    [ZincRule.rcurlyparen]: add({
+        name: ZincRule.rcurlyparen,
+        pattern: /}/,
+        start_chars_hint: [CharCode.RightCurlyBracket],
+        line_breaks: false,
+        label: '}',
         color: parenColor,
     }),
     [ZincRule.lsquareparen]: add({
@@ -267,5 +295,5 @@ const ZincTokens: Record<Exclude<ZincRule,
         line_breaks: false,
         start_chars_hint: CharCodeLetterList,
     }),
-};
-export default ZincTokens;
+}
+export default ZincTokens

@@ -1,7 +1,7 @@
-import WtsRule from "./wts-rule";
-import {createToken, Lexer, tokenMatcher, TokenType} from "chevrotain";
-import {CustomPatternMatcherReturn, IToken} from "@chevrotain/types";
-import {CharCode, CharCodeDigitList, CharCodeWhitespaceBreakList} from "../utils/char-code";
+import WtsRule from './wts-rule';
+import {createToken, Lexer, tokenMatcher, TokenType} from 'chevrotain';
+import {CustomPatternMatcherReturn, IToken} from '@chevrotain/types';
+import {CharCode, CharCodeDigitList, CharCodeWhitespaceBreakList} from '../utils/char-code';
 
 const whitespacePattern = (text: string, startOffset: number, tokens: IToken[]): CustomPatternMatcherReturn | null => {
     if (tokens.length > 0) {

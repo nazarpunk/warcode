@@ -1,8 +1,8 @@
-import {CstParser, ParserMethod} from "chevrotain";
-import WtsRule from "./wts-rule";
-import WtsTokens from "./wts-tokens";
-import WtsTokensList from "./wts-tokens-list";
-import {IParserConfig} from "@chevrotain/types";
+import {CstParser, ParserMethod} from 'chevrotain';
+import WtsRule from './wts-rule';
+import WtsTokens from './wts-tokens';
+import WtsTokensList from './wts-tokens-list';
+import {IParserConfig} from '@chevrotain/types';
 
 export class WtsParser extends CstParser {
 

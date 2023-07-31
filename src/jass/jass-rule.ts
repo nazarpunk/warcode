@@ -5,10 +5,11 @@ const enum JassRule {
     globals_declare = 'globals_declare',
     variable_declare = 'variable_declare',
     native_declare = 'native_declare',
+    function_head = 'function_head',
     function_declare = 'function_declare',
     function_locals = 'function_locals',
-    function_returns = 'function_returns',
     function_args = 'function_args',
+    function_returns = 'function_returns',
     function_call = 'function_call',
     return_statement = 'return_statement',
     if_statement = 'if_statement',
@@ -83,4 +84,4 @@ const enum JassRule {
     identifier = 'identifier',
 }
 
-export default JassRule;
+export default JassRule
