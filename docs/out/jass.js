@@ -9248,7 +9248,6 @@ var JassRule = /* @__PURE__ */ ((JassRule2) => {
   JassRule2["native_declare"] = "native_declare";
   JassRule2["function_head"] = "function_head";
   JassRule2["function_declare"] = "function_declare";
-  JassRule2["local_declare"] = "local_declare";
   JassRule2["function_call"] = "function_call";
   JassRule2["return_statement"] = "return_statement";
   JassRule2["if_statement"] = "if_statement";
@@ -9603,8 +9602,16 @@ var JassParser = class extends CstParser {
     $.RULE(jass_rule_default.function_declare, () => {
       $.CONSUME(jass_tokens_default[jass_rule_default.function]);
       $.SUBRULE($[jass_rule_default.function_head]);
-      $.MANY1(() => $.SUBRULE($[jass_rule_default.local_declare]));
-      $.MANY2(() => $.SUBRULE($[jass_rule_default.statement]));
+      $.MANY(() => $.OR([
+        { ALT: () => $.CONSUME(jass_tokens_default[jass_rule_default.linebreak]) },
+        {
+          ALT: () => {
+            $.CONSUME(jass_tokens_default[jass_rule_default.local]);
+            $.SUBRULE($[jass_rule_default.variable_declare]);
+          }
+        }
+      ]));
+      $.MANY1(() => $.SUBRULE($[jass_rule_default.statement]));
       $.CONSUME(jass_tokens_default[jass_rule_default.endfunction]);
       $.SUBRULE2($[jass_rule_default.end]);
     });
@@ -9629,30 +9636,19 @@ var JassParser = class extends CstParser {
       ]);
       $.SUBRULE($[jass_rule_default.end]);
     });
-    $.RULE(jass_rule_default.local_declare, () => {
-      $.OR([
-        { ALT: () => $.CONSUME(jass_tokens_default[jass_rule_default.linebreak]) },
-        {
-          ALT: () => {
-            $.CONSUME(jass_tokens_default[jass_rule_default.local]);
-            $.SUBRULE($[jass_rule_default.variable_declare]);
-          }
-        }
-      ]);
-    });
-    $.RULE(jass_rule_default.type_declare, () => {
-      $.CONSUME(jass_tokens_default[jass_rule_default.type]);
-      $.CONSUME(jass_tokens_default[jass_rule_default.identifier]);
-      $.CONSUME(jass_tokens_default[jass_rule_default.extends]);
-      $.CONSUME2(jass_tokens_default[jass_rule_default.identifier]);
-      $.SUBRULE($[jass_rule_default.end]);
-    });
     $.RULE(jass_rule_default.variable_declare, () => {
       $.SUBRULE($[jass_rule_default.typedname]);
       $.OPTION2(() => {
         $.CONSUME(jass_tokens_default[jass_rule_default.assign]);
         $.SUBRULE($[jass_rule_default.expression]);
       });
+      $.SUBRULE($[jass_rule_default.end]);
+    });
+    $.RULE(jass_rule_default.type_declare, () => {
+      $.CONSUME(jass_tokens_default[jass_rule_default.type]);
+      $.CONSUME(jass_tokens_default[jass_rule_default.identifier]);
+      $.CONSUME(jass_tokens_default[jass_rule_default.extends]);
+      $.CONSUME2(jass_tokens_default[jass_rule_default.identifier]);
       $.SUBRULE($[jass_rule_default.end]);
     });
     $.RULE(jass_rule_default.globals_declare, () => {
@@ -12472,9 +12468,15 @@ var JassVisitor = class extends ParserVisitor {
     const head2 = this.visit(ctx[jass_rule_default.function_head]);
     const { argMap } = head2;
     const localMap = {};
-    const localDeclares = ctx[jass_rule_default.local_declare];
-    if (localDeclares) {
-      for (const localDeclare of localDeclares) {
+    if (b) {
+      const locals = ctx[jass_rule_default.local];
+      if (locals)
+        for (const local of locals)
+          b.mark(local, token_legend_default.jass_local);
+    }
+    const variableDeclare = ctx[jass_rule_default.variable_declare];
+    if (variableDeclare) {
+      for (const localDeclare of variableDeclare) {
         const local = this.visit(localDeclare);
         if (!local)
           continue;
@@ -12593,10 +12595,6 @@ var JassVisitor = class extends ParserVisitor {
     return {
       argMap
     };
-  }
-  [jass_rule_default.local_declare](ctx) {
-    this?.bridge?.mark(ctx[jass_rule_default.local]?.[0], token_legend_default.jass_local);
-    return this.visit(ctx[jass_rule_default.variable_declare]);
   }
   [jass_rule_default.variable_declare](ctx) {
     const equals = ctx[jass_rule_default.assign]?.[0];
@@ -12852,7 +12850,7 @@ string_fn = function(ctx) {
 // docs/main.ts
 var parser2 = new JassParser({
   recoveryEnabled: true,
-  nodeLocationTracking: "none",
+  nodeLocationTracking: "onlyOffset",
   skipValidations: false
 });
 var iframe = document.createElement("iframe");

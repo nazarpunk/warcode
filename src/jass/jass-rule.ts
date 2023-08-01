@@ -13,7 +13,6 @@ const enum JassRule {
     native_declare = 'native_declare',
     function_head = 'function_head',
     function_declare = 'function_declare',
-    local_declare = 'local_declare',
     function_call = 'function_call',
     return_statement = 'return_statement',
     if_statement = 'if_statement',

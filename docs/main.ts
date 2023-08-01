@@ -6,7 +6,7 @@ import JassTokensList from '../src/jass/jass-tokens-list'
 
 const parser = new JassParser({
     recoveryEnabled: true,
-    nodeLocationTracking: 'none',
+    nodeLocationTracking: 'onlyOffset',
     skipValidations: false,
 })
 

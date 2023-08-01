@@ -42,7 +42,6 @@ const JassTokens: Record<Exclude<JassRule,
     JassRule.native_declare |
     JassRule.function_declare |
     JassRule.function_head |
-    JassRule.local_declare |
     JassRule.function_call |
     JassRule.return_statement |
     JassRule.if_statement |

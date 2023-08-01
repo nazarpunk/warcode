@@ -15,7 +15,6 @@ export default class JassParser extends CstParser {
     declare [JassRule.function_declare]: ParserMethod<any, any>
     declare [JassRule.globals_declare]: ParserMethod<any, any>
     declare [JassRule.end]: ParserMethod<any, any>
-    declare [JassRule.local_declare]: ParserMethod<any, any>
     declare [JassRule.statement]: ParserMethod<any, any>
     declare [JassRule.typedname]: ParserMethod<any, any>
     declare [JassRule.expression]: ParserMethod<any, any>
@@ -69,8 +68,17 @@ export default class JassParser extends CstParser {
         $.RULE(JassRule.function_declare, () => {
             $.CONSUME(JassTokens[JassRule.function])
             $.SUBRULE($[JassRule.function_head])
-            $.MANY1(() => $.SUBRULE($[JassRule.local_declare]))
-            $.MANY2(() => $.SUBRULE($[JassRule.statement]))
+            //$.MANY1(() => $.SUBRULE($[JassRule.local_declare]))
+            $.MANY(() => $.OR([
+                {ALT: () => $.CONSUME(JassTokens[JassRule.linebreak])},
+                {
+                    ALT: () => {
+                        $.CONSUME(JassTokens[JassRule.local])
+                        $.SUBRULE($[JassRule.variable_declare])
+                    }
+                },
+            ]))
+            $.MANY1(() => $.SUBRULE($[JassRule.statement]))
             $.CONSUME(JassTokens[JassRule.endfunction])
             $.SUBRULE2($[JassRule.end])
         })
@@ -100,17 +108,14 @@ export default class JassParser extends CstParser {
         })
         //endregion
 
-        //region function_locals
-        $.RULE(JassRule.local_declare, () => {
-            $.OR([
-                {ALT: () => $.CONSUME(JassTokens[JassRule.linebreak])},
-                {
-                    ALT: () => {
-                        $.CONSUME(JassTokens[JassRule.local])
-                        $.SUBRULE($[JassRule.variable_declare])
-                    }
-                },
-            ])
+        //region variable_declare
+        $.RULE(JassRule.variable_declare, () => {
+            $.SUBRULE($[JassRule.typedname])
+            $.OPTION2(() => {
+                $.CONSUME(JassTokens[JassRule.assign])
+                $.SUBRULE($[JassRule.expression])
+            })
+            $.SUBRULE($[JassRule.end])
         })
         //endregion
 
@@ -120,17 +125,6 @@ export default class JassParser extends CstParser {
             $.CONSUME(JassTokens[JassRule.identifier])
             $.CONSUME(JassTokens[JassRule.extends])
             $.CONSUME2(JassTokens[JassRule.identifier])
-            $.SUBRULE($[JassRule.end])
-        })
-        //endregion
-
-        //region variable_declare
-        $.RULE(JassRule.variable_declare, () => {
-            $.SUBRULE($[JassRule.typedname])
-            $.OPTION2(() => {
-                $.CONSUME(JassTokens[JassRule.assign])
-                $.SUBRULE($[JassRule.expression])
-            })
             $.SUBRULE($[JassRule.end])
         })
         //endregion

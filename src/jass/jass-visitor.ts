@@ -103,9 +103,16 @@ export class JassVisitor extends ParserVisitor {
         const localMap: Record<string, IToken[]> = {}
 
         // --- locals
-        const localDeclares = ctx[JassRule.local_declare]!
-        if (localDeclares) {
-            for (const localDeclare of localDeclares) {
+        // keyword
+        if (b) {
+            const locals = ctx[JassRule.local]
+            if (locals) for (const local of locals) b.mark(local, TokenLegend.jass_local)
+        }
+
+        // declare
+        const variableDeclare = ctx[JassRule.variable_declare]!
+        if (variableDeclare) {
+            for (const localDeclare of variableDeclare) {
                 const local = this.visit(localDeclare) as Variable | null
                 if (!local) continue
                 const {type, name} = local.typedname
@@ -234,12 +241,6 @@ export class JassVisitor extends ParserVisitor {
         return {
             argMap: argMap,
         }
-    }
-
-    [JassRule.local_declare](ctx: JassCstNode): Variable {
-        //console.log(JassRule.local_declare, ctx)
-        this?.bridge?.mark(ctx[JassRule.local]?.[0], TokenLegend.jass_local)
-        return this.visit(ctx[JassRule.variable_declare]!)
     }
 
     [JassRule.variable_declare](ctx: JassCstNode): Variable | null {

@@ -16,7 +16,6 @@ export default interface JassCstNode extends CstNode {
     [JassRule.function_head]?: CstNode[],
     [JassRule.native_declare]?: CstNode[],
     [JassRule.function_declare]?: CstNode[],
-    [JassRule.local_declare]?: CstNode[],
     [JassRule.globals_declare]?: CstNode[],
     [JassRule.variable_declare]?: CstNode[],
     [JassRule.function_call]?: CstNode[],

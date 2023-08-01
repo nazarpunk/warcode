@@ -106,7 +106,7 @@ export default class ExtProvider implements DocumentSemanticTokensProvider, Docu
             const parser = this.#parsers[path] ??= new this.#parser({
                 recoveryEnabled: true,
                 skipValidations: true,
-                nodeLocationTracking: 'none',
+                nodeLocationTracking: 'onlyOffset',
                 errorMessageProvider: {
                     buildMismatchTokenMessage: (): string => i18next.t(i18n.mismatchToken),
                     buildNotAllInputParsedMessage: (): string => i18next.t(i18n.notAllInputParsed),
