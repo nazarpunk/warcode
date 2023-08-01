@@ -1,8 +1,8 @@
 import {createSyntaxDiagramsCode, Lexer} from 'chevrotain'
 import JassParser from '../src/jass/jass-parser'
-import {JassVisitor} from '../src/jass/jass-visitor'
 import JassRule from '../src/jass/jass-rule'
 import JassTokensList from '../src/jass/jass-tokens-list'
+import {JassVisitorDocs} from '../src/jass/jass-visitor-docs'
 
 const parser = new JassParser({
     recoveryEnabled: true,
@@ -13,6 +13,7 @@ const parser = new JassParser({
 const iframe = document.createElement('iframe')
 iframe.src = 'data:text/html;charset=utf-8,' + encodeURI(createSyntaxDiagramsCode(parser.getSerializedGastProductions()))
 document.body.appendChild(iframe);
+
 
 (async () => {
     const request = await fetch('test.txt')
@@ -31,7 +32,10 @@ document.body.appendChild(iframe);
 
     for (const error of parser.errors) console.error(error)
 
-    const visitor = new JassVisitor()
+    const visitor = new JassVisitorDocs()
+
+    console.log(visitor)
+
     // @ts-ignore
     //visitor.bridge = new VscodeBridge(_document, [], []);
 

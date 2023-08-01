@@ -30,11 +30,6 @@ export default class VscodeBridge {
         if (!token || isNaN(token.startOffset)) return
 
         const p = this.document.positionAt(token.startOffset)
-        this.builder.push(
-            p.line,
-            p.character,
-            token.image.length,
-            type
-        )
+        this.builder.push(p.line,p.character,token.image.length,type)
     }
 }

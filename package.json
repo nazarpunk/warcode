@@ -34,7 +34,7 @@
   "l10n": "./l10n",
   "scripts": {
     "esbuild-docs": "esbuild jass=docs/main.ts zinc=docs/zinc/main.ts wts=docs/wts/main.ts calculator=docs/calculator/main.mjs --outdir=docs/out --target=es2020 --bundle --external:vscode --format=cjs --platform=browser --tree-shaking=true --sourcemap --watch",
-    "esbuild-base": "esbuild src/extension.ts --outfile=out/extension.js --target=es2020 --bundle --external:vscode --format=cjs --platform=node --tree-shaking=true --sourcemap",
+    "esbuild-base": "esbuild src/extension.ts --outfile=out/extension.js --tsconfig=src/tsconfig.json --target=es2020 --bundle --external:vscode --format=cjs --platform=node --tree-shaking=true --sourcemap",
     "esbuild": "npm run esbuild-base",
     "vscode:prepublish": "npm run esbuild-base",
     "build": "vsce package",

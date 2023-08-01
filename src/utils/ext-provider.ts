@@ -12,10 +12,9 @@ import {
     commands,
     DiagnosticSeverity,
     CancellationToken,
-    Range
+    Range, SemanticTokensBuilder, Diagnostic
 } from 'vscode'
 import {CstParser, ICstVisitor, Lexer} from 'chevrotain'
-import VscodeBridge from './vscode-bridge'
 import {IParserConfig, TokenType} from '@chevrotain/types'
 import i18next from 'i18next'
 import {i18n} from './i18n'
@@ -25,12 +24,14 @@ interface IParserConstructor {
     new(config?: IParserConfig): CstParser;
 }
 
-interface IVisitorConstructor {
-    new(): IVisitor;
+export interface IVisitor extends ICstVisitor<any, any> {
+    document: TextDocument
+    builder: SemanticTokensBuilder
+    diagnostics: Diagnostic[]
 }
 
-interface IVisitor extends ICstVisitor<any, any> {
-    bridge?: VscodeBridge,
+interface IVisitorConstructor {
+    new(): IVisitor
 }
 
 export default class ExtProvider implements DocumentSemanticTokensProvider, DocumentSymbolProvider, FoldingRangeProvider {
@@ -52,12 +53,12 @@ export default class ExtProvider implements DocumentSemanticTokensProvider, Docu
     #parsers: Record<string, CstParser> = {}
 
     readonly #visitor: IVisitorConstructor
+    #visitors: Record<string, IVisitor> = {}
 
     #versions: Record<string, number> = {}
     #symbols: Record<string, DocumentSymbol[] | SymbolInformation[]> = {}
     #foldings: Record<string, FoldingRange[]> = {}
-
-    //async provideDocumentSemanticTokens(document: vscode.TextDocument, token: vscode.CancellationToken): Promise<vscode.SemanticTokens>
+    
     async provideDocumentSemanticTokens(document: TextDocument, token: CancellationToken): Promise<SemanticTokens> {
         return new Promise<SemanticTokens>(resolve => {
             const now = performance.now()
@@ -68,11 +69,7 @@ export default class ExtProvider implements DocumentSemanticTokensProvider, Docu
             //=== settings
             const path = document.uri.path
             const text = document.getText()
-            const bridge = new VscodeBridge(
-                document,
-                this.#symbols[path] = [],
-                this.#foldings[path] = [],
-            )
+            const diagnostics: Diagnostic[] = []
 
             //===  lexing
             const lexer = this.#lexers[path] ??= new Lexer(this.#lexerDefinition, {
@@ -89,7 +86,7 @@ export default class ExtProvider implements DocumentSemanticTokensProvider, Docu
             const lexing = lexer.tokenize(text)
 
             for (const error of lexing.errors) {
-                bridge.diagnostics.push({
+                diagnostics.push({
                     message: error.message,
                     range: new Range(
                         document.positionAt(error.offset),
@@ -99,8 +96,13 @@ export default class ExtProvider implements DocumentSemanticTokensProvider, Docu
                 })
             }
 
+            const builder = new SemanticTokensBuilder()
+
             const comments = lexing.groups['comments']
-            if (comments) for (const comment of comments) bridge.mark(comment, TokenLegend.jass_comment)
+            if (comments) for (const comment of comments) {
+                const p = document.positionAt(comment.startOffset)
+                builder.push(p.line, p.character, comment.image.length, TokenLegend.jass_comment)
+            }
 
             //=== parsing
             const parser = this.#parsers[path] ??= new this.#parser({
@@ -118,7 +120,7 @@ export default class ExtProvider implements DocumentSemanticTokensProvider, Docu
             // @ts-ignore
             const parsing = parser[this.name]()
             for (const error of parser.errors) {
-                bridge.diagnostics.push({
+                diagnostics.push({
                     message: error.message,
                     range: new Range(
                         document.positionAt(error.token.startOffset),
@@ -129,17 +131,20 @@ export default class ExtProvider implements DocumentSemanticTokensProvider, Docu
             }
 
             //=== visitor
-            const visitor = new this.#visitor()
-            visitor.bridge = bridge
+            const visitor = this.#visitors[path] ??= new this.#visitor()
+            visitor.document = document
+            visitor.builder = builder
+            visitor.diagnostics = diagnostics
             visitor.visit(parsing)
 
             const collection = this.#collections[path] ??= languages.createDiagnosticCollection(this.name)
-            if (bridge.diagnostics.length > 0) collection.set(document.uri, bridge.diagnostics)
+            if (diagnostics.length > 0) collection.set(document.uri, diagnostics)
             else collection.clear()
 
             //=== resolve
             this.#versions[path] = document.version
-            resolve(bridge.builder.build())
+            resolve(builder.build())
+            // eslint-disable-next-line no-console
             console.log(performance.now() - now)
         })
     }
