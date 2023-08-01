@@ -18,10 +18,14 @@ export function activate(context: ExtensionContext) {
     const wts = new ExtProvider('wts', WtsTokensList, WtsParser, WtsVisitor)
 
     context.subscriptions.push(
-        languages.registerDocumentSemanticTokensProvider({language: jass.name}, jass, ExtSemanticTokensLegend),
-        languages.registerDocumentSemanticTokensProvider({language: zinc.name}, zinc, ExtSemanticTokensLegend),
-        languages.registerDocumentSemanticTokensProvider({language: wts.name}, wts, ExtSemanticTokensLegend),
-        languages.registerDocumentSymbolProvider({language: wts.name}, wts),
-        languages.registerFoldingRangeProvider({language: wts.name}, wts),
+        languages.registerDocumentSemanticTokensProvider({language: jass.languageName}, jass, ExtSemanticTokensLegend),
+        languages.registerDocumentSymbolProvider({language: jass.languageName}, jass),
+        languages.registerFoldingRangeProvider({language: jass.languageName}, jass),
+
+        languages.registerDocumentSemanticTokensProvider({language: zinc.languageName}, zinc, ExtSemanticTokensLegend),
+
+        languages.registerDocumentSemanticTokensProvider({language: wts.languageName}, wts, ExtSemanticTokensLegend),
+        languages.registerDocumentSymbolProvider({language: wts.languageName}, wts),
+        languages.registerFoldingRangeProvider({language: wts.languageName}, wts),
     )
 }

@@ -15,7 +15,9 @@ export class JassVisitorDocs extends ParserVisitor {
 
     [JassRule.jass](ctx: JassCstNode) {
         //console.log(JassRule.jass, ctx)
-        return ctx
+        ctx[JassRule.jass_constant]?.map(item => this.visit(item))
+        ctx[JassRule.type_declare]?.map(item => this.visit(item))
+        ctx[JassRule.globals_declare]?.map(item => this.visit(item))
     }
 
     [JassRule.jass_constant](ctx: JassCstNode) {
@@ -44,6 +46,7 @@ export class JassVisitorDocs extends ParserVisitor {
     }
 
     [JassRule.globals_declare](ctx: JassCstNode) {
+        console.log(JassRule.globals_declare, ctx)
         return ctx
     }
 

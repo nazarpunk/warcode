@@ -3,15 +3,23 @@
 import ZincRule from './zinc-rule'
 import type ZincCstNode from './zinc-cst-node'
 import ZincParser from './zinc-parser'
+import {Diagnostic, FoldingRange, SemanticTokensBuilder, SymbolInformation, TextDocument} from 'vscode'
+import {IVisitor} from '../utils/ext-provider'
 
 const parser = new ZincParser()
 const ParserVisitor = parser.getBaseCstVisitorConstructor()
 
-export class ZincVisitor extends ParserVisitor {
+export class ZincVisitor extends ParserVisitor implements IVisitor {
     constructor() {
         super()
         this.validateVisitor()
     }
+
+    declare document: TextDocument
+    declare builder: SemanticTokensBuilder
+    declare diagnostics: Diagnostic[]
+    declare symbols: SymbolInformation[]
+    declare foldings: FoldingRange[]
 
     [ZincRule.zinc](ctx: ZincCstNode) {
         //console.log(ZincRule.zinc, ctx);

@@ -10,6 +10,7 @@ export default interface JassCstNode extends CstNode {
     [JassRule.identifier_returns]?: IToken[],
 
     // node
+    [JassRule.jass]?: CstNode[],
     [JassRule.end]?: CstNode[],
     [JassRule.type_declare]?: CstNode[],
     [JassRule.jass_constant]?: CstNode[],
@@ -35,6 +36,8 @@ export default interface JassCstNode extends CstNode {
     [JassRule.primary]?: CstNode[],
     [JassRule.addition]?: CstNode[],
     // token
+    [JassRule.less]?: IToken[],
+    [JassRule.whitespace]?: IToken[],
     [JassRule.endfunction]?: IToken[],
     [JassRule.globals]?: IToken[],
     [JassRule.endglobals]?: IToken[],

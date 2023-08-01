@@ -1,10 +1,10 @@
-function a takes nothing returns nothing
-    local real ad = 111 //
 
-    local d r = 22
+globals
 
-    if true then
 
-    endif
+constant boolean FALSE = false
+constant boolean TRUE = true
+constant integer JASS_MAX_ARRAY_SIZE = 262144
 
-endfunction
+
+endglobals

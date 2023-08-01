@@ -1,102 +1,108 @@
 import {
+    Diagnostic,
     DiagnosticSeverity,
     FoldingRange,
     FoldingRangeKind,
     Location,
-    Range,
+    Range, SemanticTokensBuilder,
     SymbolInformation,
-    SymbolKind
-} from 'vscode';
-import {WtsParser} from './wts-parser';
-import TokenLegend from "../semantic/token-legend";
-import {IToken} from "@chevrotain/types";
-import WtsRule from "./wts-rule";
-import VscodeBridge from "../utils/vscode-bridge";
-import WtsCstNode from "./wts-cst-node";
-import {i18n} from "../utils/i18n";
-import i18next from "i18next";
+    SymbolKind, TextDocument
+} from 'vscode'
+import {WtsParser} from './wts-parser'
+import TokenLegend from '../semantic/token-legend'
+import {IToken} from '@chevrotain/types'
+import WtsRule from './wts-rule'
+import WtsCstNode from './wts-cst-node'
+import {i18n} from '../utils/i18n'
+import i18next from 'i18next'
+import {IVisitor} from '../utils/ext-provider'
 
-const parser = new WtsParser();
+const parser = new WtsParser()
 
-const BaseCstVisitor = parser.getBaseCstVisitorConstructor();
+const BaseCstVisitor = parser.getBaseCstVisitorConstructor()
 
-export class WtsVisitor extends BaseCstVisitor {
+export class WtsVisitor extends BaseCstVisitor implements IVisitor {
     constructor() {
-        super();
-        this.validateVisitor();
+        super()
+        this.validateVisitor()
     }
 
-    bridge?: VscodeBridge;
+    declare document: TextDocument
+    declare builder: SemanticTokensBuilder
+    declare diagnostics: Diagnostic[]
+    declare symbols: SymbolInformation[]
+    declare foldings: FoldingRange[]
+
+    #mark(token: IToken | undefined, type: number) {
+        if (!token || isNaN(token.startOffset)) return
+        const p = this.document.positionAt(token.startOffset)
+        this.builder.push(p.line, p.character, token.image.length, type)
+    }
 
     [WtsRule.wts](ctx: WtsCstNode) {
         //console.log(WtsRule.wts, ctx);
-        const blocks = ctx[WtsRule.block];
-        const indexMap: Record<string, IToken[]> = {};
+        const blocks = ctx[WtsRule.block]
+        const indexMap: Record<string, IToken[]> = {}
         if (blocks) {
             for (const item of blocks) {
-                const block = this.visit(item);
-                const index: IToken = block.index;
-                if (index) (indexMap[index.image] ??= []).push(index);
+                const block = this.visit(item)
+                const index: IToken = block.index
+                if (index) (indexMap[index.image] ??= []).push(index)
             }
         }
 
-        const b = this.bridge;
-
-        if (b) for (const tokens of Object.values(indexMap)) {
-            if (tokens.length < 2) continue;
+        for (const tokens of Object.values(indexMap)) {
+            if (tokens.length < 2) continue
             for (const token of tokens) {
-                b.diagnostics.push({
+                this.diagnostics.push({
                     message: i18next.t(i18n.stringIndexRedeclareError, {index: token.image}),
                     range: new Range(
-                        b.document.positionAt(token.startOffset),
-                        b.document.positionAt(token.startOffset + token.image.length)
+                        this.document.positionAt(token.startOffset),
+                        this.document.positionAt(token.startOffset + token.image.length)
                     ),
                     severity: DiagnosticSeverity.Warning,
-                });
+                })
             }
         }
 
-        return null;
+        return null
     }
 
     [WtsRule.block](ctx: WtsCstNode) {
         //console.log(Rule.block, ctx);
-        const index = ctx[WtsRule.index]?.[0];
+        const index = ctx[WtsRule.index]?.[0]
 
-        const b = this?.bridge;
-        if (b) {
-            const string = ctx[WtsRule.string]?.[0];
-            const rparen = ctx[WtsRule.rparen]?.[0];
+        const string = ctx[WtsRule.string]?.[0]
+        const rparen = ctx[WtsRule.rparen]?.[0]
 
-            if (index && string && rparen) {
-                b.mark(index, TokenLegend.wts_index);
-                b.mark(string, TokenLegend.wts_string);
-                b.mark(rparen, TokenLegend.wts_paren);
+        if (index && string && rparen) {
+            this.#mark(index, TokenLegend.wts_index)
+            this.#mark(string, TokenLegend.wts_string)
+            this.#mark(rparen, TokenLegend.wts_paren)
 
-                const start = b.document.positionAt(string.startOffset);
-                const end = b.document.positionAt(rparen.startOffset + 1);
+            const start = this.document.positionAt(string.startOffset)
+            const end = this.document.positionAt(rparen.startOffset + 1)
 
-                b.symbols.push(new SymbolInformation(
-                    `${string.image} ${index.image}`,
-                    SymbolKind.String,
-                    '',
-                    new Location(b.document.uri, new Range(start, end)
-                    ),
-                ));
+            this.symbols.push(new SymbolInformation(
+                `${string.image} ${index.image}`,
+                SymbolKind.String,
+                '',
+                new Location(this.document.uri, new Range(start, end)
+                ),
+            ))
 
-                b.foldings.push(new FoldingRange(
-                    start.line,
-                    end.line,
-                    FoldingRangeKind.Region,
-                ));
-            }
-            b.mark(ctx[WtsRule.lparen]?.[0], TokenLegend.wts_paren);
-            ctx[WtsRule.comment]?.map(item => b.mark(item, TokenLegend.wts_comment));
+            this.foldings.push(new FoldingRange(
+                start.line,
+                end.line,
+                FoldingRangeKind.Region,
+            ))
         }
+        this.#mark(ctx[WtsRule.lparen]?.[0], TokenLegend.wts_paren)
+        ctx[WtsRule.comment]?.map(item => this.#mark(item, TokenLegend.wts_comment))
 
         return {
             index: index,
-        };
+        }
     }
 
 }

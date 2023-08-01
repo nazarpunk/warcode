@@ -33,11 +33,5 @@ document.body.appendChild(iframe);
     for (const error of parser.errors) console.error(error)
 
     const visitor = new JassVisitorDocs()
-
-    console.log(visitor)
-
-    // @ts-ignore
-    //visitor.bridge = new VscodeBridge(_document, [], []);
-
     visitor.visit(nodes)
 })()

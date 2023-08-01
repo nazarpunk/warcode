@@ -9865,7 +9865,9 @@ var JassVisitorDocs = class extends ParserVisitor {
     this.validateVisitor();
   }
   [jass_rule_default.jass](ctx) {
-    return ctx;
+    ctx[jass_rule_default.jass_constant]?.map((item) => this.visit(item));
+    ctx[jass_rule_default.type_declare]?.map((item) => this.visit(item));
+    ctx[jass_rule_default.globals_declare]?.map((item) => this.visit(item));
   }
   [jass_rule_default.jass_constant](ctx) {
     return ctx;
@@ -9883,6 +9885,7 @@ var JassVisitorDocs = class extends ParserVisitor {
     return ctx;
   }
   [jass_rule_default.globals_declare](ctx) {
+    console.log(jass_rule_default.globals_declare, ctx);
     return ctx;
   }
   [jass_rule_default.type_declare](ctx) {
@@ -9965,7 +9968,6 @@ document.body.appendChild(iframe);
   for (const error of parser2.errors)
     console.error(error);
   const visitor = new JassVisitorDocs();
-  console.log(visitor);
   visitor.visit(nodes);
 })();
 /*! Bundled license information:

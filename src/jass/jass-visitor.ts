@@ -1,6 +1,14 @@
 // noinspection DuplicatedCode
 
-import {Diagnostic, DiagnosticSeverity, Range, SemanticTokensBuilder, TextDocument} from 'vscode'
+import {
+    Diagnostic,
+    DiagnosticSeverity,
+    FoldingRange, FoldingRangeKind, Location,
+    Range,
+    SemanticTokensBuilder,
+    SymbolInformation, SymbolKind,
+    TextDocument
+} from 'vscode'
 import TokenLegend from '../semantic/token-legend'
 import JassRule from './jass-rule'
 import {type IToken} from '@chevrotain/types'
@@ -32,11 +40,21 @@ export class JassVisitor extends ParserVisitor implements IVisitor {
     declare document: TextDocument
     declare builder: SemanticTokensBuilder
     declare diagnostics: Diagnostic[]
+    declare symbols: SymbolInformation[]
+    declare foldings: FoldingRange[]
 
     #mark(token: IToken | undefined, type: number) {
         if (!token || isNaN(token.startOffset)) return
         const p = this.document.positionAt(token.startOffset)
         this.builder.push(p.line, p.character, token.image.length, type)
+    }
+
+    #token(ctx: JassCstNode, rule: JassRule, type: TokenLegend): IToken | null {
+        const token = ctx[rule]?.[0] as IToken
+        if (!token || isNaN(token.startOffset) || token.isInsertedInRecovery) return null
+        const p = this.document.positionAt(token.startOffset)
+        this.builder.push(p.line, p.character, token.image.length, type)
+        return token
     }
 
     #string(ctx: JassCstNode) {
@@ -76,7 +94,6 @@ export class JassVisitor extends ParserVisitor implements IVisitor {
     [JassRule.jass_constant](ctx: JassCstNode) {
         //console.log(JassRule.jass_constant, ctx)
         const constant = ctx[JassRule.constant]?.[0]
-
         this.#mark(constant, TokenLegend.jass_takes)
 
         this.visit(ctx[JassRule.function_declare]!, {constant: constant})
@@ -92,15 +109,23 @@ export class JassVisitor extends ParserVisitor implements IVisitor {
 
     [JassRule.function_declare](ctx: JassCstNode) {
         //console.log(JassRule.function_declare, ctx)
-        this.#mark(ctx[JassRule.function]?.[0], TokenLegend.jass_function)
-        this.#mark(ctx[JassRule.endfunction]?.[0], TokenLegend.jass_endfunction)
 
         // --- head
         const head = this.visit(ctx[JassRule.function_head]!) as {
+            name: IToken,
             argMap: Record<string, IToken[]>
         }
+        const {name, argMap} = head
 
-        const {argMap} = head
+        const func = this.#token(ctx, JassRule.function, TokenLegend.jass_function)
+        const endfunc = this.#token(ctx, JassRule.endfunction, TokenLegend.jass_endfunction)
+        if (func && endfunc && name && !name.isInsertedInRecovery) {
+            const start = this.document.positionAt(func.startOffset)
+            const end = this.document.positionAt(endfunc.startOffset + 1)
+            this.foldings.push(new FoldingRange(start.line, end.line, FoldingRangeKind.Region,))
+            this.symbols.push(new SymbolInformation(`${name.image}`, SymbolKind.Function, '', new Location(this.document.uri, new Range(start, end))))
+        }
+
         const localMap: Record<string, IToken[]> = {}
 
         // --- locals
@@ -169,7 +194,6 @@ export class JassVisitor extends ParserVisitor implements IVisitor {
         this.#mark(ctx[JassRule.takes]?.[0], TokenLegend.jass_takes)
         this.#mark(ctx[JassRule.returns]?.[0], TokenLegend.jass_returns)
 
-
         // --- name
         const name = ctx[JassRule.identifier_name]?.[0]
         if (name) this.#mark(name, opts?.native ? TokenLegend.jass_function_native : TokenLegend.jass_function_user)
@@ -232,6 +256,7 @@ export class JassVisitor extends ParserVisitor implements IVisitor {
 
         // --- final
         return {
+            name: name,
             argMap: argMap,
         }
     }
@@ -267,8 +292,19 @@ export class JassVisitor extends ParserVisitor implements IVisitor {
     }
 
     [JassRule.globals_declare](ctx: JassCstNode) {
-        this.#mark(ctx[JassRule.globals]?.[0], TokenLegend.jass_globals)
-        this.#mark(ctx[JassRule.endglobals]?.[0], TokenLegend.jass_endglobals)
+        ctx[JassRule.constant]?.map(item => this.#mark(item, TokenLegend.jass_takes))
+
+        const globals = ctx[JassRule.globals]?.[0]
+        const endglobals = ctx[JassRule.endglobals]?.[0]
+
+        if (globals && !globals.isInsertedInRecovery && endglobals && !endglobals.isInsertedInRecovery) {
+            this.#mark(globals, TokenLegend.jass_globals)
+            this.#mark(endglobals, TokenLegend.jass_endglobals)
+            const start = this.document.positionAt(globals.startOffset)
+            const end = this.document.positionAt(endglobals.startOffset + 1)
+            this.foldings.push(new FoldingRange(start.line, end.line, FoldingRangeKind.Region))
+            this.symbols.push(new SymbolInformation(`${globals.image}`, SymbolKind.Struct, '', new Location(this.document.uri, new Range(start, end)),))
+        }
 
         const vardecl = ctx[JassRule.variable_declare]
 
