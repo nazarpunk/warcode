@@ -33,8 +33,8 @@
   "main": "./out/extension.js",
   "l10n": "./l10n",
   "scripts": {
-    "esbuild-docs": "esbuild jass=docs/main.ts zinc=docs/zinc/main.ts wts=docs/wts/main.ts calculator=docs/calculator/main.mjs gen=docs/_gen/gen.ts --outdir=docs/out --target=es2020 --bundle --external:vscode --format=cjs --platform=browser --tree-shaking=true --sourcemap --watch",
-    "esbuild-base": "esbuild src/extension.ts --outfile=out/extension.js --tsconfig=src/tsconfig.json --target=es2020 --bundle --external:vscode --format=cjs --platform=node --tree-shaking=true --sourcemap",
+    "esbuild-docs": "esbuild jass=docs/main.ts zinc=docs/zinc/main.ts wts=docs/wts/main.ts calculator=docs/calculator/main.mjs gen=docs/_gen/gen.ts --outdir=docs/out --target=es2020 --bundle --external:vscode --external:fs --format=cjs --platform=browser --tree-shaking=true --sourcemap --watch",
+    "esbuild-base": "esbuild src/extension.ts --outfile=out/extension.js --tsconfig=src/tsconfig.json --target=es2020 --bundle --external:vscode --external:fs --format=cjs --platform=node --tree-shaking=true --sourcemap",
     "esbuild": "npm run esbuild-base",
     "vscode:prepublish": "npm run esbuild-base",
     "build": "vsce package",
@@ -103,7 +103,59 @@
     ],
     "semanticTokenTypes": [
       {
+        "id": "jass_argument",
+        "description": ""
+      },
+      {
+        "id": "jass_variable_global",
+        "description": ""
+      },
+      {
+        "id": "jass_variable_local",
+        "description": ""
+      },
+      {
+        "id": "jass_function_user",
+        "description": ""
+      },
+      {
+        "id": "jass_function_native",
+        "description": ""
+      },
+      {
+        "id": "jass_type_name",
+        "description": ""
+      },
+      {
+        "id": "wts_string",
+        "description": ""
+      },
+      {
+        "id": "wts_index",
+        "description": ""
+      },
+      {
+        "id": "wts_comment",
+        "description": ""
+      },
+      {
+        "id": "wts_paren",
+        "description": ""
+      },
+      {
+        "id": "wts_text",
+        "description": ""
+      },
+      {
+        "id": "jass_whitespace",
+        "description": ""
+      },
+      {
         "id": "jass_comment",
+        "description": ""
+      },
+      {
+        "id": "jass_linebreak",
         "description": ""
       },
       {
@@ -283,14 +335,6 @@
         "description": ""
       },
       {
-        "id": "jass_real",
-        "description": ""
-      },
-      {
-        "id": "jass_integer",
-        "description": ""
-      },
-      {
         "id": "jass_idliteral",
         "description": ""
       },
@@ -299,50 +343,35 @@
         "description": ""
       },
       {
-        "id": "jass_variable",
+        "id": "jass_real",
         "description": ""
       },
       {
-        "id": "jass_function_user",
+        "id": "jass_integer",
         "description": ""
       },
       {
-        "id": "jass_function_native",
-        "description": ""
-      },
-      {
-        "id": "jass_type_name",
-        "description": ""
-      },
-      {
-        "id": "jass_argument",
-        "description": ""
-      },
-      {
-        "id": "wts_string",
-        "description": ""
-      },
-      {
-        "id": "wts_index",
-        "description": ""
-      },
-      {
-        "id": "wts_comment",
-        "description": ""
-      },
-      {
-        "id": "wts_paren",
-        "description": ""
-      },
-      {
-        "id": "wts_text",
+        "id": "jass_identifier",
         "description": ""
       }
     ],
     "configurationDefaults": {
       "editor.semanticTokenColorCustomizations": {
         "rules": {
+          "jass_argument": "#9A9A9A",
+          "jass_variable_global": "#DADADA",
+          "jass_variable_local": "#9CDCF0",
+          "jass_function_user": "#DCDCAA",
+          "jass_function_native": "#C586C0",
+          "jass_type_name": "#4EC9B0",
+          "wts_string": "#5974c0",
+          "wts_index": "#d828dc",
+          "wts_comment": "#9b9b9b",
+          "wts_paren": "#7fc036",
+          "wts_text": "#66c9a2",
+          "jass_whitespace": "#ff0026",
           "jass_comment": "#308030",
+          "jass_linebreak": "#ff0026",
           "jass_and": "#2C7AD6",
           "jass_array": "#2C7AD6",
           "jass_call": "#2C7AD6",
@@ -387,20 +416,11 @@
           "jass_rparen": "#e1d132",
           "jass_lsquareparen": "#e1d132",
           "jass_rsquareparen": "#e1d132",
-          "jass_real": "#e760cc",
-          "jass_integer": "#e760cc",
           "jass_idliteral": "#e760cc",
           "jass_stringliteral": "#CE9178",
-          "jass_variable": "#ffffff",
-          "jass_function_user": "#DCDCAA",
-          "jass_function_native": "#C586C0",
-          "jass_type_name": "#4EC9B0",
-          "jass_argument": "#9CDCDA",
-          "wts_string": "#5974c0",
-          "wts_index": "#d828dc",
-          "wts_comment": "#9b9b9b",
-          "wts_paren": "#7fc036",
-          "wts_text": "#66c9a2"
+          "jass_real": "#e760cc",
+          "jass_integer": "#e760cc",
+          "jass_identifier": "#ff0026"
         }
       }
     }

@@ -26,7 +26,7 @@ export interface IVisitor extends ICstVisitor<any, any> {
     document: TextDocument
     builder: SemanticTokensBuilder
     diagnostics: Diagnostic[]
-    symbols: DocumentSymbol[] | SymbolInformation[]
+    symbols: SymbolInformation[] | DocumentSymbol[]
     foldings: FoldingRange[]
 }
 

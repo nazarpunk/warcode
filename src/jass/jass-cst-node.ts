@@ -7,6 +7,7 @@ export default interface JassCstNode extends CstNode {
     [JassRule.takes_nothing]?: IToken[],
     [JassRule.returns_nothing]?: IToken[],
     [JassRule.identifier_name]?: IToken[],
+    [JassRule.identifier_base]?: IToken[],
     [JassRule.identifier_returns]?: IToken[],
 
     // node

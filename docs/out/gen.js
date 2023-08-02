@@ -1,4 +1,26 @@
 "use strict";
+var __create = Object.create;
+var __defProp = Object.defineProperty;
+var __getOwnPropDesc = Object.getOwnPropertyDescriptor;
+var __getOwnPropNames = Object.getOwnPropertyNames;
+var __getProtoOf = Object.getPrototypeOf;
+var __hasOwnProp = Object.prototype.hasOwnProperty;
+var __copyProps = (to, from, except, desc) => {
+  if (from && typeof from === "object" || typeof from === "function") {
+    for (let key of __getOwnPropNames(from))
+      if (!__hasOwnProp.call(to, key) && key !== except)
+        __defProp(to, key, { get: () => from[key], enumerable: !(desc = __getOwnPropDesc(from, key)) || desc.enumerable });
+  }
+  return to;
+};
+var __toESM = (mod, isNodeMode, target) => (target = mod != null ? __create(__getProtoOf(mod)) : {}, __copyProps(
+  // If the importer is in node compatibility mode or this is not an ESM
+  // file that has been converted to a CommonJS file using a Babel-
+  // compatible transform (i.e. "__esModule" has not been set), then set
+  // "default" to the CommonJS "module.exports" for node compatibility.
+  isNodeMode || !mod || !mod.__esModule ? __defProp(target, "default", { value: mod, enumerable: true }) : target,
+  mod
+));
 
 // node_modules/lodash-es/_freeGlobal.js
 var freeGlobal = typeof global == "object" && global && global.Object === Object && global;
@@ -10,8 +32,8 @@ var root = freeGlobal_default || freeSelf || Function("return this")();
 var root_default = root;
 
 // node_modules/lodash-es/_Symbol.js
-var Symbol = root_default.Symbol;
-var Symbol_default = Symbol;
+var Symbol2 = root_default.Symbol;
+var Symbol_default = Symbol2;
 
 // node_modules/lodash-es/_getRawTag.js
 var objectProto = Object.prototype;
@@ -608,8 +630,8 @@ var stubFalse_default = stubFalse;
 var freeExports = typeof exports == "object" && exports && !exports.nodeType && exports;
 var freeModule = freeExports && typeof module == "object" && module && !module.nodeType && module;
 var moduleExports = freeModule && freeModule.exports === freeExports;
-var Buffer = moduleExports ? root_default.Buffer : void 0;
-var nativeIsBuffer = Buffer ? Buffer.isBuffer : void 0;
+var Buffer2 = moduleExports ? root_default.Buffer : void 0;
+var nativeIsBuffer = Buffer2 ? Buffer2.isBuffer : void 0;
 var isBuffer = nativeIsBuffer || stubFalse_default;
 var isBuffer_default = isBuffer;
 
@@ -1267,8 +1289,8 @@ var baseAssignIn_default = baseAssignIn;
 var freeExports3 = typeof exports == "object" && exports && !exports.nodeType && exports;
 var freeModule3 = freeExports3 && typeof module == "object" && module && !module.nodeType && module;
 var moduleExports3 = freeModule3 && freeModule3.exports === freeExports3;
-var Buffer2 = moduleExports3 ? root_default.Buffer : void 0;
-var allocUnsafe = Buffer2 ? Buffer2.allocUnsafe : void 0;
+var Buffer3 = moduleExports3 ? root_default.Buffer : void 0;
+var allocUnsafe = Buffer3 ? Buffer3.allocUnsafe : void 0;
 function cloneBuffer(buffer, isDeep) {
   if (isDeep) {
     return buffer.slice();
@@ -1417,8 +1439,8 @@ function initCloneArray(array) {
 var initCloneArray_default = initCloneArray;
 
 // node_modules/lodash-es/_Uint8Array.js
-var Uint8Array = root_default.Uint8Array;
-var Uint8Array_default = Uint8Array;
+var Uint8Array2 = root_default.Uint8Array;
+var Uint8Array_default = Uint8Array2;
 
 // node_modules/lodash-es/_cloneArrayBuffer.js
 function cloneArrayBuffer(arrayBuffer) {
@@ -9177,6 +9199,7 @@ var JassRule = /* @__PURE__ */ ((JassRule2) => {
   JassRule2["takes_nothing"] = "takes_nothing";
   JassRule2["returns_nothing"] = "returns_nothing";
   JassRule2["identifier_name"] = "identifier_name";
+  JassRule2["identifier_base"] = "identifier_base";
   JassRule2["identifier_returns"] = "identifier_returns";
   JassRule2["jass"] = "jass";
   JassRule2["type_declare"] = "type_declare";
@@ -9530,8 +9553,35 @@ var JassTokens = {
 };
 
 // docs/_gen/gen.ts
-var colors = JassColors;
-console.log(colors);
+var fs = __toESM(require("fs"));
+var legendMap = JassColors;
+var root2 = "../..";
+var packagePath = `${root2}/package.json`;
+var writeLegendMap = (text, flag = "a+") => fs.writeFileSync(`${root2}/src/semantic/token-legend.ts`, text, { flag });
+var writeLegendList = (text, flag = "a+") => fs.writeFileSync(`${root2}/src/semantic/ext-semantic-tokens-legend.ts`, text, { flag });
+var tab = " ".repeat(4);
+var json = JSON.parse(fs.readFileSync(packagePath, { encoding: "utf8" }));
+var contributes = json["contributes"];
+var semanticTokenColorCustomizations = contributes["configurationDefaults"]["editor.semanticTokenColorCustomizations"];
+semanticTokenColorCustomizations.rules = {};
+contributes["semanticTokenTypes"] = [];
+var legendList = [];
+writeLegendMap("const enum TokenLegend {\n", "w+");
+for (const [name, color] of Object.entries(legendMap)) {
+  semanticTokenColorCustomizations.rules[name] = color;
+  contributes["semanticTokenTypes"].push({
+    id: name,
+    description: ""
+  });
+  writeLegendMap(`${tab}${name} = ${legendList.length},
+`);
+  legendList.push(name);
+}
+writeLegendMap("}\n export default TokenLegend");
+writeLegendList(`import {SemanticTokensLegend} from 'vscode';
+
+export default new SemanticTokensLegend([${legendList.map((s) => `'${s}'`).join(", ")}], []);`, "w+");
+fs.writeFileSync(packagePath, JSON.stringify(json, null, 2), { flag: "w+" });
 /*! Bundled license information:
 
 lodash-es/lodash.js:

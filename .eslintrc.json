@@ -19,7 +19,6 @@
   "rules": {
     "no-console": "warn",
     "no-eq-null": "warn",
-    "no-undefined": "warn",
     "curly": "off",
     "semi": ["error", "never"],
     "quotes": ["error", "single"],

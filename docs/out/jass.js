@@ -9226,6 +9226,7 @@ var JassRule = /* @__PURE__ */ ((JassRule2) => {
   JassRule2["takes_nothing"] = "takes_nothing";
   JassRule2["returns_nothing"] = "returns_nothing";
   JassRule2["identifier_name"] = "identifier_name";
+  JassRule2["identifier_base"] = "identifier_base";
   JassRule2["identifier_returns"] = "identifier_returns";
   JassRule2["jass"] = "jass";
   JassRule2["type_declare"] = "type_declare";
@@ -9651,9 +9652,9 @@ var JassParser = class extends CstParser {
     });
     $.RULE(jass_rule_default.type_declare, () => {
       $.CONSUME(jass_tokens_default[jass_rule_default.type]);
-      $.CONSUME(jass_tokens_default[jass_rule_default.identifier]);
+      $.CONSUME(jass_tokens_default[jass_rule_default.identifier], { LABEL: jass_rule_default.identifier_name });
       $.CONSUME(jass_tokens_default[jass_rule_default.extends]);
-      $.CONSUME2(jass_tokens_default[jass_rule_default.identifier]);
+      $.CONSUME2(jass_tokens_default[jass_rule_default.identifier], { LABEL: jass_rule_default.identifier_base });
       $.SUBRULE($[jass_rule_default.end]);
     });
     $.RULE(jass_rule_default.globals_declare, () => {
@@ -9903,7 +9904,6 @@ var JassVisitorDocs = class extends ParserVisitor {
     return ctx;
   }
   [jass_rule_default.globals_declare](ctx) {
-    console.log(jass_rule_default.globals_declare, ctx);
     return ctx;
   }
   [jass_rule_default.type_declare](ctx) {

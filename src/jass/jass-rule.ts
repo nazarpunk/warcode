@@ -3,6 +3,7 @@ const enum JassRule {
     takes_nothing = 'takes_nothing',
     returns_nothing = 'returns_nothing',
     identifier_name = 'identifier_name',
+    identifier_base = 'identifier_base',
     identifier_returns = 'identifier_returns',
     // rules
     jass = 'jass',

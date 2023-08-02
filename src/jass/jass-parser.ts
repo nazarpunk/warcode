@@ -122,9 +122,9 @@ export default class JassParser extends CstParser {
         //region type_declare
         $.RULE(JassRule.type_declare, () => {
             $.CONSUME(JassTokens[JassRule.type])
-            $.CONSUME(JassTokens[JassRule.identifier])
+            $.CONSUME(JassTokens[JassRule.identifier],{LABEL: JassRule.identifier_name})
             $.CONSUME(JassTokens[JassRule.extends])
-            $.CONSUME2(JassTokens[JassRule.identifier])
+            $.CONSUME2(JassTokens[JassRule.identifier],{LABEL: JassRule.identifier_base})
             $.SUBRULE($[JassRule.end])
         })
         //endregion

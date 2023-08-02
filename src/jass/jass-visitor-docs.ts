@@ -46,7 +46,7 @@ export class JassVisitorDocs extends ParserVisitor {
     }
 
     [JassRule.globals_declare](ctx: JassCstNode) {
-        console.log(JassRule.globals_declare, ctx)
+        //console.log(JassRule.globals_declare, ctx)
         return ctx
     }
 

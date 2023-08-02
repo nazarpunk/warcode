@@ -1,12 +1,15 @@
+// noinspection DuplicatedCode
+
 import {
     Diagnostic,
     DiagnosticSeverity,
+    DocumentSymbol,
     FoldingRange,
     FoldingRangeKind,
-    Location,
-    Range, SemanticTokensBuilder,
-    SymbolInformation,
-    SymbolKind, TextDocument
+    Range,
+    SemanticTokensBuilder,
+    SymbolKind,
+    TextDocument
 } from 'vscode'
 import {WtsParser} from './wts-parser'
 import TokenLegend from '../semantic/token-legend'
@@ -30,13 +33,38 @@ export class WtsVisitor extends BaseCstVisitor implements IVisitor {
     declare document: TextDocument
     declare builder: SemanticTokensBuilder
     declare diagnostics: Diagnostic[]
-    declare symbols: SymbolInformation[]
+    declare symbols: DocumentSymbol[]
     declare foldings: FoldingRange[]
 
     #mark(token: IToken | undefined, type: number) {
         if (!token || isNaN(token.startOffset)) return
         const p = this.document.positionAt(token.startOffset)
         this.builder.push(p.line, p.character, token.image.length, type)
+    }
+
+    #token(ctx: WtsCstNode, rule: WtsRule, type: TokenLegend): IToken | null {
+        const token = ctx[rule]?.[0] as IToken
+        if (!token || isNaN(token.startOffset) || token.isInsertedInRecovery) return null
+        const p = this.document.positionAt(token.startOffset)
+        this.builder.push(p.line, p.character, token.image.length, type)
+        return token
+    }
+
+    #documentSymbol(name: string, detail: string, kind: SymbolKind, start: IToken, end?: IToken, selection?: IToken): DocumentSymbol {
+        let range: Range
+        const startPos = this.document.positionAt(start.startOffset)
+        selection ??= start
+        if (end) {
+            const endPos = this.document.positionAt(end!.startOffset + end!.image.length)
+            range = new Range(startPos, endPos)
+            if (startPos.line !== endPos.line) this.foldings.push(new FoldingRange(startPos.line, endPos.line, FoldingRangeKind.Region))
+        } else {
+            range = this.document.lineAt(startPos.line).range
+        }
+        return new DocumentSymbol(name, detail, kind, range, new Range(
+            this.document.positionAt(selection.startOffset),
+            this.document.positionAt(selection.startOffset + selection.image.length),
+        ))
     }
 
     [WtsRule.wts](ctx: WtsCstNode) {
@@ -70,35 +98,25 @@ export class WtsVisitor extends BaseCstVisitor implements IVisitor {
 
     [WtsRule.block](ctx: WtsCstNode) {
         //console.log(Rule.block, ctx);
-        const index = ctx[WtsRule.index]?.[0]
 
-        const string = ctx[WtsRule.string]?.[0]
-        const rparen = ctx[WtsRule.rparen]?.[0]
+        const index = this.#token(ctx, WtsRule.index, TokenLegend.wts_index)
+        const string = this.#token(ctx, WtsRule.string, TokenLegend.wts_string)
+
+        this.#token(ctx, WtsRule.lparen, TokenLegend.wts_paren)
+        const rparen = this.#token(ctx, WtsRule.rparen, TokenLegend.wts_paren)
+
+        let stringSymbol: DocumentSymbol | undefined
 
         if (index && string && rparen) {
-            this.#mark(index, TokenLegend.wts_index)
-            this.#mark(string, TokenLegend.wts_string)
-            this.#mark(rparen, TokenLegend.wts_paren)
-
-            const start = this.document.positionAt(string.startOffset)
-            const end = this.document.positionAt(rparen.startOffset + 1)
-
-            this.symbols.push(new SymbolInformation(
-                `${string.image} ${index.image}`,
-                SymbolKind.String,
-                '',
-                new Location(this.document.uri, new Range(start, end)
-                ),
-            ))
-
-            this.foldings.push(new FoldingRange(
-                start.line,
-                end.line,
-                FoldingRangeKind.Region,
-            ))
+            stringSymbol = this.#documentSymbol(index.image, string.image, SymbolKind.String, string, rparen, index)
+            this.symbols.push(stringSymbol)
         }
-        this.#mark(ctx[WtsRule.lparen]?.[0], TokenLegend.wts_paren)
-        ctx[WtsRule.comment]?.map(item => this.#mark(item, TokenLegend.wts_comment))
+
+        const comments = ctx[WtsRule.comment]
+        if (comments) for (const comment of comments) {
+            this.#mark(comment, TokenLegend.wts_comment)
+            if (stringSymbol) stringSymbol.children.push(this.#documentSymbol(comment.image.replace(/^\s*\/\/\s*/, ''), '', SymbolKind.String, comment))
+        }
 
         return {
             index: index,

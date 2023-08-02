@@ -3,12 +3,10 @@ import * as fs from 'fs'
 
 const legendMap = JassColors
 
-console.log(legendMap)
-
 const root = '../..'
 
-const packagePath = '../package.json'
-const writeLegendMap = (text: string, flag = 'a+') => fs.writeFileSync(`${root}/src/semantic/token-legend-test.ts`, text, {flag: flag})
+const packagePath = `${root}/package.json`
+const writeLegendMap = (text: string, flag = 'a+') => fs.writeFileSync(`${root}/src/semantic/token-legend.ts`, text, {flag: flag})
 const writeLegendList = (text: string, flag = 'a+') => fs.writeFileSync(`${root}/src/semantic/ext-semantic-tokens-legend.ts`, text, {flag: flag})
 
 const tab = ' '.repeat(4)
@@ -22,7 +20,7 @@ semanticTokenColorCustomizations.rules = {}
 contributes['semanticTokenTypes'] = []
 
 const legendList = []
-writeLegendMap('export default {\n', 'w+')
+writeLegendMap('const enum TokenLegend {\n', 'w+')
 
 for (const [name, color] of Object.entries(legendMap)) {
     semanticTokenColorCustomizations.rules[name] = color
@@ -30,13 +28,12 @@ for (const [name, color] of Object.entries(legendMap)) {
         id: name,
         description: '',
     })
-    writeLegendMap(`${tab}${name}: ${legendList.length},\n`)
+    writeLegendMap(`${tab}${name} = ${legendList.length},\n`)
     legendList.push(name)
 }
-writeLegendMap('}')
+writeLegendMap('}\n export default TokenLegend')
 
-writeLegendList(`// noinspection NpmUsedModulesInstalled
-import {SemanticTokensLegend} from "vscode";
+writeLegendList(`import {SemanticTokensLegend} from 'vscode';
 
 export default new SemanticTokensLegend([${legendList.map(s => `'${s}'`).join(', ')}], []);`, 'w+')
 
