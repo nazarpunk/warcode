@@ -9225,10 +9225,15 @@ function createSyntaxDiagramsCode(grammar, { resourceBase = `https://unpkg.com/c
 var ZincRule = /* @__PURE__ */ ((ZincRule2) => {
   ZincRule2["zinc"] = "zinc";
   ZincRule2["library"] = "library";
+  ZincRule2["requires"] = "requires";
+  ZincRule2["optional"] = "optional";
+  ZincRule2["library_constant"] = "library_constant";
   ZincRule2["library_declare"] = "library_declare";
+  ZincRule2["library_requires"] = "library_requires";
   ZincRule2["library_root"] = "library_root";
   ZincRule2["access_scope"] = "access_scope";
   ZincRule2["variable_declare"] = "variable_declare";
+  ZincRule2["variable_set"] = "variable_set";
   ZincRule2["function_declare"] = "function_declare";
   ZincRule2["function_locals"] = "function_locals";
   ZincRule2["function_returns"] = "function_returns";
@@ -9252,7 +9257,6 @@ var ZincRule = /* @__PURE__ */ ((ZincRule2) => {
   ZincRule2["whitespace"] = "whitespace";
   ZincRule2["comment"] = "comment";
   ZincRule2["and"] = "and";
-  ZincRule2["array"] = "array";
   ZincRule2["call"] = "call";
   ZincRule2["constant"] = "constant";
   ZincRule2["public"] = "public";
@@ -9300,7 +9304,6 @@ var ZincRule = /* @__PURE__ */ ((ZincRule2) => {
   ZincRule2["rsquareparen"] = "rsquareparen";
   ZincRule2["real"] = "real";
   ZincRule2["integer"] = "integer";
-  ZincRule2["linebreak"] = "linebreak";
   ZincRule2["idliteral"] = "idliteral";
   ZincRule2["stringliteral"] = "stringliteral";
   ZincRule2["identifier"] = "identifier";
@@ -9318,10 +9321,6 @@ var CharCodeWhitespaceBreakList = [
   32 /* Space */,
   133 /* NextLine */
 ];
-var CharCodeBreakList = [
-  10 /* LineFeed */,
-  13 /* CarriageReturn */
-];
 var CharCodeDigitList = [];
 for (let i = 48 /* d0 */; i <= 57 /* d9 */; i++)
   CharCodeDigitList.push(i);
@@ -9332,10 +9331,22 @@ for (let i = 97 /* a */; i <= 122 /* z */; i++)
   CharCodeLetterList.push(i);
 
 // src/zinc/zinc-tokens.ts
+var ZincColors = {
+  zinc_argument: "#9A9A9A",
+  zinc_variable_global: "#DADADA",
+  zinc_variable_local: "#9CDCF0",
+  zinc_function_user: "#DCDCAA",
+  zinc_function_native: "#C586C0",
+  zinc_type_name: "#4EC9B0"
+};
 var add = (config) => {
+  const color = config.color ?? "#ff0026";
+  delete config.color;
+  ZincColors[`zinc_${config.name}`] = color;
   return createToken(config);
 };
-var keyword = (k) => {
+var keyword = (k, color = "#2C7AD6") => {
+  ZincColors[`zinc_${k}`] = color;
   return createToken({
     name: k,
     pattern: new RegExp(`\\b${k}\\b`),
@@ -9362,17 +9373,9 @@ var ZincTokens = {
     color: "#308030",
     group: "comments"
   }),
-  [zinc_rule_default.linebreak]: add({
-    name: zinc_rule_default.linebreak,
-    pattern: /\n|\r\n?/,
-    label: "\\n",
-    start_chars_hint: CharCodeBreakList,
-    line_breaks: true
-  }),
   // keyword
   [zinc_rule_default.library]: keyword(zinc_rule_default.library),
   [zinc_rule_default.and]: keyword(zinc_rule_default.and),
-  [zinc_rule_default.array]: keyword(zinc_rule_default.array),
   [zinc_rule_default.call]: keyword(zinc_rule_default.call),
   [zinc_rule_default.public]: keyword(zinc_rule_default.public),
   [zinc_rule_default.private]: keyword(zinc_rule_default.private),
@@ -9393,7 +9396,9 @@ var ZincTokens = {
   [zinc_rule_default.not]: keyword(zinc_rule_default.not),
   [zinc_rule_default.nothing]: keyword(zinc_rule_default.nothing),
   [zinc_rule_default.or]: keyword(zinc_rule_default.or),
+  [zinc_rule_default.optional]: keyword(zinc_rule_default.optional),
   [zinc_rule_default.returns]: keyword(zinc_rule_default.returns),
+  [zinc_rule_default.requires]: keyword(zinc_rule_default.requires),
   [zinc_rule_default.return]: keyword(zinc_rule_default.return),
   [zinc_rule_default.set]: keyword(zinc_rule_default.set),
   [zinc_rule_default.takes]: keyword(zinc_rule_default.takes),
@@ -9602,14 +9607,32 @@ var ZincParser = class extends CstParser {
     $.RULE(zinc_rule_default.library_declare, () => {
       $.CONSUME(zinc_tokens_default[zinc_rule_default.library]);
       $.CONSUME(zinc_tokens_default[zinc_rule_default.identifier]);
+      $.OPTION(() => {
+        $.CONSUME(zinc_tokens_default[zinc_rule_default.requires]);
+        $.AT_LEAST_ONE_SEP({
+          SEP: zinc_tokens_default[zinc_rule_default.comma],
+          DEF: () => $.SUBRULE($[zinc_rule_default.library_requires])
+        });
+      });
       $.CONSUME(zinc_tokens_default[zinc_rule_default.lcurlyparen]);
       $.MANY(() => $.SUBRULE($[zinc_rule_default.library_root]));
       $.CONSUME(zinc_tokens_default[zinc_rule_default.rcurlyparen]);
     });
+    $.RULE(zinc_rule_default.library_requires, () => {
+      $.OPTION(() => $.CONSUME(zinc_tokens_default[zinc_rule_default.optional]));
+      $.CONSUME(zinc_tokens_default[zinc_rule_default.identifier]);
+    });
     $.RULE(zinc_rule_default.library_root, () => {
       $.OR([
-        { ALT: () => $.SUBRULE($[zinc_rule_default.variable_declare]) },
+        { ALT: () => $.SUBRULE($[zinc_rule_default.library_constant]) },
         { ALT: () => $.SUBRULE($[zinc_rule_default.access_scope]) }
+      ]);
+    });
+    $.RULE(zinc_rule_default.library_constant, () => {
+      $.OPTION(() => $.CONSUME(zinc_tokens_default[zinc_rule_default.constant]));
+      $.OR([
+        { ALT: () => $.SUBRULE($[zinc_rule_default.function_declare]) },
+        { ALT: () => $.SUBRULE($[zinc_rule_default.variable_declare]) }
       ]);
     });
     $.RULE(zinc_rule_default.access_scope, () => {
@@ -9617,12 +9640,20 @@ var ZincParser = class extends CstParser {
         { ALT: () => $.CONSUME(zinc_tokens_default[zinc_rule_default.public]) },
         { ALT: () => $.CONSUME(zinc_tokens_default[zinc_rule_default.private]) }
       ]);
-      $.CONSUME(zinc_tokens_default[zinc_rule_default.lcurlyparen]);
-      $.MANY(() => $.SUBRULE($[zinc_rule_default.library_root]));
-      $.CONSUME(zinc_tokens_default[zinc_rule_default.rcurlyparen]);
+      $.OR1([
+        {
+          ALT: () => $.SUBRULE($[zinc_rule_default.library_root])
+        },
+        {
+          ALT: () => {
+            $.CONSUME(zinc_tokens_default[zinc_rule_default.lcurlyparen]);
+            $.MANY(() => $.SUBRULE2($[zinc_rule_default.library_root]));
+            $.CONSUME(zinc_tokens_default[zinc_rule_default.rcurlyparen]);
+          }
+        }
+      ]);
     });
     $.RULE(zinc_rule_default.function_declare, () => {
-      $.OPTION(() => $.CONSUME(zinc_tokens_default[zinc_rule_default.constant]));
       $.CONSUME(zinc_tokens_default[zinc_rule_default.function]);
       $.CONSUME2(zinc_tokens_default[zinc_rule_default.identifier]);
       $.CONSUME3(zinc_tokens_default[zinc_rule_default.takes]);
@@ -9634,17 +9665,24 @@ var ZincParser = class extends CstParser {
       $.CONSUME(zinc_tokens_default[zinc_rule_default.endfunction]);
     });
     $.RULE(zinc_rule_default.variable_declare, () => {
-      $.OPTION(() => $.OR([
-        { ALT: () => $.CONSUME(zinc_tokens_default[zinc_rule_default.public]) },
-        { ALT: () => $.CONSUME(zinc_tokens_default[zinc_rule_default.private]) }
-      ]));
-      $.OPTION2(() => $.CONSUME(zinc_tokens_default[zinc_rule_default.constant]));
-      $.SUBRULE($[zinc_rule_default.typedname]);
-      $.OPTION3(() => {
-        $.CONSUME(zinc_tokens_default[zinc_rule_default.assign]);
-        $.SUBRULE($[zinc_rule_default.expression]);
+      $.CONSUME(zinc_tokens_default[zinc_rule_default.identifier]);
+      $.AT_LEAST_ONE_SEP({
+        SEP: zinc_tokens_default[zinc_rule_default.comma],
+        DEF: () => $.SUBRULE($[zinc_rule_default.variable_set])
       });
       $.CONSUME(zinc_tokens_default[zinc_rule_default.semicolon]);
+    });
+    $.RULE(zinc_rule_default.variable_set, () => {
+      $.CONSUME2(zinc_tokens_default[zinc_rule_default.identifier]);
+      $.MANY(() => {
+        $.CONSUME(zinc_tokens_default[zinc_rule_default.lsquareparen]);
+        $.OPTION(() => $.SUBRULE($[zinc_rule_default.expression]));
+        $.CONSUME(zinc_tokens_default[zinc_rule_default.rsquareparen]);
+      });
+      $.OPTION3(() => {
+        $.CONSUME(zinc_tokens_default[zinc_rule_default.assign]);
+        $.SUBRULE2($[zinc_rule_default.expression]);
+      });
     });
     $.RULE(zinc_rule_default.if_statement, () => {
       $.CONSUME(zinc_tokens_default[zinc_rule_default.if]);
@@ -9705,8 +9743,11 @@ var ZincParser = class extends CstParser {
     });
     $.RULE(zinc_rule_default.typedname, () => {
       $.CONSUME(zinc_tokens_default[zinc_rule_default.identifier]);
-      $.OPTION2(() => $.CONSUME(zinc_tokens_default[zinc_rule_default.array]));
       $.CONSUME2(zinc_tokens_default[zinc_rule_default.identifier]);
+      $.OPTION2(() => {
+        $.CONSUME(zinc_tokens_default[zinc_rule_default.lsquareparen]);
+        $.CONSUME(zinc_tokens_default[zinc_rule_default.rsquareparen]);
+      });
     });
     $.RULE(zinc_rule_default.function_returns, () => {
       $.OR([
@@ -9856,10 +9897,10 @@ var ZincParser = class extends CstParser {
   }
 };
 
-// src/zinc/zinc-visitor.ts
+// src/zinc/zinc-visitor-docs.ts
 var parser = new ZincParser();
 var ParserVisitor = parser.getBaseCstVisitorConstructor();
-var ZincVisitor = class extends ParserVisitor {
+var ZincVisitorDocs = class extends ParserVisitor {
   constructor() {
     super();
     this.validateVisitor();
@@ -9871,12 +9912,18 @@ var ZincVisitor = class extends ParserVisitor {
     ctx[zinc_rule_default.library_root]?.map((item) => this.visit(item));
     return ctx;
   }
+  [zinc_rule_default.library_constant](ctx) {
+    return ctx;
+  }
   [zinc_rule_default.access_scope](ctx) {
     ctx[zinc_rule_default.library_root]?.map((item) => this.visit(item));
     return ctx;
   }
   [zinc_rule_default.library_root](ctx) {
     ctx[zinc_rule_default.access_scope]?.map((item) => this.visit(item));
+    return ctx;
+  }
+  [zinc_rule_default.library_requires](ctx) {
     return ctx;
   }
   [zinc_rule_default.function_declare](ctx) {
@@ -9898,6 +9945,9 @@ var ZincVisitor = class extends ParserVisitor {
     return ctx;
   }
   [zinc_rule_default.variable_declare](ctx) {
+    return ctx;
+  }
+  [zinc_rule_default.variable_set](ctx) {
     return ctx;
   }
   [zinc_rule_default.statement](ctx) {
@@ -9961,7 +10011,7 @@ document.body.appendChild(iframe);
   const result = lexer.tokenize(text);
   parser2.input = result.tokens;
   const nodes = parser2[zinc_rule_default.zinc]();
-  const visitor = new ZincVisitor();
+  const visitor = new ZincVisitorDocs();
   visitor.visit(nodes);
 })();
 /*! Bundled license information:

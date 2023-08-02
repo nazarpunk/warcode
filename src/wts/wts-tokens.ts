@@ -3,6 +3,14 @@ import {createToken, Lexer, tokenMatcher, TokenType} from 'chevrotain'
 import {CustomPatternMatcherReturn, IToken} from '@chevrotain/types'
 import {CharCode, CharCodeDigitList, CharCodeWhitespaceBreakList} from '../utils/char-code'
 
+export const WtsColors: Record<string, string> = {
+    wts_string: '#5974c0',
+    wts_index: '#d828dc',
+    wts_comment: '#9b9b9b',
+    wts_paren: '#7fc036',
+    wts_text: '#66c9a2',
+}
+
 const whitespacePattern = (text: string, startOffset: number, tokens: IToken[]): CustomPatternMatcherReturn | null => {
     if (tokens.length > 0) {
         const lastMatchedToken = tokens[tokens.length - 1]

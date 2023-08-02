@@ -9287,6 +9287,15 @@ var CharCodeWhitespaceList = [
   9 /* HorizontalTab */,
   32 /* Space */
 ];
+var CharCodeWhitespaceBreakList = [
+  9 /* HorizontalTab */,
+  10 /* LineFeed */,
+  11 /* LineTabulation */,
+  12 /* FormFeed */,
+  13 /* CarriageReturn */,
+  32 /* Space */,
+  133 /* NextLine */
+];
 var CharCodeBreakList = [
   10 /* LineFeed */,
   13 /* CarriageReturn */
@@ -9307,13 +9316,7 @@ var JassColors = {
   jass_variable_local: "#9CDCF0",
   jass_function_user: "#DCDCAA",
   jass_function_native: "#C586C0",
-  jass_type_name: "#4EC9B0",
-  // wts
-  wts_string: "#5974c0",
-  wts_index: "#d828dc",
-  wts_comment: "#9b9b9b",
-  wts_paren: "#7fc036",
-  wts_text: "#66c9a2"
+  jass_type_name: "#4EC9B0"
 };
 var add = (config) => {
   const color = config.color ?? "#ff0026";
@@ -9552,9 +9555,451 @@ var JassTokens = {
   })
 };
 
+// src/zinc/zinc-rule.ts
+var ZincRule = /* @__PURE__ */ ((ZincRule2) => {
+  ZincRule2["zinc"] = "zinc";
+  ZincRule2["library"] = "library";
+  ZincRule2["requires"] = "requires";
+  ZincRule2["optional"] = "optional";
+  ZincRule2["library_constant"] = "library_constant";
+  ZincRule2["library_declare"] = "library_declare";
+  ZincRule2["library_requires"] = "library_requires";
+  ZincRule2["library_root"] = "library_root";
+  ZincRule2["access_scope"] = "access_scope";
+  ZincRule2["variable_declare"] = "variable_declare";
+  ZincRule2["variable_set"] = "variable_set";
+  ZincRule2["function_declare"] = "function_declare";
+  ZincRule2["function_locals"] = "function_locals";
+  ZincRule2["function_returns"] = "function_returns";
+  ZincRule2["function_args"] = "function_args";
+  ZincRule2["function_call"] = "function_call";
+  ZincRule2["return_statement"] = "return_statement";
+  ZincRule2["if_statement"] = "if_statement";
+  ZincRule2["else_statement"] = "else_statement";
+  ZincRule2["elseif_statement"] = "elseif_statement";
+  ZincRule2["addition"] = "addition";
+  ZincRule2["arrayaccess"] = "arrayaccess";
+  ZincRule2["call_statement"] = "call_statement";
+  ZincRule2["exitwhen_statement"] = "exitwhen_statement";
+  ZincRule2["expression"] = "expression";
+  ZincRule2["typedname"] = "typedname";
+  ZincRule2["loop_statement"] = "loop_statement";
+  ZincRule2["multiplication"] = "multiplication";
+  ZincRule2["primary"] = "primary";
+  ZincRule2["set_statement"] = "set_statement";
+  ZincRule2["statement"] = "statement";
+  ZincRule2["whitespace"] = "whitespace";
+  ZincRule2["comment"] = "comment";
+  ZincRule2["and"] = "and";
+  ZincRule2["call"] = "call";
+  ZincRule2["constant"] = "constant";
+  ZincRule2["public"] = "public";
+  ZincRule2["private"] = "private";
+  ZincRule2["debug"] = "debug";
+  ZincRule2["else"] = "else";
+  ZincRule2["elseif"] = "elseif";
+  ZincRule2["endfunction"] = "endfunction";
+  ZincRule2["endglobals"] = "endglobals";
+  ZincRule2["endif"] = "endif";
+  ZincRule2["endloop"] = "endloop";
+  ZincRule2["exitwhen"] = "exitwhen";
+  ZincRule2["extends"] = "extends";
+  ZincRule2["function"] = "function";
+  ZincRule2["globals"] = "globals";
+  ZincRule2["if"] = "if";
+  ZincRule2["loop"] = "loop";
+  ZincRule2["not"] = "not";
+  ZincRule2["nothing"] = "nothing";
+  ZincRule2["or"] = "or";
+  ZincRule2["returns"] = "returns";
+  ZincRule2["return"] = "return";
+  ZincRule2["set"] = "set";
+  ZincRule2["takes"] = "takes";
+  ZincRule2["then"] = "then";
+  ZincRule2["type"] = "type";
+  ZincRule2["comma"] = "comma";
+  ZincRule2["equals"] = "equals";
+  ZincRule2["assign"] = "assign";
+  ZincRule2["notequals"] = "notequals";
+  ZincRule2["lessorequal"] = "lessorequal";
+  ZincRule2["less"] = "less";
+  ZincRule2["greatorequal"] = "greatorequal";
+  ZincRule2["great"] = "great";
+  ZincRule2["add"] = "add";
+  ZincRule2["sub"] = "sub";
+  ZincRule2["mult"] = "mult";
+  ZincRule2["div"] = "div";
+  ZincRule2["semicolon"] = "semicolon";
+  ZincRule2["lparen"] = "lparen";
+  ZincRule2["rparen"] = "rparen";
+  ZincRule2["lcurlyparen"] = "lcurlyparen";
+  ZincRule2["rcurlyparen"] = "rcurlyparen";
+  ZincRule2["lsquareparen"] = "lsquareparen";
+  ZincRule2["rsquareparen"] = "rsquareparen";
+  ZincRule2["real"] = "real";
+  ZincRule2["integer"] = "integer";
+  ZincRule2["idliteral"] = "idliteral";
+  ZincRule2["stringliteral"] = "stringliteral";
+  ZincRule2["identifier"] = "identifier";
+  return ZincRule2;
+})(ZincRule || {});
+var zinc_rule_default = ZincRule;
+
+// src/zinc/zinc-tokens.ts
+var ZincColors = {
+  zinc_argument: "#9A9A9A",
+  zinc_variable_global: "#DADADA",
+  zinc_variable_local: "#9CDCF0",
+  zinc_function_user: "#DCDCAA",
+  zinc_function_native: "#C586C0",
+  zinc_type_name: "#4EC9B0"
+};
+var add2 = (config) => {
+  const color = config.color ?? "#ff0026";
+  delete config.color;
+  ZincColors[`zinc_${config.name}`] = color;
+  return createToken(config);
+};
+var keyword2 = (k, color = "#2C7AD6") => {
+  ZincColors[`zinc_${k}`] = color;
+  return createToken({
+    name: k,
+    pattern: new RegExp(`\\b${k}\\b`),
+    start_chars_hint: [k.charCodeAt(0)],
+    line_breaks: false
+  });
+};
+var numberColor2 = "#e760cc";
+var operatorColor2 = "#e7be60";
+var parenColor2 = "#e1d132";
+var ZincTokens = {
+  [zinc_rule_default.whitespace]: add2({
+    name: zinc_rule_default.whitespace,
+    pattern: /\s+/,
+    line_breaks: true,
+    start_chars_hint: CharCodeWhitespaceBreakList,
+    group: Lexer.SKIPPED
+  }),
+  [zinc_rule_default.comment]: add2({
+    name: zinc_rule_default.comment,
+    pattern: /\/\/[^\r\n]*/,
+    line_breaks: false,
+    start_chars_hint: [47 /* Slash */],
+    color: "#308030",
+    group: "comments"
+  }),
+  // keyword
+  [zinc_rule_default.library]: keyword2(zinc_rule_default.library),
+  [zinc_rule_default.and]: keyword2(zinc_rule_default.and),
+  [zinc_rule_default.call]: keyword2(zinc_rule_default.call),
+  [zinc_rule_default.public]: keyword2(zinc_rule_default.public),
+  [zinc_rule_default.private]: keyword2(zinc_rule_default.private),
+  [zinc_rule_default.constant]: keyword2(zinc_rule_default.constant),
+  [zinc_rule_default.debug]: keyword2(zinc_rule_default.debug),
+  [zinc_rule_default.else]: keyword2(zinc_rule_default.else),
+  [zinc_rule_default.elseif]: keyword2(zinc_rule_default.elseif),
+  [zinc_rule_default.endfunction]: keyword2(zinc_rule_default.endfunction),
+  [zinc_rule_default.endglobals]: keyword2(zinc_rule_default.endglobals),
+  [zinc_rule_default.endif]: keyword2(zinc_rule_default.endif),
+  [zinc_rule_default.endloop]: keyword2(zinc_rule_default.endloop),
+  [zinc_rule_default.exitwhen]: keyword2(zinc_rule_default.exitwhen),
+  [zinc_rule_default.extends]: keyword2(zinc_rule_default.extends),
+  [zinc_rule_default.function]: keyword2(zinc_rule_default.function),
+  [zinc_rule_default.globals]: keyword2(zinc_rule_default.globals),
+  [zinc_rule_default.if]: keyword2(zinc_rule_default.if),
+  [zinc_rule_default.loop]: keyword2(zinc_rule_default.loop),
+  [zinc_rule_default.not]: keyword2(zinc_rule_default.not),
+  [zinc_rule_default.nothing]: keyword2(zinc_rule_default.nothing),
+  [zinc_rule_default.or]: keyword2(zinc_rule_default.or),
+  [zinc_rule_default.optional]: keyword2(zinc_rule_default.optional),
+  [zinc_rule_default.returns]: keyword2(zinc_rule_default.returns),
+  [zinc_rule_default.requires]: keyword2(zinc_rule_default.requires),
+  [zinc_rule_default.return]: keyword2(zinc_rule_default.return),
+  [zinc_rule_default.set]: keyword2(zinc_rule_default.set),
+  [zinc_rule_default.takes]: keyword2(zinc_rule_default.takes),
+  [zinc_rule_default.then]: keyword2(zinc_rule_default.then),
+  [zinc_rule_default.type]: keyword2(zinc_rule_default.type),
+  // operator
+  [zinc_rule_default.comma]: add2({
+    name: zinc_rule_default.comma,
+    pattern: /,/,
+    start_chars_hint: [44 /* Comma */],
+    label: ",",
+    line_breaks: false,
+    color: "#FFFFFF"
+  }),
+  [zinc_rule_default.equals]: add2({
+    name: zinc_rule_default.equals,
+    pattern: /==/,
+    start_chars_hint: [61 /* Equal */],
+    line_breaks: false,
+    label: "==",
+    color: operatorColor2
+  }),
+  [zinc_rule_default.assign]: add2({
+    name: zinc_rule_default.assign,
+    pattern: /=/,
+    start_chars_hint: [61 /* Equal */],
+    line_breaks: false,
+    label: "=",
+    color: operatorColor2
+  }),
+  [zinc_rule_default.notequals]: add2({
+    name: zinc_rule_default.notequals,
+    pattern: /!=/,
+    start_chars_hint: [33 /* Exclamation */],
+    line_breaks: false,
+    label: "!=",
+    color: operatorColor2
+  }),
+  [zinc_rule_default.lessorequal]: add2({
+    name: zinc_rule_default.lessorequal,
+    pattern: /<=/,
+    start_chars_hint: [60 /* Less */],
+    line_breaks: false,
+    label: "<=",
+    color: operatorColor2
+  }),
+  [zinc_rule_default.less]: add2({
+    name: zinc_rule_default.less,
+    pattern: /</,
+    start_chars_hint: [60 /* Less */],
+    line_breaks: false,
+    label: "<",
+    color: operatorColor2
+  }),
+  [zinc_rule_default.greatorequal]: add2({
+    name: zinc_rule_default.greatorequal,
+    pattern: />=/,
+    start_chars_hint: [62 /* Greater */],
+    line_breaks: false,
+    label: ">=",
+    color: operatorColor2
+  }),
+  [zinc_rule_default.great]: add2({
+    name: zinc_rule_default.great,
+    pattern: />/,
+    start_chars_hint: [62 /* Greater */],
+    line_breaks: false,
+    label: ">",
+    color: operatorColor2
+  }),
+  [zinc_rule_default.add]: add2({
+    name: zinc_rule_default.add,
+    pattern: /\+/,
+    start_chars_hint: [43 /* Plus */],
+    line_breaks: false,
+    label: "+",
+    color: operatorColor2
+  }),
+  [zinc_rule_default.sub]: add2({
+    name: zinc_rule_default.sub,
+    pattern: /-/,
+    start_chars_hint: [45 /* Minus */],
+    line_breaks: false,
+    label: "-",
+    color: operatorColor2
+  }),
+  [zinc_rule_default.mult]: add2({
+    name: zinc_rule_default.mult,
+    pattern: /\*/,
+    start_chars_hint: [42 /* Asterisk */],
+    line_breaks: false,
+    label: "*",
+    color: operatorColor2
+  }),
+  [zinc_rule_default.div]: add2({
+    name: zinc_rule_default.div,
+    pattern: /\//,
+    start_chars_hint: [47 /* Slash */],
+    line_breaks: false,
+    label: "/",
+    color: operatorColor2
+  }),
+  [zinc_rule_default.semicolon]: add2({
+    name: zinc_rule_default.semicolon,
+    pattern: /;/,
+    start_chars_hint: [59 /* Semicolon */],
+    line_breaks: false,
+    label: ";",
+    color: operatorColor2
+  }),
+  [zinc_rule_default.lparen]: add2({
+    name: zinc_rule_default.lparen,
+    pattern: /\(/,
+    start_chars_hint: [40 /* LeftParenthesis */],
+    line_breaks: false,
+    label: "(",
+    color: parenColor2
+  }),
+  [zinc_rule_default.rparen]: add2({
+    name: zinc_rule_default.rparen,
+    pattern: /\)/,
+    start_chars_hint: [41 /* RightParenthesis */],
+    line_breaks: false,
+    label: ")",
+    color: parenColor2
+  }),
+  [zinc_rule_default.lcurlyparen]: add2({
+    name: zinc_rule_default.lcurlyparen,
+    pattern: /\{/,
+    start_chars_hint: [123 /* LeftCurlyBracket */],
+    line_breaks: false,
+    label: "{",
+    color: parenColor2
+  }),
+  [zinc_rule_default.rcurlyparen]: add2({
+    name: zinc_rule_default.rcurlyparen,
+    pattern: /}/,
+    start_chars_hint: [125 /* RightCurlyBracket */],
+    line_breaks: false,
+    label: "}",
+    color: parenColor2
+  }),
+  [zinc_rule_default.lsquareparen]: add2({
+    name: zinc_rule_default.lsquareparen,
+    pattern: /\[/,
+    start_chars_hint: [91 /* LeftSquareBracket */],
+    line_breaks: false,
+    label: "[",
+    color: parenColor2
+  }),
+  [zinc_rule_default.rsquareparen]: add2({
+    name: zinc_rule_default.rsquareparen,
+    pattern: /]/,
+    start_chars_hint: [93 /* RightSquareBracket */],
+    line_breaks: false,
+    label: "]",
+    color: parenColor2
+  }),
+  //
+  [zinc_rule_default.idliteral]: add2({
+    name: zinc_rule_default.idliteral,
+    pattern: /'[^']*'/,
+    line_breaks: true,
+    start_chars_hint: [39 /* Apostrophe */],
+    color: numberColor2
+  }),
+  [zinc_rule_default.stringliteral]: add2({
+    name: zinc_rule_default.stringliteral,
+    pattern: /"[^"\\]*(?:\\.[^"\\]*)*"/,
+    start_chars_hint: [34 /* Quotation */],
+    line_breaks: true,
+    color: "#CE9178"
+  }),
+  [zinc_rule_default.real]: add2({
+    name: zinc_rule_default.real,
+    pattern: /\d+\.\d*|\.\d+/,
+    line_breaks: false,
+    start_chars_hint: [46 /* Dot */, ...CharCodeDigitList],
+    color: numberColor2
+  }),
+  [zinc_rule_default.integer]: add2({
+    name: zinc_rule_default.integer,
+    pattern: /\b0x[0-9a-z]+|\$[0-9a-z]+|\d+\b/i,
+    start_chars_hint: [36 /* Dollar */, ...CharCodeDigitList],
+    line_breaks: false,
+    color: numberColor2
+  }),
+  [zinc_rule_default.identifier]: add2({
+    name: zinc_rule_default.identifier,
+    pattern: /\b[a-zA-Z][a-zA-Z0-9_]*\b/,
+    line_breaks: false,
+    start_chars_hint: CharCodeLetterList
+  })
+};
+
+// src/wts/wts-rule.ts
+var WtsRule = /* @__PURE__ */ ((WtsRule2) => {
+  WtsRule2["wts"] = "wts";
+  WtsRule2["block"] = "block";
+  WtsRule2["whitespace"] = "whitespace";
+  WtsRule2["string"] = "string";
+  WtsRule2["index"] = "index";
+  WtsRule2["comment"] = "comment";
+  WtsRule2["lparen"] = "lparen";
+  WtsRule2["rparen"] = "rparen";
+  WtsRule2["text"] = "text";
+  return WtsRule2;
+})(WtsRule || {});
+var wts_rule_default = WtsRule;
+
+// src/wts/wts-tokens.ts
+var WtsColors = {
+  wts_string: "#5974c0",
+  wts_index: "#d828dc",
+  wts_comment: "#9b9b9b",
+  wts_paren: "#7fc036",
+  wts_text: "#66c9a2"
+};
+var whitespacePattern = (text, startOffset, tokens) => {
+  if (tokens.length > 0) {
+    const lastMatchedToken = tokens[tokens.length - 1];
+    if (tokenMatcher(lastMatchedToken, WtsTokens.lparen))
+      return null;
+  }
+  let endOffset = startOffset;
+  let charCode = text.charCodeAt(endOffset);
+  while (CharCodeWhitespaceBreakList.indexOf(charCode) >= 0) {
+    endOffset++;
+    charCode = text.charCodeAt(endOffset);
+  }
+  return endOffset === startOffset ? null : [text.substring(startOffset, endOffset)];
+};
+var WtsTokens = {
+  [wts_rule_default.whitespace]: createToken({
+    name: wts_rule_default.whitespace,
+    pattern: whitespacePattern,
+    line_breaks: true,
+    start_chars_hint: CharCodeWhitespaceBreakList,
+    group: Lexer.SKIPPED
+  }),
+  [wts_rule_default.string]: createToken({
+    name: wts_rule_default.string,
+    pattern: /\bSTRING\b/,
+    start_chars_hint: [83 /* S */],
+    line_breaks: false
+  }),
+  [wts_rule_default.index]: createToken({
+    name: wts_rule_default.index,
+    pattern: /\d+/,
+    start_chars_hint: CharCodeDigitList,
+    line_breaks: false
+  }),
+  [wts_rule_default.comment]: createToken({
+    name: wts_rule_default.comment,
+    pattern: /\/\/[^\r\n]*/,
+    start_chars_hint: [47 /* Slash */],
+    line_breaks: false
+  }),
+  [wts_rule_default.lparen]: createToken({
+    name: wts_rule_default.lparen,
+    pattern: /\{/,
+    line_breaks: false,
+    start_chars_hint: [123 /* LeftCurlyBracket */],
+    label: "{"
+  }),
+  [wts_rule_default.rparen]: createToken({
+    name: wts_rule_default.rparen,
+    pattern: /}/,
+    line_breaks: false,
+    start_chars_hint: [125 /* RightCurlyBracket */],
+    label: "}"
+  }),
+  [wts_rule_default.text]: createToken({
+    name: wts_rule_default.text,
+    pattern: /[^}]+/,
+    line_breaks: true
+  })
+};
+
 // docs/_gen/gen.ts
 var fs = __toESM(require("fs"));
-var legendMap = JassColors;
+var legendMap = {
+  ...JassColors,
+  ...WtsColors,
+  ...ZincColors
+};
 var root2 = "../..";
 var packagePath = `${root2}/package.json`;
 var writeLegendMap = (text, flag = "a+") => fs.writeFileSync(`${root2}/src/semantic/token-legend.ts`, text, { flag });

@@ -47,7 +47,7 @@ export default class JassParser extends CstParser {
         ])))
         //endregion
 
-        //region root_constant
+        //region jass_constant
         $.RULE(JassRule.jass_constant, () => {
             $.OPTION(() => $.CONSUME(JassTokens[JassRule.constant]))
             $.OR([

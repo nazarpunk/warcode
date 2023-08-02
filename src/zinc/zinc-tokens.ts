@@ -2,20 +2,32 @@ import {createToken, ITokenConfig, Lexer, TokenType} from 'chevrotain'
 import ZincRule from './zinc-rule'
 import {
     CharCode,
-    CharCodeBreakList,
     CharCodeDigitList,
     CharCodeLetterList,
     CharCodeWhitespaceBreakList,
 } from '../utils/char-code'
 
+export const ZincColors: Record<string, string> = {
+    zinc_argument: '#9A9A9A',
+    zinc_variable_global: '#DADADA',
+    zinc_variable_local: '#9CDCF0',
+    zinc_function_user: '#DCDCAA',
+    zinc_function_native: '#C586C0',
+    zinc_type_name: '#4EC9B0',
+}
+
 const add = (config: ITokenConfig & {
     color?: string
 }): TokenType => {
+    const color = config.color ?? '#ff0026'
+    delete config.color
+    ZincColors[`zinc_${config.name}`] = color
     return createToken(config)
 }
 
-const keyword = (k: ZincRule): TokenType => {
+const keyword = (k: ZincRule, color: string = '#2C7AD6'): TokenType => {
     // color: color ??= '#2C7AD6',
+    ZincColors[`zinc_${k}`] = color
     return createToken({
         name: k,
         pattern: new RegExp(`\\b${k}\\b`),
@@ -31,9 +43,12 @@ const parenColor = '#e1d132'
 const ZincTokens: Record<Exclude<ZincRule,
     ZincRule.zinc |
     ZincRule.library_declare |
+    ZincRule.library_requires |
     ZincRule.library_root |
+    ZincRule.library_constant |
     ZincRule.access_scope |
     ZincRule.variable_declare |
+    ZincRule.variable_set |
     ZincRule.function_declare |
     ZincRule.function_locals |
     ZincRule.function_returns |
@@ -70,17 +85,9 @@ const ZincTokens: Record<Exclude<ZincRule,
         color: '#308030',
         group: 'comments'
     }),
-    [ZincRule.linebreak]: add({
-        name: ZincRule.linebreak,
-        pattern: /\n|\r\n?/,
-        label: '\\n',
-        start_chars_hint: CharCodeBreakList,
-        line_breaks: true,
-    }),
     // keyword
     [ZincRule.library]: keyword(ZincRule.library),
     [ZincRule.and]: keyword(ZincRule.and),
-    [ZincRule.array]: keyword(ZincRule.array),
     [ZincRule.call]: keyword(ZincRule.call),
     [ZincRule.public]: keyword(ZincRule.public),
     [ZincRule.private]: keyword(ZincRule.private),
@@ -101,7 +108,9 @@ const ZincTokens: Record<Exclude<ZincRule,
     [ZincRule.not]: keyword(ZincRule.not),
     [ZincRule.nothing]: keyword(ZincRule.nothing),
     [ZincRule.or]: keyword(ZincRule.or),
+    [ZincRule.optional]: keyword(ZincRule.optional),
     [ZincRule.returns]: keyword(ZincRule.returns),
+    [ZincRule.requires]: keyword(ZincRule.requires),
     [ZincRule.return]: keyword(ZincRule.return),
     [ZincRule.set]: keyword(ZincRule.set),
     [ZincRule.takes]: keyword(ZincRule.takes),

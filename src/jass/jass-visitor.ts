@@ -19,6 +19,7 @@ import JassParser from './jass-parser'
 import i18next from 'i18next'
 import {i18n} from '../utils/i18n'
 import {IVisitor} from '../utils/ext-provider'
+import {CstNode} from 'chevrotain'
 
 const parser = new JassParser()
 const ParserVisitor = parser.getBaseCstVisitorConstructor()
@@ -65,6 +66,27 @@ export class JassVisitor extends ParserVisitor implements IVisitor {
         return token
     }
 
+    #tokens(ctx: JassCstNode, rule: JassRule, type: TokenLegend) {
+        const tokens = ctx[rule] as IToken[]
+        if (!tokens) return
+        for (const token of tokens) {
+            const p = this.document.positionAt(token.startOffset)
+            this.builder.push(p.line, p.character, token.image.length, type)
+        }
+    }
+
+    #node(ctx: JassCstNode, rule: JassRule, param?: any) {
+        const node = ctx[rule]?.[0] as CstNode
+        if (!node) return
+        return this.visit(node, param)
+    }
+
+    #nodes(ctx: JassCstNode, rule: JassRule) {
+        const nodes = ctx[rule] as CstNode[]
+        if (!nodes) return
+        for (const node of nodes) this.visit(node)
+    }
+
     #string(ctx: JassCstNode) {
         const strings = ctx[JassRule.stringliteral]
         if (!strings) return
@@ -109,20 +131,16 @@ export class JassVisitor extends ParserVisitor implements IVisitor {
     [JassRule.jass](ctx: JassCstNode) {
         delete ctx[JassRule.linebreak]
         //console.log(JassRule.jass, ctx)
-        ctx[JassRule.jass_constant]?.map(item => this.visit(item))
-        ctx[JassRule.type_declare]?.map(item => this.visit(item))
-        ctx[JassRule.globals_declare]?.map(item => this.visit(item))
-        return null
+        this.#nodes(ctx, JassRule.jass_constant)
+        this.#nodes(ctx, JassRule.type_declare)
+        this.#nodes(ctx, JassRule.globals_declare)
     }
 
     [JassRule.jass_constant](ctx: JassCstNode) {
         //console.log(JassRule.jass_constant, ctx)
-        const constant = ctx[JassRule.constant]?.[0]
-        this.#mark(constant, TokenLegend.jass_takes)
-
-        this.visit(ctx[JassRule.function_declare]!, {constant: constant})
-        this.visit(ctx[JassRule.native_declare]!, {constant: constant})
-        return null
+        const constant = this.#token(ctx, JassRule.constant, TokenLegend.jass_constant)
+        this.#node(ctx, JassRule.function_declare, {constant: constant})
+        this.#node(ctx, JassRule.native_declare, {constant: constant})
     }
 
     [JassRule.native_declare](ctx: JassCstNode) {
@@ -135,6 +153,8 @@ export class JassVisitor extends ParserVisitor implements IVisitor {
 
     [JassRule.function_declare](ctx: JassCstNode) {
         //console.log(JassRule.function_declare, ctx)
+
+        // Cannot return value from function that returns nothing
 
         // --- head
         const head = this.visit(ctx[JassRule.function_head]!) as FuncHead
@@ -210,8 +230,8 @@ export class JassVisitor extends ParserVisitor implements IVisitor {
     [JassRule.function_head](ctx: JassCstNode, opts: { native?: boolean }): FuncHead {
         //console.log(JassRule.function_head, ctx)
         // --- keywords
-        this.#mark(ctx[JassRule.takes]?.[0], TokenLegend.jass_takes)
-        this.#mark(ctx[JassRule.returns]?.[0], TokenLegend.jass_returns)
+        this.#token(ctx, JassRule.takes, TokenLegend.jass_takes)
+        this.#token(ctx, JassRule.returns, TokenLegend.jass_returns)
 
         // --- name
         const name = this.#token(ctx, JassRule.identifier_name, opts?.native ? TokenLegend.jass_function_native : TokenLegend.jass_function_user)
@@ -295,10 +315,8 @@ export class JassVisitor extends ParserVisitor implements IVisitor {
             })
         }
 
-        this.#mark(ctx[JassRule.assign]?.[0], TokenLegend.jass_equals)
-
-        const exp = ctx[JassRule.expression]
-        if (exp) this.visit(exp)
+        this.#token(ctx, JassRule.assign, TokenLegend.jass_assign)
+        this.#node(ctx, JassRule.expression)
 
         return {
             typedname: typedname,
@@ -306,7 +324,7 @@ export class JassVisitor extends ParserVisitor implements IVisitor {
     }
 
     [JassRule.globals_declare](ctx: JassCstNode) {
-        ctx[JassRule.constant]?.map(item => this.#mark(item, TokenLegend.jass_takes))
+        this.#tokens(ctx, JassRule.constant, TokenLegend.jass_takes)
 
         const globals = this.#token(ctx, JassRule.globals, TokenLegend.jass_globals)
         const endglobals = this.#token(ctx, JassRule.endglobals, TokenLegend.jass_endglobals)
@@ -347,12 +365,9 @@ export class JassVisitor extends ParserVisitor implements IVisitor {
                 }
             }
         }
-
-        return ctx
     }
 
     [JassRule.type_declare](ctx: JassCstNode) {
-        ctx[JassRule.end]?.map(item => this.visit(item))
         const name = this.#token(ctx, JassRule.identifier_name, TokenLegend.jass_type_name)
         const base = this.#token(ctx, JassRule.identifier_base, TokenLegend.jass_type_name)
         if (name && base) this.symbols.push(this.#documentSymbol(name.image, base.image, SymbolKind.TypeParameter, name))
@@ -380,117 +395,103 @@ export class JassVisitor extends ParserVisitor implements IVisitor {
 
     [JassRule.function_call](ctx: JassCstNode) {
         // console.log(JassRule.function_call, ctx);
-        this.#mark(ctx[JassRule.identifier]?.[0], TokenLegend.jass_function_user)
-        this.#mark(ctx[JassRule.lparen]?.[0], TokenLegend.jass_lparen)
-        this.#mark(ctx[JassRule.rparen]?.[0], TokenLegend.jass_rparen)
-        ctx[JassRule.comma]?.map(item => this.#mark(item, TokenLegend.jass_comma))
-        ctx[JassRule.expression]?.map(item => this.visit(item))
-        return ctx
+        this.#token(ctx, JassRule.identifier, TokenLegend.jass_function_user)
+        this.#token(ctx, JassRule.lparen, TokenLegend.jass_lparen)
+        this.#token(ctx, JassRule.rparen, TokenLegend.jass_rparen)
+        this.#tokens(ctx, JassRule.comma, TokenLegend.jass_comma)
+        this.#nodes(ctx, JassRule.expression)
     }
 
     [JassRule.statement](ctx: JassCstNode) {
-        for (const statement of [
-            ctx[JassRule.if_statement],
-            ctx[JassRule.set_statement],
-            ctx[JassRule.call_statement],
-            ctx[JassRule.loop_statement],
-            ctx[JassRule.exitwhen_statement],
-            ctx[JassRule.return_statement]
-        ]) if (statement) return this.visit(statement)
-
-        return null
+        this.#nodes(ctx, JassRule.if_statement)
+        this.#nodes(ctx, JassRule.set_statement)
+        this.#nodes(ctx, JassRule.call_statement)
+        this.#nodes(ctx, JassRule.loop_statement)
+        this.#nodes(ctx, JassRule.exitwhen_statement)
+        this.#nodes(ctx, JassRule.return_statement)
     }
 
     [JassRule.call_statement](ctx: JassCstNode) {
         //console.log(JassRule.call_statement, ctx)
-        this.#mark(ctx[JassRule.debug]?.[0], TokenLegend.jass_debug)
-        this.#mark(ctx[JassRule.call]?.[0], TokenLegend.jass_call)
-        this.visit(ctx[JassRule.function_call]!)
-        return null
+        this.#token(ctx, JassRule.debug, TokenLegend.jass_debug)
+        this.#token(ctx, JassRule.call, TokenLegend.jass_call)
+        this.#node(ctx, JassRule.function_call)
     }
 
     [JassRule.set_statement](ctx: JassCstNode) {
         // console.log(JassRule.set_statement, ctx);
-        this.#mark(ctx[JassRule.set]?.[0], TokenLegend.jass_set)
-        this.#mark(ctx[JassRule.identifier]?.[0], TokenLegend.jass_variable_local)
-        this.#mark(ctx[JassRule.assign]?.[0], TokenLegend.jass_assign)
-
-        this.visit(ctx[JassRule.expression]!)
-        this.visit(ctx[JassRule.arrayaccess]!)
-        return null
+        this.#token(ctx, JassRule.set, TokenLegend.jass_set)
+        this.#token(ctx, JassRule.identifier, TokenLegend.jass_variable_local)
+        this.#token(ctx, JassRule.assign, TokenLegend.jass_assign)
+        this.#node(ctx, JassRule.expression)
+        this.#node(ctx, JassRule.arrayaccess)
     }
 
     [JassRule.loop_statement](ctx: JassCstNode) {
-        this.#mark(ctx[JassRule.loop]?.[0], TokenLegend.jass_loop)
-        this.#mark(ctx[JassRule.endloop]?.[0], TokenLegend.jass_endloop)
+        this.#token(ctx, JassRule.loop, TokenLegend.jass_loop)
+        this.#token(ctx, JassRule.endloop, TokenLegend.jass_endloop)
         ctx[JassRule.statement]?.map(item => this.visit(item))
-        return ctx
     }
 
     [JassRule.exitwhen_statement](ctx: JassCstNode) {
-        this.#mark(ctx[JassRule.exitwhen]?.[0], TokenLegend.jass_loop)
-
-        this.visit(ctx[JassRule.expression]!)
-        return ctx
+        this.#token(ctx, JassRule.exitwhen, TokenLegend.jass_loop)
+        this.#node(ctx, JassRule.expression)
     }
 
     [JassRule.return_statement](ctx: JassCstNode) {
-        this.#mark(ctx[JassRule.return]?.[0], TokenLegend.jass_return)
-
-        this.visit(ctx[JassRule.expression]!)
-        return null
+        this.#token(ctx, JassRule.return, TokenLegend.jass_return)
+        this.#node(ctx, JassRule.expression)
     }
 
     [JassRule.if_statement](ctx: JassCstNode) {
         // console.log(JassRule.if_statement, ctx);
-        this.#mark(ctx[JassRule.if]?.[0], TokenLegend.jass_if)
-        this.#mark(ctx[JassRule.then]?.[0], TokenLegend.jass_then)
-        this.#mark(ctx[JassRule.endif]?.[0], TokenLegend.jass_endif)
-
-        this.visit(ctx[JassRule.expression]!)
-        ctx[JassRule.statement]?.map(item => this.visit(item))
-        ctx[JassRule.elseif_statement]?.map(item => this.visit(item))
-        this.visit(ctx[JassRule.else_statement]!)
-        return null
+        this.#token(ctx, JassRule.if, TokenLegend.jass_if)
+        this.#token(ctx, JassRule.then, TokenLegend.jass_then)
+        this.#token(ctx, JassRule.endif, TokenLegend.jass_endif)
+        this.#node(ctx, JassRule.expression)
+        this.#nodes(ctx, JassRule.statement)
+        this.#nodes(ctx, JassRule.elseif_statement)
+        this.#node(ctx, JassRule.else_statement)
     }
 
     [JassRule.elseif_statement](ctx: JassCstNode) {
         this.visit(ctx[JassRule.expression]!)
-        this.#mark(ctx[JassRule.elseif]?.[0], TokenLegend.jass_elseif)
-        this.#mark(ctx[JassRule.then]?.[0], TokenLegend.jass_then)
-        ctx[JassRule.statement]?.map(item => this.visit(item))
-        return null
+        this.#token(ctx, JassRule.elseif, TokenLegend.jass_elseif)
+        this.#token(ctx, JassRule.then, TokenLegend.jass_then)
+        this.#nodes(ctx, JassRule.statement)
     }
 
     [JassRule.else_statement](ctx: JassCstNode) {
         this.#mark(ctx[JassRule.else]?.[0], TokenLegend.jass_else)
-        ctx[JassRule.statement]?.map(item => this.visit(item))
-        return null
+        this.#nodes(ctx, JassRule.statement)
     }
 
     [JassRule.expression](ctx: JassCstNode) {
         //console.log(JassRule.expression, ctx);
-        ctx[JassRule.and]?.map(item => this.#mark(item, TokenLegend.jass_and))
-        ctx[JassRule.or]?.map(item => this.#mark(item, TokenLegend.jass_or))
-        ctx[JassRule.equals]?.map(item => this.#mark(item, TokenLegend.jass_equals))
-        ctx[JassRule.notequals]?.map(item => this.#mark(item, TokenLegend.jass_notequals))
-        ctx[JassRule.lessorequal]?.map(item => this.#mark(item, TokenLegend.jass_lessorequal))
-        ctx[JassRule.great]?.map(item => this.#mark(item, TokenLegend.jass_great))
-        ctx[JassRule.greatorequal]?.map(item => this.#mark(item, TokenLegend.jass_greatorequal))
-
-        ctx[JassRule.addition]?.map(item => this.visit(item))
-        return null
+        this.#tokens(ctx, JassRule.and, TokenLegend.jass_and)
+        this.#tokens(ctx, JassRule.or, TokenLegend.jass_or)
+        this.#tokens(ctx, JassRule.equals, TokenLegend.jass_equals)
+        this.#tokens(ctx, JassRule.notequals, TokenLegend.jass_notequals)
+        this.#tokens(ctx, JassRule.lessorequal, TokenLegend.jass_lessorequal)
+        this.#tokens(ctx, JassRule.great, TokenLegend.jass_great)
+        this.#tokens(ctx, JassRule.greatorequal, TokenLegend.jass_greatorequal)
+        this.#nodes(ctx, JassRule.addition)
     }
 
     [JassRule.primary](ctx: JassCstNode) {
         //console.log(JassRule.primary, ctx);
         this.#string(ctx)
-        this.#mark(ctx[JassRule.sub]?.[0], TokenLegend.jass_sub)
-        this.#mark(ctx[JassRule.integer]?.[0], TokenLegend.jass_integer)
-        this.#mark(ctx[JassRule.real]?.[0], TokenLegend.jass_real)
-        this.#mark(ctx[JassRule.idliteral]?.[0], TokenLegend.jass_idliteral)
-        this.#mark(ctx[JassRule.function]?.[0], TokenLegend.jass_function)
-        this.#mark(ctx[JassRule.not]?.[0], TokenLegend.jass_not)
+        this.#token(ctx, JassRule.sub, TokenLegend.jass_sub)
+        this.#token(ctx, JassRule.integer, TokenLegend.jass_integer)
+        this.#token(ctx, JassRule.real, TokenLegend.jass_real)
+        this.#token(ctx, JassRule.idliteral, TokenLegend.jass_idliteral)
+        this.#token(ctx, JassRule.function, TokenLegend.jass_function)
+        this.#token(ctx, JassRule.not, TokenLegend.jass_not)
+
+        this.#node(ctx, JassRule.arrayaccess)
+        this.#node(ctx, JassRule.function_call)
+        this.#node(ctx, JassRule.expression)
+        this.#node(ctx, JassRule.primary)
 
         const identifier = ctx[JassRule.identifier]?.[0]
         if (identifier) {
@@ -501,40 +502,29 @@ export class JassVisitor extends ParserVisitor implements IVisitor {
                 this.#mark(identifier, TokenLegend.jass_function)
             }
         }
-        this.visit(ctx[JassRule.arrayaccess]!)
-        this.visit(ctx[JassRule.function_call]!)
-        this.visit(ctx[JassRule.expression]!)
-        this.visit(ctx[JassRule.primary]!)
-        return null
     }
 
     [JassRule.addition](ctx: JassCstNode) {
         // console.log(JassRule.addition, ctx);
-        ctx[JassRule.add]?.map(item => this.#mark(item, TokenLegend.jass_add))
-        ctx[JassRule.sub]?.map(item => this.#mark(item, TokenLegend.jass_sub))
-
-        ctx[JassRule.multiplication]?.map(item => this.visit(item))
-        return null
+        this.#tokens(ctx, JassRule.add, TokenLegend.jass_add)
+        this.#tokens(ctx, JassRule.sub, TokenLegend.jass_sub)
+        this.#nodes(ctx, JassRule.multiplication)
     }
 
     [JassRule.multiplication](ctx: JassCstNode) {
         // console.log(JassRule.multiplication, ctx);
-        ctx[JassRule.mult]?.map(item => this.#mark(item, TokenLegend.jass_mult))
-        ctx[JassRule.div]?.map(item => this.#mark(item, TokenLegend.jass_div))
-        ctx[JassRule.primary]?.map(item => this.visit(item))
-        return null
+        this.#tokens(ctx, JassRule.mult, TokenLegend.jass_mult)
+        this.#tokens(ctx, JassRule.div, TokenLegend.jass_div)
+        this.#nodes(ctx, JassRule.primary)
     }
 
     [JassRule.arrayaccess](ctx: JassCstNode) {
         // console.log(JassRule.arrayaccess, ctx);
-        this.#mark(ctx[JassRule.lsquareparen]?.[0], TokenLegend.jass_lsquareparen)
-        this.#mark(ctx[JassRule.rsquareparen]?.[0], TokenLegend.jass_rsquareparen)
-
-        this.visit(ctx[JassRule.expression]!)
-        return null
+        this.#token(ctx, JassRule.lsquareparen, TokenLegend.jass_lsquareparen)
+        this.#token(ctx, JassRule.rsquareparen, TokenLegend.jass_rsquareparen)
+        this.#node(ctx, JassRule.expression)
     }
 
-    [JassRule.end](ctx: JassCstNode) {
-        return ctx
+    [JassRule.end]() {
     }
 }

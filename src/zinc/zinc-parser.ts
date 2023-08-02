@@ -9,7 +9,9 @@ import {IParserConfig} from '@chevrotain/types'
 export default class ZincParser extends CstParser {
     declare [ZincRule.zinc]: ParserMethod<any, any>
     declare [ZincRule.library_declare]: ParserMethod<any, any>
+    declare [ZincRule.library_requires]: ParserMethod<any, any>
     declare [ZincRule.library_root]: ParserMethod<any, any>
+    declare [ZincRule.library_constant]: ParserMethod<any, any>
     declare [ZincRule.access_scope]: ParserMethod<any, any>
     declare [ZincRule.function_declare]: ParserMethod<any, any>
     declare [ZincRule.function_args]: ParserMethod<any, any>
@@ -19,6 +21,7 @@ export default class ZincParser extends CstParser {
     declare [ZincRule.typedname]: ParserMethod<any, any>
     declare [ZincRule.expression]: ParserMethod<any, any>
     declare [ZincRule.variable_declare]: ParserMethod<any, any>
+    declare [ZincRule.variable_set]: ParserMethod<any, any>
     declare [ZincRule.elseif_statement]: ParserMethod<any, any>
     declare [ZincRule.else_statement]: ParserMethod<any, any>
     declare [ZincRule.function_call]: ParserMethod<any, any>
@@ -46,17 +49,41 @@ export default class ZincParser extends CstParser {
         $.RULE(ZincRule.library_declare, () => {
             $.CONSUME(ZincTokens[ZincRule.library])
             $.CONSUME(ZincTokens[ZincRule.identifier])
+            $.OPTION(() => {
+                $.CONSUME(ZincTokens[ZincRule.requires])
+                $.AT_LEAST_ONE_SEP({
+                    SEP: ZincTokens[ZincRule.comma],
+                    DEF: () => $.SUBRULE($[ZincRule.library_requires])
+                })
+            })
             $.CONSUME(ZincTokens[ZincRule.lcurlyparen])
             $.MANY(() => $.SUBRULE($[ZincRule.library_root]))
             $.CONSUME(ZincTokens[ZincRule.rcurlyparen])
         })
         //endregion
 
+        //region library_requires
+        $.RULE(ZincRule.library_requires, () => {
+            $.OPTION(() => $.CONSUME(ZincTokens[ZincRule.optional]))
+            $.CONSUME(ZincTokens[ZincRule.identifier])
+        })
+        //endregion
+
         //region library_root
         $.RULE(ZincRule.library_root, () => {
             $.OR([
-                {ALT: () => $.SUBRULE($[ZincRule.variable_declare])},
+                {ALT: () => $.SUBRULE($[ZincRule.library_constant])},
                 {ALT: () => $.SUBRULE($[ZincRule.access_scope])}
+            ])
+        })
+        //endregion
+
+        //region zinc_constant
+        $.RULE(ZincRule.library_constant, () => {
+            $.OPTION(() => $.CONSUME(ZincTokens[ZincRule.constant]))
+            $.OR([
+                {ALT: () => $.SUBRULE($[ZincRule.function_declare])},
+                {ALT: () => $.SUBRULE($[ZincRule.variable_declare])},
             ])
         })
         //endregion
@@ -66,14 +93,22 @@ export default class ZincParser extends CstParser {
                 {ALT: () => $.CONSUME(ZincTokens[ZincRule.public])},
                 {ALT: () => $.CONSUME(ZincTokens[ZincRule.private])},
             ])
-            $.CONSUME(ZincTokens[ZincRule.lcurlyparen])
-            $.MANY(() => $.SUBRULE($[ZincRule.library_root]))
-            $.CONSUME(ZincTokens[ZincRule.rcurlyparen])
+            $.OR1([
+                {
+                    ALT: () => $.SUBRULE($[ZincRule.library_root])
+                },
+                {
+                    ALT: () => {
+                        $.CONSUME(ZincTokens[ZincRule.lcurlyparen])
+                        $.MANY(() => $.SUBRULE2($[ZincRule.library_root]))
+                        $.CONSUME(ZincTokens[ZincRule.rcurlyparen])
+                    }
+                }
+            ])
         })
 
         //region function
         $.RULE(ZincRule.function_declare, () => {
-            $.OPTION(() => $.CONSUME(ZincTokens[ZincRule.constant]))
             $.CONSUME(ZincTokens[ZincRule.function])
             $.CONSUME2(ZincTokens[ZincRule.identifier])
             $.CONSUME3(ZincTokens[ZincRule.takes])
@@ -86,19 +121,29 @@ export default class ZincParser extends CstParser {
         })
         //endregion
 
-        //region variable
+        //region variable_declare
         $.RULE(ZincRule.variable_declare, () => {
-            $.OPTION(() => $.OR([
-                {ALT: () => $.CONSUME(ZincTokens[ZincRule.public])},
-                {ALT: () => $.CONSUME(ZincTokens[ZincRule.private])},
-            ]))
-            $.OPTION2(() => $.CONSUME(ZincTokens[ZincRule.constant]))
-            $.SUBRULE($[ZincRule.typedname])
-            $.OPTION3(() => {
-                $.CONSUME(ZincTokens[ZincRule.assign])
-                $.SUBRULE($[ZincRule.expression])
+            $.CONSUME(ZincTokens[ZincRule.identifier])
+            $.AT_LEAST_ONE_SEP({
+                SEP: ZincTokens[ZincRule.comma],
+                DEF: () => $.SUBRULE($[ZincRule.variable_set])
             })
             $.CONSUME(ZincTokens[ZincRule.semicolon])
+        })
+        //endregion
+
+        //region variable_declare
+        $.RULE(ZincRule.variable_set, () => {
+            $.CONSUME2(ZincTokens[ZincRule.identifier])
+            $.MANY(() => {
+                $.CONSUME(ZincTokens[ZincRule.lsquareparen])
+                $.OPTION(() => $.SUBRULE($[ZincRule.expression]))
+                $.CONSUME(ZincTokens[ZincRule.rsquareparen])
+            })
+            $.OPTION3(() => {
+                $.CONSUME(ZincTokens[ZincRule.assign])
+                $.SUBRULE2($[ZincRule.expression])
+            })
         })
         //endregion
 
@@ -189,8 +234,11 @@ export default class ZincParser extends CstParser {
         //region typedname
         $.RULE(ZincRule.typedname, () => {
             $.CONSUME(ZincTokens[ZincRule.identifier])
-            $.OPTION2(() => $.CONSUME(ZincTokens[ZincRule.array]))
             $.CONSUME2(ZincTokens[ZincRule.identifier])
+            $.OPTION2(() => {
+                $.CONSUME(ZincTokens[ZincRule.lsquareparen])
+                $.CONSUME(ZincTokens[ZincRule.rsquareparen])
+            })
         })
         //endregion
 

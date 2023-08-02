@@ -4,11 +4,15 @@ import {IToken} from '@chevrotain/types'
 
 export default interface ZincCstNode extends CstNode {
     // node
+    [ZincRule.zinc]?: CstNode[],
     [ZincRule.library_declare]?: CstNode[],
+    [ZincRule.library_requires]?: CstNode[],
     [ZincRule.library_root]?: CstNode[],
+    [ZincRule.library_constant]?: CstNode[],
     [ZincRule.access_scope]?: CstNode[],
     [ZincRule.function_declare]?: CstNode[],
     [ZincRule.variable_declare]?: CstNode[],
+    [ZincRule.variable_set]?: CstNode[],
     [ZincRule.function_returns]?: CstNode[],
     [ZincRule.function_args]?: CstNode[],
     [ZincRule.function_locals]?: CstNode[],
@@ -29,6 +33,10 @@ export default interface ZincCstNode extends CstNode {
     [ZincRule.primary]?: CstNode[],
     [ZincRule.addition]?: CstNode[],
     // token
+    [ZincRule.whitespace]?: IToken[],
+    [ZincRule.requires]?: IToken[],
+    [ZincRule.optional]?: IToken[],
+    [ZincRule.less]?: IToken[],
     [ZincRule.library]?: IToken[],
     [ZincRule.endfunction]?: IToken[],
     [ZincRule.globals]?: IToken[],
@@ -44,7 +52,6 @@ export default interface ZincCstNode extends CstNode {
     [ZincRule.function]?: IToken[],
     [ZincRule.comment]?: IToken[],
     [ZincRule.stringliteral]?: IToken[],
-    [ZincRule.array]?: IToken[],
     [ZincRule.lparen]?: IToken[],
     [ZincRule.rparen]?: IToken[],
     [ZincRule.lcurlyparen]?: IToken[],

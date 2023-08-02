@@ -127,26 +127,6 @@
         "description": ""
       },
       {
-        "id": "wts_string",
-        "description": ""
-      },
-      {
-        "id": "wts_index",
-        "description": ""
-      },
-      {
-        "id": "wts_comment",
-        "description": ""
-      },
-      {
-        "id": "wts_paren",
-        "description": ""
-      },
-      {
-        "id": "wts_text",
-        "description": ""
-      },
-      {
         "id": "jass_whitespace",
         "description": ""
       },
@@ -353,6 +333,274 @@
       {
         "id": "jass_identifier",
         "description": ""
+      },
+      {
+        "id": "wts_string",
+        "description": ""
+      },
+      {
+        "id": "wts_index",
+        "description": ""
+      },
+      {
+        "id": "wts_comment",
+        "description": ""
+      },
+      {
+        "id": "wts_paren",
+        "description": ""
+      },
+      {
+        "id": "wts_text",
+        "description": ""
+      },
+      {
+        "id": "zinc_argument",
+        "description": ""
+      },
+      {
+        "id": "zinc_variable_global",
+        "description": ""
+      },
+      {
+        "id": "zinc_variable_local",
+        "description": ""
+      },
+      {
+        "id": "zinc_function_user",
+        "description": ""
+      },
+      {
+        "id": "zinc_function_native",
+        "description": ""
+      },
+      {
+        "id": "zinc_type_name",
+        "description": ""
+      },
+      {
+        "id": "zinc_whitespace",
+        "description": ""
+      },
+      {
+        "id": "zinc_comment",
+        "description": ""
+      },
+      {
+        "id": "zinc_library",
+        "description": ""
+      },
+      {
+        "id": "zinc_and",
+        "description": ""
+      },
+      {
+        "id": "zinc_call",
+        "description": ""
+      },
+      {
+        "id": "zinc_public",
+        "description": ""
+      },
+      {
+        "id": "zinc_private",
+        "description": ""
+      },
+      {
+        "id": "zinc_constant",
+        "description": ""
+      },
+      {
+        "id": "zinc_debug",
+        "description": ""
+      },
+      {
+        "id": "zinc_else",
+        "description": ""
+      },
+      {
+        "id": "zinc_elseif",
+        "description": ""
+      },
+      {
+        "id": "zinc_endfunction",
+        "description": ""
+      },
+      {
+        "id": "zinc_endglobals",
+        "description": ""
+      },
+      {
+        "id": "zinc_endif",
+        "description": ""
+      },
+      {
+        "id": "zinc_endloop",
+        "description": ""
+      },
+      {
+        "id": "zinc_exitwhen",
+        "description": ""
+      },
+      {
+        "id": "zinc_extends",
+        "description": ""
+      },
+      {
+        "id": "zinc_function",
+        "description": ""
+      },
+      {
+        "id": "zinc_globals",
+        "description": ""
+      },
+      {
+        "id": "zinc_if",
+        "description": ""
+      },
+      {
+        "id": "zinc_loop",
+        "description": ""
+      },
+      {
+        "id": "zinc_not",
+        "description": ""
+      },
+      {
+        "id": "zinc_nothing",
+        "description": ""
+      },
+      {
+        "id": "zinc_or",
+        "description": ""
+      },
+      {
+        "id": "zinc_optional",
+        "description": ""
+      },
+      {
+        "id": "zinc_returns",
+        "description": ""
+      },
+      {
+        "id": "zinc_requires",
+        "description": ""
+      },
+      {
+        "id": "zinc_return",
+        "description": ""
+      },
+      {
+        "id": "zinc_set",
+        "description": ""
+      },
+      {
+        "id": "zinc_takes",
+        "description": ""
+      },
+      {
+        "id": "zinc_then",
+        "description": ""
+      },
+      {
+        "id": "zinc_type",
+        "description": ""
+      },
+      {
+        "id": "zinc_comma",
+        "description": ""
+      },
+      {
+        "id": "zinc_equals",
+        "description": ""
+      },
+      {
+        "id": "zinc_assign",
+        "description": ""
+      },
+      {
+        "id": "zinc_notequals",
+        "description": ""
+      },
+      {
+        "id": "zinc_lessorequal",
+        "description": ""
+      },
+      {
+        "id": "zinc_less",
+        "description": ""
+      },
+      {
+        "id": "zinc_greatorequal",
+        "description": ""
+      },
+      {
+        "id": "zinc_great",
+        "description": ""
+      },
+      {
+        "id": "zinc_add",
+        "description": ""
+      },
+      {
+        "id": "zinc_sub",
+        "description": ""
+      },
+      {
+        "id": "zinc_mult",
+        "description": ""
+      },
+      {
+        "id": "zinc_div",
+        "description": ""
+      },
+      {
+        "id": "zinc_semicolon",
+        "description": ""
+      },
+      {
+        "id": "zinc_lparen",
+        "description": ""
+      },
+      {
+        "id": "zinc_rparen",
+        "description": ""
+      },
+      {
+        "id": "zinc_lcurlyparen",
+        "description": ""
+      },
+      {
+        "id": "zinc_rcurlyparen",
+        "description": ""
+      },
+      {
+        "id": "zinc_lsquareparen",
+        "description": ""
+      },
+      {
+        "id": "zinc_rsquareparen",
+        "description": ""
+      },
+      {
+        "id": "zinc_idliteral",
+        "description": ""
+      },
+      {
+        "id": "zinc_stringliteral",
+        "description": ""
+      },
+      {
+        "id": "zinc_real",
+        "description": ""
+      },
+      {
+        "id": "zinc_integer",
+        "description": ""
+      },
+      {
+        "id": "zinc_identifier",
+        "description": ""
       }
     ],
     "configurationDefaults": {
@@ -364,11 +612,6 @@
           "jass_function_user": "#DCDCAA",
           "jass_function_native": "#C586C0",
           "jass_type_name": "#4EC9B0",
-          "wts_string": "#5974c0",
-          "wts_index": "#d828dc",
-          "wts_comment": "#9b9b9b",
-          "wts_paren": "#7fc036",
-          "wts_text": "#66c9a2",
           "jass_whitespace": "#ff0026",
           "jass_comment": "#308030",
           "jass_linebreak": "#ff0026",
@@ -420,7 +663,74 @@
           "jass_stringliteral": "#CE9178",
           "jass_real": "#e760cc",
           "jass_integer": "#e760cc",
-          "jass_identifier": "#ff0026"
+          "jass_identifier": "#ff0026",
+          "wts_string": "#5974c0",
+          "wts_index": "#d828dc",
+          "wts_comment": "#9b9b9b",
+          "wts_paren": "#7fc036",
+          "wts_text": "#66c9a2",
+          "zinc_argument": "#9A9A9A",
+          "zinc_variable_global": "#DADADA",
+          "zinc_variable_local": "#9CDCF0",
+          "zinc_function_user": "#DCDCAA",
+          "zinc_function_native": "#C586C0",
+          "zinc_type_name": "#4EC9B0",
+          "zinc_whitespace": "#ff0026",
+          "zinc_comment": "#308030",
+          "zinc_library": "#2C7AD6",
+          "zinc_and": "#2C7AD6",
+          "zinc_call": "#2C7AD6",
+          "zinc_public": "#2C7AD6",
+          "zinc_private": "#2C7AD6",
+          "zinc_constant": "#2C7AD6",
+          "zinc_debug": "#2C7AD6",
+          "zinc_else": "#2C7AD6",
+          "zinc_elseif": "#2C7AD6",
+          "zinc_endfunction": "#2C7AD6",
+          "zinc_endglobals": "#2C7AD6",
+          "zinc_endif": "#2C7AD6",
+          "zinc_endloop": "#2C7AD6",
+          "zinc_exitwhen": "#2C7AD6",
+          "zinc_extends": "#2C7AD6",
+          "zinc_function": "#2C7AD6",
+          "zinc_globals": "#2C7AD6",
+          "zinc_if": "#2C7AD6",
+          "zinc_loop": "#2C7AD6",
+          "zinc_not": "#2C7AD6",
+          "zinc_nothing": "#2C7AD6",
+          "zinc_or": "#2C7AD6",
+          "zinc_optional": "#2C7AD6",
+          "zinc_returns": "#2C7AD6",
+          "zinc_requires": "#2C7AD6",
+          "zinc_return": "#2C7AD6",
+          "zinc_set": "#2C7AD6",
+          "zinc_takes": "#2C7AD6",
+          "zinc_then": "#2C7AD6",
+          "zinc_type": "#2C7AD6",
+          "zinc_comma": "#FFFFFF",
+          "zinc_equals": "#e7be60",
+          "zinc_assign": "#e7be60",
+          "zinc_notequals": "#e7be60",
+          "zinc_lessorequal": "#e7be60",
+          "zinc_less": "#e7be60",
+          "zinc_greatorequal": "#e7be60",
+          "zinc_great": "#e7be60",
+          "zinc_add": "#e7be60",
+          "zinc_sub": "#e7be60",
+          "zinc_mult": "#e7be60",
+          "zinc_div": "#e7be60",
+          "zinc_semicolon": "#e7be60",
+          "zinc_lparen": "#e1d132",
+          "zinc_rparen": "#e1d132",
+          "zinc_lcurlyparen": "#e1d132",
+          "zinc_rcurlyparen": "#e1d132",
+          "zinc_lsquareparen": "#e1d132",
+          "zinc_rsquareparen": "#e1d132",
+          "zinc_idliteral": "#e760cc",
+          "zinc_stringliteral": "#CE9178",
+          "zinc_real": "#e760cc",
+          "zinc_integer": "#e760cc",
+          "zinc_identifier": "#ff0026"
         }
       }
     }
