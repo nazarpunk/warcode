@@ -2,8 +2,6 @@ import {Lexer} from "chevrotain";
 import fs from "fs";
 
 const packagePath = '../package.json';
-const writeTokenMap = (text, flag = 'a+') => fs.writeFileSync('jass/lexer/jass-token-map.mjs', text, {flag: flag});
-const writeTokenList = (text, flag = 'a+') => fs.writeFileSync('jass/lexer/jass-token-list.mjs', text, {flag: flag});
 const writeLegendMap = (text, flag = 'a+') => fs.writeFileSync('semantic/token-legend.mjs', text, {flag: flag});
 const writeLegendList = (text, flag = 'a+') => fs.writeFileSync('semantic/ext-semantic-tokens-legend.mjs', text, {flag: flag});
 
@@ -235,11 +233,6 @@ const tokenList = [
     },
 ]
 
-writeTokenMap(`import {createToken, Lexer} from 'chevrotain';
-
-export default {
-`, 'w+');
-
 /** @type {Object.<string, string>} */
 let legendMap = {};
 
@@ -247,34 +240,8 @@ const nameList = [];
 
 for (const c of tokenList) {
     nameList.push(c.name);
-
     if (c.color) legendMap[`jass_${c.name}`] = c.color;
-
-    writeTokenMap(`${tab}${c.name}: createToken({\n`);
-    for (const [k, v] of Object.entries(c)) {
-        if (k === 'color') continue;
-
-        writeTokenMap(`${tab.repeat(2)}${k}: `);
-        switch (k) {
-            case 'name':
-                writeTokenMap(`'${c.name}'`);
-                break;
-            case 'pattern':
-                writeTokenMap(`${v}`);
-                break;
-            default:
-                writeTokenMap(v === Lexer.SKIPPED ? 'Lexer.SKIPPED' : `${JSON.stringify(v)}`);
-        }
-        writeTokenMap(`,\n`);
-    }
-
-    writeTokenMap(`${tab}}),\n`);
 }
-writeTokenMap(`}\n`);
-
-writeTokenList(`import JassTokenMap from "./jass-token-map.mjs";
-
-export default [${nameList.map(s => `JassTokenMap.${s}`).join(', ')}];`, 'w+');
 
 //region legend
 /** @type {{}} */

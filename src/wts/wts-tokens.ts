@@ -1,21 +1,21 @@
-import WtsRule from './wts-rule';
-import {createToken, Lexer, tokenMatcher, TokenType} from 'chevrotain';
-import {CustomPatternMatcherReturn, IToken} from '@chevrotain/types';
-import {CharCode, CharCodeDigitList, CharCodeWhitespaceBreakList} from '../utils/char-code';
+import WtsRule from './wts-rule'
+import {createToken, Lexer, tokenMatcher, TokenType} from 'chevrotain'
+import {CustomPatternMatcherReturn, IToken} from '@chevrotain/types'
+import {CharCode, CharCodeDigitList, CharCodeWhitespaceBreakList} from '../utils/char-code'
 
 const whitespacePattern = (text: string, startOffset: number, tokens: IToken[]): CustomPatternMatcherReturn | null => {
     if (tokens.length > 0) {
-        const lastMatchedToken = tokens[tokens.length - 1];
-        if (tokenMatcher(lastMatchedToken, WtsTokens.lparen)) return null;
+        const lastMatchedToken = tokens[tokens.length - 1]
+        if (tokenMatcher(lastMatchedToken, WtsTokens.lparen)) return null
     }
-    let endOffset = startOffset;
-    let charCode = text.charCodeAt(endOffset);
+    let endOffset = startOffset
+    let charCode = text.charCodeAt(endOffset)
     while (CharCodeWhitespaceBreakList.indexOf(charCode) >= 0) {
-        endOffset++;
-        charCode = text.charCodeAt(endOffset);
+        endOffset++
+        charCode = text.charCodeAt(endOffset)
     }
-    return endOffset === startOffset ? null : [text.substring(startOffset, endOffset)];
-};
+    return endOffset === startOffset ? null : [text.substring(startOffset, endOffset)]
+}
 
 const WtsTokens: Record<Exclude<WtsRule, WtsRule.wts | WtsRule.block>, TokenType> = {
     [WtsRule.whitespace]: createToken({
@@ -62,6 +62,6 @@ const WtsTokens: Record<Exclude<WtsRule, WtsRule.wts | WtsRule.block>, TokenType
         pattern: /[^}]+/,
         line_breaks: true,
     }),
-};
+}
 
-export default WtsTokens;
+export default WtsTokens

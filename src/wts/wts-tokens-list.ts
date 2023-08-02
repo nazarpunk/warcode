@@ -1,3 +1,3 @@
-import WtsTokens from './wts-tokens';
+import WtsTokens from './wts-tokens'
 
-export default Object.values(WtsTokens);
+export default Object.values(WtsTokens)

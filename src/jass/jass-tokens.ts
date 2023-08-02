@@ -8,14 +8,33 @@ import {
     CharCodeWhitespaceList
 } from '../utils/char-code'
 
+export const JassColors: Record<string, string> = {
+    jass_argument: '#9A9A9A',
+    jass_variable_global: '#DADADA',
+    jass_variable_local: '#9CDCF0',
+    jass_function_user: '#DCDCAA',
+    jass_function_native: '#C586C0',
+    jass_type_name: '#4EC9B0',
+    // wts
+    wts_string: '#5974c0',
+    wts_index: '#d828dc',
+    wts_comment: '#9b9b9b',
+    wts_paren: '#7fc036',
+    wts_text: '#66c9a2',
+}
+
 const add = (config: ITokenConfig & {
     color?: string
 }): TokenType => {
+    const color = config.color ?? '#ff0026'
+    delete config.color
+    JassColors[`jass_${config.name}`] = color
     return createToken(config)
 }
 
-const keyword = (k: JassRule): TokenType => {
-    // color: color ??= '#2C7AD6',
+const keyword = (k: JassRule, color: string = '#2C7AD6'): TokenType => {
+    JassColors[`jass_${k}`] = color
+
     return createToken({
         name: k,
         pattern: new RegExp(`\\b${k}\\b`),
