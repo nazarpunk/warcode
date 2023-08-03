@@ -16,7 +16,6 @@ import {IVisitor} from '../utils/ext-provider'
 import TokenLegend from '../semantic/token-legend'
 import {IToken} from '@chevrotain/types'
 import {CstNode} from 'chevrotain'
-import JassCstNode from '../jass/jass-cst-node'
 import i18next from 'i18next'
 import {i18n} from '../utils/i18n'
 
@@ -70,7 +69,7 @@ export class ZincVisitor extends ParserVisitor implements IVisitor {
         for (const node of nodes) this.visit(node)
     }
 
-    #string(ctx: JassCstNode) {
+    #string(ctx: ZincCstNode) {
         const strings = ctx[ZincRule.stringliteral]
         if (!strings) return
 
@@ -126,6 +125,7 @@ export class ZincVisitor extends ParserVisitor implements IVisitor {
         //console.log(ZincRule.library_constant, ctx)
         this.#token(ctx, ZincRule.constant, TokenLegend.zinc_constant)
         this.#node(ctx, ZincRule.variable_declare)
+        this.#node(ctx, ZincRule.function_declare)
     }
 
     [ZincRule.access_scope](ctx: ZincCstNode) {
@@ -138,15 +138,25 @@ export class ZincVisitor extends ParserVisitor implements IVisitor {
     }
 
     [ZincRule.function_declare](ctx: ZincCstNode) {
-        return ctx
+        //console.log(ZincRule.function_declare, ctx)
+        this.#token(ctx, ZincRule.function, TokenLegend.zinc_function)
+        this.#token(ctx, ZincRule.identifier_name, TokenLegend.zinc_function_user)
+        this.#token(ctx, ZincRule.returns, TokenLegend.zinc_returns)
+        this.#token(ctx, ZincRule.identifier_returns, TokenLegend.zinc_type_name)
+        this.#token(ctx, ZincRule.comma, TokenLegend.zinc_comma)
+        this.#token(ctx, ZincRule.lparen, TokenLegend.zinc_lparen)
+        this.#token(ctx, ZincRule.rparen, TokenLegend.zinc_rparen)
+        this.#token(ctx, ZincRule.lcurlyparen, TokenLegend.zinc_lcurlyparen)
+        this.#token(ctx, ZincRule.rcurlyparen, TokenLegend.zinc_rcurlyparen)
+        this.#nodes(ctx, ZincRule.function_arg)
+        this.#nodes(ctx, ZincRule.variable_declare)
+        this.#nodes(ctx, ZincRule.statement)
     }
 
-    [ZincRule.function_locals](ctx: ZincCstNode) {
-        return ctx
-    }
-
-    [ZincRule.typedname](ctx: ZincCstNode) {
-        return ctx
+    [ZincRule.function_arg](ctx: ZincCstNode) {
+        //console.log(ZincRule.function_arg, ctx)
+        this.#token(ctx, ZincRule.identifier_type, TokenLegend.zinc_type_name)
+        this.#token(ctx, ZincRule.identifier_name, TokenLegend.zinc_argument)
     }
 
     [ZincRule.function_call](ctx: ZincCstNode) {
@@ -155,14 +165,6 @@ export class ZincVisitor extends ParserVisitor implements IVisitor {
         this.#token(ctx, ZincRule.rparen, TokenLegend.zinc_rparen)
         this.#tokens(ctx, ZincRule.comma, TokenLegend.zinc_comma)
         this.#nodes(ctx, ZincRule.expression)
-    }
-
-    [ZincRule.function_args](ctx: ZincCstNode) {
-        return ctx
-    }
-
-    [ZincRule.function_returns](ctx: ZincCstNode) {
-        return ctx
     }
 
     [ZincRule.variable_declare](ctx: ZincCstNode) {
@@ -183,7 +185,12 @@ export class ZincVisitor extends ParserVisitor implements IVisitor {
     }
 
     [ZincRule.statement](ctx: ZincCstNode) {
-        return ctx
+        //console.log(ZincRule.statement, ctx)
+        this.#nodes(ctx, ZincRule.if_statement)
+        this.#nodes(ctx, ZincRule.set_statement)
+        this.#nodes(ctx, ZincRule.call_statement)
+        this.#nodes(ctx, ZincRule.loop_statement)
+        this.#nodes(ctx, ZincRule.return_statement)
     }
 
     [ZincRule.call_statement](ctx: ZincCstNode) {
@@ -191,31 +198,40 @@ export class ZincVisitor extends ParserVisitor implements IVisitor {
     }
 
     [ZincRule.set_statement](ctx: ZincCstNode) {
-        return ctx
+        //console.log(ZincRule.set_statement, ctx)
+        this.#token(ctx, ZincRule.assign, TokenLegend.zinc_assign)
+        this.#token(ctx, ZincRule.identifier, TokenLegend.zinc_variable_local)
+        this.#node(ctx, ZincRule.expression)
+        this.#nodes(ctx, ZincRule.arrayaccess)
     }
 
     [ZincRule.loop_statement](ctx: ZincCstNode) {
-        return ctx
-    }
-
-    [ZincRule.exitwhen_statement](ctx: ZincCstNode) {
+        //console.log(ZincRule.loop_statement, ctx)
         return ctx
     }
 
     [ZincRule.return_statement](ctx: ZincCstNode) {
-        return ctx
+        this.#token(ctx, ZincRule.return, TokenLegend.zinc_return)
+        this.#token(ctx, ZincRule.semicolon, TokenLegend.zinc_semicolon)
+        this.#node(ctx, ZincRule.expression)
     }
 
     [ZincRule.if_statement](ctx: ZincCstNode) {
-        return ctx
-    }
-
-    [ZincRule.elseif_statement](ctx: ZincCstNode) {
-        return ctx
+        this.#token(ctx, ZincRule.if, TokenLegend.zinc_if)
+        this.#token(ctx, ZincRule.lparen, TokenLegend.zinc_lparen)
+        this.#token(ctx, ZincRule.rparen, TokenLegend.zinc_rparen)
+        this.#token(ctx, ZincRule.lcurlyparen, TokenLegend.zinc_lcurlyparen)
+        this.#token(ctx, ZincRule.rcurlyparen, TokenLegend.zinc_rcurlyparen)
+        this.#node(ctx, ZincRule.expression)
+        this.#nodes(ctx, ZincRule.statement)
+        this.#node(ctx, ZincRule.else_statement)
     }
 
     [ZincRule.else_statement](ctx: ZincCstNode) {
-        return ctx
+        this.#token(ctx, ZincRule.else, TokenLegend.zinc_else)
+        this.#token(ctx, ZincRule.lcurlyparen, TokenLegend.zinc_lcurlyparen)
+        this.#token(ctx, ZincRule.rcurlyparen, TokenLegend.zinc_rcurlyparen)
+        this.#nodes(ctx, ZincRule.statement)
     }
 
     [ZincRule.expression](ctx: ZincCstNode) {

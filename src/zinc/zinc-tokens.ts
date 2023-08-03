@@ -41,6 +41,9 @@ const operatorColor = '#e7be60'
 const parenColor = '#e1d132'
 
 const ZincTokens: Record<Exclude<ZincRule,
+    ZincRule.identifier_name |
+    ZincRule.identifier_type |
+    ZincRule.identifier_returns |
     ZincRule.zinc |
     ZincRule.library_declare |
     ZincRule.library_requires |
@@ -50,20 +53,15 @@ const ZincTokens: Record<Exclude<ZincRule,
     ZincRule.variable_declare |
     ZincRule.variable_set |
     ZincRule.function_declare |
-    ZincRule.function_locals |
-    ZincRule.function_returns |
-    ZincRule.function_args |
+    ZincRule.function_arg |
     ZincRule.function_call |
     ZincRule.return_statement |
     ZincRule.if_statement |
     ZincRule.else_statement |
-    ZincRule.elseif_statement |
     ZincRule.addition |
     ZincRule.arrayaccess |
     ZincRule.call_statement |
-    ZincRule.exitwhen_statement |
     ZincRule.expression |
-    ZincRule.typedname |
     ZincRule.loop_statement |
     ZincRule.multiplication |
     ZincRule.primary |
@@ -85,36 +83,35 @@ const ZincTokens: Record<Exclude<ZincRule,
         color: '#308030',
         group: 'comments'
     }),
+    [ZincRule.comment_multiline]: add({
+        name: ZincRule.comment_multiline,
+        pattern: /\/\*[^]*?\*\//,
+        line_breaks: true,
+        start_chars_hint: [CharCode.Slash],
+        color: '#308030',
+        group: 'comments'
+    }),
     // keyword
     [ZincRule.library]: keyword(ZincRule.library),
     [ZincRule.and]: keyword(ZincRule.and),
-    [ZincRule.call]: keyword(ZincRule.call),
     [ZincRule.public]: keyword(ZincRule.public),
     [ZincRule.private]: keyword(ZincRule.private),
     [ZincRule.constant]: keyword(ZincRule.constant),
     [ZincRule.debug]: keyword(ZincRule.debug),
     [ZincRule.else]: keyword(ZincRule.else),
-    [ZincRule.elseif]: keyword(ZincRule.elseif),
     [ZincRule.endfunction]: keyword(ZincRule.endfunction),
     [ZincRule.endglobals]: keyword(ZincRule.endglobals),
-    [ZincRule.endif]: keyword(ZincRule.endif),
     [ZincRule.endloop]: keyword(ZincRule.endloop),
-    [ZincRule.exitwhen]: keyword(ZincRule.exitwhen),
     [ZincRule.extends]: keyword(ZincRule.extends),
     [ZincRule.function]: keyword(ZincRule.function),
     [ZincRule.globals]: keyword(ZincRule.globals),
     [ZincRule.if]: keyword(ZincRule.if),
     [ZincRule.loop]: keyword(ZincRule.loop),
     [ZincRule.not]: keyword(ZincRule.not),
-    [ZincRule.nothing]: keyword(ZincRule.nothing),
     [ZincRule.or]: keyword(ZincRule.or),
     [ZincRule.optional]: keyword(ZincRule.optional),
-    [ZincRule.returns]: keyword(ZincRule.returns),
     [ZincRule.requires]: keyword(ZincRule.requires),
     [ZincRule.return]: keyword(ZincRule.return),
-    [ZincRule.set]: keyword(ZincRule.set),
-    [ZincRule.takes]: keyword(ZincRule.takes),
-    [ZincRule.then]: keyword(ZincRule.then),
     [ZincRule.type]: keyword(ZincRule.type),
     // operator
     [ZincRule.comma]: add({
@@ -124,6 +121,14 @@ const ZincTokens: Record<Exclude<ZincRule,
         label: ',',
         line_breaks: false,
         color: '#FFFFFF',
+    }),
+    [ZincRule.returns]: add({
+        name: ZincRule.returns,
+        pattern: /->/,
+        start_chars_hint: [CharCode.Minus],
+        line_breaks: false,
+        label: '->',
+        color: operatorColor,
     }),
     [ZincRule.equals]: add({
         name: ZincRule.equals,

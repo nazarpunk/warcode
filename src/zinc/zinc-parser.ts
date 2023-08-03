@@ -14,15 +14,11 @@ export default class ZincParser extends CstParser {
     declare [ZincRule.library_constant]: ParserMethod<any, any>
     declare [ZincRule.access_scope]: ParserMethod<any, any>
     declare [ZincRule.function_declare]: ParserMethod<any, any>
-    declare [ZincRule.function_args]: ParserMethod<any, any>
-    declare [ZincRule.function_returns]: ParserMethod<any, any>
-    declare [ZincRule.function_locals]: ParserMethod<any, any>
+    declare [ZincRule.function_arg]: ParserMethod<any, any>
     declare [ZincRule.statement]: ParserMethod<any, any>
-    declare [ZincRule.typedname]: ParserMethod<any, any>
     declare [ZincRule.expression]: ParserMethod<any, any>
     declare [ZincRule.variable_declare]: ParserMethod<any, any>
     declare [ZincRule.variable_set]: ParserMethod<any, any>
-    declare [ZincRule.elseif_statement]: ParserMethod<any, any>
     declare [ZincRule.else_statement]: ParserMethod<any, any>
     declare [ZincRule.function_call]: ParserMethod<any, any>
     declare [ZincRule.arrayaccess]: ParserMethod<any, any>
@@ -32,7 +28,6 @@ export default class ZincParser extends CstParser {
     declare [ZincRule.call_statement]: ParserMethod<any, any>
     declare [ZincRule.set_statement]: ParserMethod<any, any>
     declare [ZincRule.loop_statement]: ParserMethod<any, any>
-    declare [ZincRule.exitwhen_statement]: ParserMethod<any, any>
     declare [ZincRule.if_statement]: ParserMethod<any, any>
     declare [ZincRule.return_statement]: ParserMethod<any, any>
 
@@ -107,20 +102,6 @@ export default class ZincParser extends CstParser {
             ])
         })
 
-        //region function
-        $.RULE(ZincRule.function_declare, () => {
-            $.CONSUME(ZincTokens[ZincRule.function])
-            $.CONSUME2(ZincTokens[ZincRule.identifier])
-            $.CONSUME3(ZincTokens[ZincRule.takes])
-            $.SUBRULE($[ZincRule.function_args])
-            $.CONSUME4(ZincTokens[ZincRule.returns])
-            $.SUBRULE($[ZincRule.function_returns])
-            $.MANY1(() => $.SUBRULE($[ZincRule.function_locals]))
-            $.MANY2(() => $.SUBRULE($[ZincRule.statement]))
-            $.CONSUME(ZincTokens[ZincRule.endfunction])
-        })
-        //endregion
-
         //region variable_declare
         $.RULE(ZincRule.variable_declare, () => {
             $.CONSUME(ZincTokens[ZincRule.identifier])
@@ -132,7 +113,7 @@ export default class ZincParser extends CstParser {
         })
         //endregion
 
-        //region variable_declare
+        //region variable_set
         $.RULE(ZincRule.variable_set, () => {
             $.CONSUME2(ZincTokens[ZincRule.identifier])
             $.MANY(() => {
@@ -147,39 +128,74 @@ export default class ZincParser extends CstParser {
         })
         //endregion
 
-        //region if
-        $.RULE(ZincRule.if_statement, () => {
-            $.CONSUME(ZincTokens[ZincRule.if])
-            $.SUBRULE($[ZincRule.expression])
-            $.CONSUME(ZincTokens[ZincRule.then])
-            $.MANY(() => $.SUBRULE($[ZincRule.statement]))
-            $.MANY2(() => $.SUBRULE($[ZincRule.elseif_statement]))
-            $.OPTION(() => $.SUBRULE($[ZincRule.else_statement]))
-            $.CONSUME(ZincTokens[ZincRule.endif])
+        //region function_declare
+        $.RULE(ZincRule.function_declare, () => {
+            $.CONSUME(ZincTokens[ZincRule.function])
+            $.OPTION(() => $.CONSUME2(ZincTokens[ZincRule.identifier], {LABEL: ZincRule.identifier_name}))
+            $.CONSUME(ZincTokens[ZincRule.lparen])
+            $.MANY_SEP({
+                SEP: ZincTokens[ZincRule.comma],
+                DEF: () => $.SUBRULE2($[ZincRule.function_arg])
+            })
+            $.CONSUME(ZincTokens[ZincRule.rparen])
+            $.OPTION1(() => {
+                $.CONSUME(ZincTokens[ZincRule.returns])
+                $.CONSUME(ZincTokens[ZincRule.identifier], {LABEL: ZincRule.identifier_returns})
+            })
+            $.CONSUME(ZincTokens[ZincRule.lcurlyparen])
+            $.MANY(() => $.SUBRULE($[ZincRule.variable_declare]))
+            $.MANY1(() => $.SUBRULE($[ZincRule.statement]))
+            $.CONSUME(ZincTokens[ZincRule.rcurlyparen])
         })
         //endregion
 
-        //region elseif
-        $.RULE(ZincRule.elseif_statement, () => {
-            $.CONSUME(ZincTokens[ZincRule.elseif])
+        //region function_args
+        $.RULE(ZincRule.function_arg, () => {
+            $.CONSUME(ZincTokens[ZincRule.identifier], {LABEL: ZincRule.identifier_type})
+            $.CONSUME2(ZincTokens[ZincRule.identifier], {LABEL: ZincRule.identifier_name})
+        })
+        //endregion
+
+        //region if_statement
+        $.RULE(ZincRule.if_statement, () => {
+            $.CONSUME(ZincTokens[ZincRule.if])
+            $.CONSUME(ZincTokens[ZincRule.lparen])
             $.SUBRULE($[ZincRule.expression])
-            $.CONSUME(ZincTokens[ZincRule.then])
-            $.MANY(() => $.SUBRULE($[ZincRule.statement]))
+            $.CONSUME(ZincTokens[ZincRule.rparen])
+            $.OR([
+                {ALT: () => $.SUBRULE($[ZincRule.statement])},
+                {
+                    ALT: () => {
+                        $.CONSUME(ZincTokens[ZincRule.lcurlyparen])
+                        $.MANY(() => $.SUBRULE1($[ZincRule.statement]))
+                        $.CONSUME(ZincTokens[ZincRule.rcurlyparen])
+                    }
+                }
+            ])
+            $.OPTION(() => $.SUBRULE($[ZincRule.else_statement]))
         })
         //endregion
 
         //region else
         $.RULE(ZincRule.else_statement, () => {
             $.CONSUME(ZincTokens[ZincRule.else])
-            $.MANY(() => $.SUBRULE($[ZincRule.statement]))
+            $.OR([
+                {ALT: () => $.SUBRULE($[ZincRule.statement])},
+                {
+                    ALT: () => {
+                        $.CONSUME(ZincTokens[ZincRule.lcurlyparen])
+                        $.MANY(() => $.SUBRULE1($[ZincRule.statement]))
+                        $.CONSUME(ZincTokens[ZincRule.rcurlyparen])
+                    }
+                }
+            ])
         })
         //endregion
 
         //region call
         $.RULE(ZincRule.call_statement, () => {
-            $.OPTION(() => $.CONSUME(ZincTokens[ZincRule.debug]))
-            $.CONSUME(ZincTokens[ZincRule.call])
             $.SUBRULE($[ZincRule.function_call])
+            $.CONSUME(ZincTokens[ZincRule.semicolon])
         })
         //endregion
 
@@ -187,16 +203,17 @@ export default class ZincParser extends CstParser {
         $.RULE(ZincRule.return_statement, () => {
             $.CONSUME(ZincTokens[ZincRule.return])
             $.OPTION(() => $.SUBRULE($[ZincRule.expression]))
+            $.CONSUME(ZincTokens[ZincRule.semicolon])
         })
         //endregion
 
-        //region set
+        //region set_statement
         $.RULE(ZincRule.set_statement, () => {
-            $.CONSUME(ZincTokens[ZincRule.set])
             $.CONSUME(ZincTokens[ZincRule.identifier])
             $.OPTION(() => $.SUBRULE($[ZincRule.arrayaccess]))
             $.CONSUME(ZincTokens[ZincRule.assign])
             $.SUBRULE($[ZincRule.expression])
+            $.CONSUME(ZincTokens[ZincRule.semicolon])
         })
         //endregion
 
@@ -207,53 +224,6 @@ export default class ZincParser extends CstParser {
             $.CONSUME(ZincTokens[ZincRule.endloop])
         })
         //endregion
-
-        //region exitwhen
-        $.RULE(ZincRule.exitwhen_statement, () => {
-            $.CONSUME(ZincTokens[ZincRule.exitwhen])
-            $.SUBRULE($[ZincRule.expression])
-        })
-        //endregion
-
-        //region function_args
-        $.RULE(ZincRule.function_args, () => {
-            $.OR([
-                {ALT: () => $.CONSUME(ZincTokens[ZincRule.nothing])},
-                {
-                    ALT: () => {
-                        $.AT_LEAST_ONE_SEP({
-                            SEP: ZincTokens[ZincRule.comma],
-                            DEF: () => $.SUBRULE($[ZincRule.typedname])
-                        })
-                    }
-                },
-            ])
-        })
-        //endregion
-
-        //region typedname
-        $.RULE(ZincRule.typedname, () => {
-            $.CONSUME(ZincTokens[ZincRule.identifier])
-            $.CONSUME2(ZincTokens[ZincRule.identifier])
-            $.OPTION2(() => {
-                $.CONSUME(ZincTokens[ZincRule.lsquareparen])
-                $.CONSUME(ZincTokens[ZincRule.rsquareparen])
-            })
-        })
-        //endregion
-
-        $.RULE(ZincRule.function_returns, () => {
-            $.OR([
-                {ALT: () => $.CONSUME(ZincTokens[ZincRule.nothing])},
-                {ALT: () => $.CONSUME(ZincTokens[ZincRule.identifier])},
-            ])
-        })
-
-        $.RULE(ZincRule.function_locals, () => {
-            $.OR([
-                {ALT: () => $.SUBRULE($[ZincRule.variable_declare])},
-            ])
-        })
 
         //region expression
         $.RULE(ZincRule.expression, () => {
@@ -394,7 +364,6 @@ export default class ZincParser extends CstParser {
                 {ALT: () => $.SUBRULE($[ZincRule.call_statement])},
                 {ALT: () => $.SUBRULE($[ZincRule.set_statement])},
                 {ALT: () => $.SUBRULE($[ZincRule.loop_statement])},
-                {ALT: () => $.SUBRULE($[ZincRule.exitwhen_statement])},
                 {ALT: () => $.SUBRULE($[ZincRule.if_statement])},
                 {ALT: () => $.SUBRULE($[ZincRule.return_statement])},
             ])

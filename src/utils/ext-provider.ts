@@ -120,8 +120,9 @@ class DocumentHolder {
 
         const comments = lexing.groups['comments']
         if (comments) for (const comment of comments) {
-            const p = this.document.positionAt(comment.startOffset)
-            this.semanticTokensBuilder.push(p.line, p.character, comment.image.length, TokenLegend.jass_comment)
+            const start = this.document.positionAt(comment.startOffset)
+            const end = this.document.positionAt(comment.startOffset + comment.image.length)
+            if (start.line === end.line) this.semanticTokensBuilder.push(start.line, start.character, comment.image.length, TokenLegend.jass_comment)
         }
 
         // === parsing

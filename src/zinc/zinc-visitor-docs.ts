@@ -56,23 +56,11 @@ export class ZincVisitorDocs extends ParserVisitor implements IVisitor {
         return ctx
     }
 
-    [ZincRule.function_locals](ctx: ZincCstNode) {
-        return ctx
-    }
-
-    [ZincRule.typedname](ctx: ZincCstNode) {
-        return ctx
-    }
-
     [ZincRule.function_call](ctx: ZincCstNode) {
         return ctx
     }
 
-    [ZincRule.function_args](ctx: ZincCstNode) {
-        return ctx
-    }
-
-    [ZincRule.function_returns](ctx: ZincCstNode) {
+    [ZincRule.function_arg](ctx: ZincCstNode) {
         return ctx
     }
 
@@ -100,19 +88,11 @@ export class ZincVisitorDocs extends ParserVisitor implements IVisitor {
         return ctx
     }
 
-    [ZincRule.exitwhen_statement](ctx: ZincCstNode) {
-        return ctx
-    }
-
     [ZincRule.return_statement](ctx: ZincCstNode) {
         return ctx
     }
 
     [ZincRule.if_statement](ctx: ZincCstNode) {
-        return ctx
-    }
-
-    [ZincRule.elseif_statement](ctx: ZincCstNode) {
         return ctx
     }
 

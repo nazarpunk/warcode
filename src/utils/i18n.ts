@@ -39,7 +39,7 @@ const en: Record<i18n, string> = {
     // validator
     [i18n.stringIndexRedeclareError]: 'String with index {{index}} redeclared.',
     [i18n.localInGlobalsError]: 'Local variable not allowed in globals block.',
-    [i18n.multilineStringError]: 'Avoid multiline strings. Use |n or \\n to linebreak.',
+    [i18n.multilineStringError]: 'Avoid multiline strings. Use `|n` or `\\n` to linebreak.',
     [i18n.arrayInFunctionArgumentError]: 'Array not allowed in function argument.',
     [i18n.localRedeclareArgError]: 'Local variable `{{name}}` redeclare argument.',
     [i18n.localRedeclareLocalError]: 'Local variable `{{name}}` redeclared.',
@@ -63,7 +63,7 @@ const ru: Record<i18n, string> = {
     // validator
     [i18n.stringIndexRedeclareError]: 'Строка с индексом {{index}} переопределена.',
     [i18n.localInGlobalsError]: 'Локальные переменные нельзя объявлять в блоке globals.',
-    [i18n.multilineStringError]: 'Избегайте многострочных строк. Используйте |n или \\n для переноса строки.',
+    [i18n.multilineStringError]: 'Избегайте многострочных строк. Используйте `|n` или `\\n` для переноса строки.',
     [i18n.arrayInFunctionArgumentError]: 'Запрешено использовать массивы в аргументах функции.',
     [i18n.localRedeclareArgError]: 'Локальная переменная `{{name}}` переопределяет аргумент.',
     [i18n.localRedeclareLocalError]: 'Локальная переменная `{{name}}` объявлена повторно.',

@@ -96,6 +96,11 @@
         "path": "./src/jass/syntaxes/tmLanguage.json"
       },
       {
+        "language": "zinc",
+        "scopeName": "source.zinc",
+        "path": "./src/zinc/syntaxes/tmLanguage.json"
+      },
+      {
         "language": "wts",
         "scopeName": "source.wts",
         "path": "./src/wts/syntaxes/tmLanguage.json"
@@ -467,19 +472,11 @@
         "description": ""
       },
       {
-        "id": "zinc_nothing",
-        "description": ""
-      },
-      {
         "id": "zinc_or",
         "description": ""
       },
       {
         "id": "zinc_optional",
-        "description": ""
-      },
-      {
-        "id": "zinc_returns",
         "description": ""
       },
       {
@@ -495,10 +492,6 @@
         "description": ""
       },
       {
-        "id": "zinc_takes",
-        "description": ""
-      },
-      {
         "id": "zinc_then",
         "description": ""
       },
@@ -508,6 +501,10 @@
       },
       {
         "id": "zinc_comma",
+        "description": ""
+      },
+      {
+        "id": "zinc_returns",
         "description": ""
       },
       {
@@ -697,17 +694,15 @@
           "zinc_if": "#2C7AD6",
           "zinc_loop": "#2C7AD6",
           "zinc_not": "#2C7AD6",
-          "zinc_nothing": "#2C7AD6",
           "zinc_or": "#2C7AD6",
           "zinc_optional": "#2C7AD6",
-          "zinc_returns": "#2C7AD6",
           "zinc_requires": "#2C7AD6",
           "zinc_return": "#2C7AD6",
           "zinc_set": "#2C7AD6",
-          "zinc_takes": "#2C7AD6",
           "zinc_then": "#2C7AD6",
           "zinc_type": "#2C7AD6",
           "zinc_comma": "#FFFFFF",
+          "zinc_returns": "#e7be60",
           "zinc_equals": "#e7be60",
           "zinc_assign": "#e7be60",
           "zinc_notequals": "#e7be60",

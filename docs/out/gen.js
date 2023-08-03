@@ -9557,6 +9557,9 @@ var JassTokens = {
 
 // src/zinc/zinc-rule.ts
 var ZincRule = /* @__PURE__ */ ((ZincRule2) => {
+  ZincRule2["identifier_name"] = "identifier_name";
+  ZincRule2["identifier_type"] = "identifier_type";
+  ZincRule2["identifier_returns"] = "identifier_returns";
   ZincRule2["zinc"] = "zinc";
   ZincRule2["library"] = "library";
   ZincRule2["requires"] = "requires";
@@ -9569,20 +9572,15 @@ var ZincRule = /* @__PURE__ */ ((ZincRule2) => {
   ZincRule2["variable_declare"] = "variable_declare";
   ZincRule2["variable_set"] = "variable_set";
   ZincRule2["function_declare"] = "function_declare";
-  ZincRule2["function_locals"] = "function_locals";
-  ZincRule2["function_returns"] = "function_returns";
-  ZincRule2["function_args"] = "function_args";
+  ZincRule2["function_arg"] = "function_arg";
   ZincRule2["function_call"] = "function_call";
   ZincRule2["return_statement"] = "return_statement";
   ZincRule2["if_statement"] = "if_statement";
   ZincRule2["else_statement"] = "else_statement";
-  ZincRule2["elseif_statement"] = "elseif_statement";
   ZincRule2["addition"] = "addition";
   ZincRule2["arrayaccess"] = "arrayaccess";
   ZincRule2["call_statement"] = "call_statement";
-  ZincRule2["exitwhen_statement"] = "exitwhen_statement";
   ZincRule2["expression"] = "expression";
-  ZincRule2["typedname"] = "typedname";
   ZincRule2["loop_statement"] = "loop_statement";
   ZincRule2["multiplication"] = "multiplication";
   ZincRule2["primary"] = "primary";
@@ -9590,32 +9588,25 @@ var ZincRule = /* @__PURE__ */ ((ZincRule2) => {
   ZincRule2["statement"] = "statement";
   ZincRule2["whitespace"] = "whitespace";
   ZincRule2["comment"] = "comment";
+  ZincRule2["comment_multiline"] = "comment_multiline";
   ZincRule2["and"] = "and";
-  ZincRule2["call"] = "call";
   ZincRule2["constant"] = "constant";
   ZincRule2["public"] = "public";
   ZincRule2["private"] = "private";
   ZincRule2["debug"] = "debug";
   ZincRule2["else"] = "else";
-  ZincRule2["elseif"] = "elseif";
   ZincRule2["endfunction"] = "endfunction";
   ZincRule2["endglobals"] = "endglobals";
-  ZincRule2["endif"] = "endif";
   ZincRule2["endloop"] = "endloop";
-  ZincRule2["exitwhen"] = "exitwhen";
   ZincRule2["extends"] = "extends";
   ZincRule2["function"] = "function";
   ZincRule2["globals"] = "globals";
   ZincRule2["if"] = "if";
   ZincRule2["loop"] = "loop";
   ZincRule2["not"] = "not";
-  ZincRule2["nothing"] = "nothing";
   ZincRule2["or"] = "or";
   ZincRule2["returns"] = "returns";
   ZincRule2["return"] = "return";
-  ZincRule2["set"] = "set";
-  ZincRule2["takes"] = "takes";
-  ZincRule2["then"] = "then";
   ZincRule2["type"] = "type";
   ZincRule2["comma"] = "comma";
   ZincRule2["equals"] = "equals";
@@ -9688,36 +9679,35 @@ var ZincTokens = {
     color: "#308030",
     group: "comments"
   }),
+  [zinc_rule_default.comment_multiline]: add2({
+    name: zinc_rule_default.comment_multiline,
+    pattern: /\/\*[^]*?\*\//,
+    line_breaks: true,
+    start_chars_hint: [47 /* Slash */],
+    color: "#308030",
+    group: "comments"
+  }),
   // keyword
   [zinc_rule_default.library]: keyword2(zinc_rule_default.library),
   [zinc_rule_default.and]: keyword2(zinc_rule_default.and),
-  [zinc_rule_default.call]: keyword2(zinc_rule_default.call),
   [zinc_rule_default.public]: keyword2(zinc_rule_default.public),
   [zinc_rule_default.private]: keyword2(zinc_rule_default.private),
   [zinc_rule_default.constant]: keyword2(zinc_rule_default.constant),
   [zinc_rule_default.debug]: keyword2(zinc_rule_default.debug),
   [zinc_rule_default.else]: keyword2(zinc_rule_default.else),
-  [zinc_rule_default.elseif]: keyword2(zinc_rule_default.elseif),
   [zinc_rule_default.endfunction]: keyword2(zinc_rule_default.endfunction),
   [zinc_rule_default.endglobals]: keyword2(zinc_rule_default.endglobals),
-  [zinc_rule_default.endif]: keyword2(zinc_rule_default.endif),
   [zinc_rule_default.endloop]: keyword2(zinc_rule_default.endloop),
-  [zinc_rule_default.exitwhen]: keyword2(zinc_rule_default.exitwhen),
   [zinc_rule_default.extends]: keyword2(zinc_rule_default.extends),
   [zinc_rule_default.function]: keyword2(zinc_rule_default.function),
   [zinc_rule_default.globals]: keyword2(zinc_rule_default.globals),
   [zinc_rule_default.if]: keyword2(zinc_rule_default.if),
   [zinc_rule_default.loop]: keyword2(zinc_rule_default.loop),
   [zinc_rule_default.not]: keyword2(zinc_rule_default.not),
-  [zinc_rule_default.nothing]: keyword2(zinc_rule_default.nothing),
   [zinc_rule_default.or]: keyword2(zinc_rule_default.or),
   [zinc_rule_default.optional]: keyword2(zinc_rule_default.optional),
-  [zinc_rule_default.returns]: keyword2(zinc_rule_default.returns),
   [zinc_rule_default.requires]: keyword2(zinc_rule_default.requires),
   [zinc_rule_default.return]: keyword2(zinc_rule_default.return),
-  [zinc_rule_default.set]: keyword2(zinc_rule_default.set),
-  [zinc_rule_default.takes]: keyword2(zinc_rule_default.takes),
-  [zinc_rule_default.then]: keyword2(zinc_rule_default.then),
   [zinc_rule_default.type]: keyword2(zinc_rule_default.type),
   // operator
   [zinc_rule_default.comma]: add2({
@@ -9727,6 +9717,14 @@ var ZincTokens = {
     label: ",",
     line_breaks: false,
     color: "#FFFFFF"
+  }),
+  [zinc_rule_default.returns]: add2({
+    name: zinc_rule_default.returns,
+    pattern: /->/,
+    start_chars_hint: [45 /* Minus */],
+    line_breaks: false,
+    label: "->",
+    color: operatorColor2
   }),
   [zinc_rule_default.equals]: add2({
     name: zinc_rule_default.equals,
