@@ -9581,7 +9581,7 @@ var ZincRule = /* @__PURE__ */ ((ZincRule2) => {
   ZincRule2["arrayaccess"] = "arrayaccess";
   ZincRule2["call_statement"] = "call_statement";
   ZincRule2["expression"] = "expression";
-  ZincRule2["loop_statement"] = "loop_statement";
+  ZincRule2["for_statement"] = "for_statement";
   ZincRule2["multiplication"] = "multiplication";
   ZincRule2["primary"] = "primary";
   ZincRule2["set_statement"] = "set_statement";
@@ -9597,12 +9597,11 @@ var ZincRule = /* @__PURE__ */ ((ZincRule2) => {
   ZincRule2["else"] = "else";
   ZincRule2["endfunction"] = "endfunction";
   ZincRule2["endglobals"] = "endglobals";
-  ZincRule2["endloop"] = "endloop";
   ZincRule2["extends"] = "extends";
   ZincRule2["function"] = "function";
   ZincRule2["globals"] = "globals";
   ZincRule2["if"] = "if";
-  ZincRule2["loop"] = "loop";
+  ZincRule2["for"] = "for";
   ZincRule2["not"] = "not";
   ZincRule2["or"] = "or";
   ZincRule2["returns"] = "returns";
@@ -9689,7 +9688,6 @@ var ZincTokens = {
   }),
   // keyword
   [zinc_rule_default.library]: keyword2(zinc_rule_default.library),
-  [zinc_rule_default.and]: keyword2(zinc_rule_default.and),
   [zinc_rule_default.public]: keyword2(zinc_rule_default.public),
   [zinc_rule_default.private]: keyword2(zinc_rule_default.private),
   [zinc_rule_default.constant]: keyword2(zinc_rule_default.constant),
@@ -9697,14 +9695,11 @@ var ZincTokens = {
   [zinc_rule_default.else]: keyword2(zinc_rule_default.else),
   [zinc_rule_default.endfunction]: keyword2(zinc_rule_default.endfunction),
   [zinc_rule_default.endglobals]: keyword2(zinc_rule_default.endglobals),
-  [zinc_rule_default.endloop]: keyword2(zinc_rule_default.endloop),
   [zinc_rule_default.extends]: keyword2(zinc_rule_default.extends),
   [zinc_rule_default.function]: keyword2(zinc_rule_default.function),
   [zinc_rule_default.globals]: keyword2(zinc_rule_default.globals),
   [zinc_rule_default.if]: keyword2(zinc_rule_default.if),
-  [zinc_rule_default.loop]: keyword2(zinc_rule_default.loop),
-  [zinc_rule_default.not]: keyword2(zinc_rule_default.not),
-  [zinc_rule_default.or]: keyword2(zinc_rule_default.or),
+  [zinc_rule_default.for]: keyword2(zinc_rule_default.for),
   [zinc_rule_default.optional]: keyword2(zinc_rule_default.optional),
   [zinc_rule_default.requires]: keyword2(zinc_rule_default.requires),
   [zinc_rule_default.return]: keyword2(zinc_rule_default.return),
@@ -9717,6 +9712,38 @@ var ZincTokens = {
     label: ",",
     line_breaks: false,
     color: "#FFFFFF"
+  }),
+  [zinc_rule_default.notequals]: add2({
+    name: zinc_rule_default.notequals,
+    pattern: /!=/,
+    start_chars_hint: [33 /* Exclamation */],
+    line_breaks: false,
+    label: "!=",
+    color: operatorColor2
+  }),
+  [zinc_rule_default.not]: add2({
+    name: zinc_rule_default.not,
+    pattern: /!/,
+    start_chars_hint: [33 /* Exclamation */],
+    line_breaks: false,
+    label: "!",
+    color: operatorColor2
+  }),
+  [zinc_rule_default.or]: add2({
+    name: zinc_rule_default.or,
+    pattern: /\|\|/,
+    start_chars_hint: [124 /* VerticalBar */],
+    line_breaks: false,
+    label: "||",
+    color: operatorColor2
+  }),
+  [zinc_rule_default.and]: add2({
+    name: zinc_rule_default.and,
+    pattern: /&&/,
+    start_chars_hint: [38 /* Ampersand */],
+    line_breaks: false,
+    label: "&&",
+    color: operatorColor2
   }),
   [zinc_rule_default.returns]: add2({
     name: zinc_rule_default.returns,
@@ -9740,14 +9767,6 @@ var ZincTokens = {
     start_chars_hint: [61 /* Equal */],
     line_breaks: false,
     label: "=",
-    color: operatorColor2
-  }),
-  [zinc_rule_default.notequals]: add2({
-    name: zinc_rule_default.notequals,
-    pattern: /!=/,
-    start_chars_hint: [33 /* Exclamation */],
-    line_breaks: false,
-    label: "!=",
     color: operatorColor2
   }),
   [zinc_rule_default.lessorequal]: add2({

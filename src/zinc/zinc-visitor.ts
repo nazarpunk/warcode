@@ -189,7 +189,7 @@ export class ZincVisitor extends ParserVisitor implements IVisitor {
         this.#nodes(ctx, ZincRule.if_statement)
         this.#nodes(ctx, ZincRule.set_statement)
         this.#nodes(ctx, ZincRule.call_statement)
-        this.#nodes(ctx, ZincRule.loop_statement)
+        this.#nodes(ctx, ZincRule.for_statement)
         this.#nodes(ctx, ZincRule.return_statement)
     }
 
@@ -205,9 +205,19 @@ export class ZincVisitor extends ParserVisitor implements IVisitor {
         this.#nodes(ctx, ZincRule.arrayaccess)
     }
 
-    [ZincRule.loop_statement](ctx: ZincCstNode) {
-        //console.log(ZincRule.loop_statement, ctx)
-        return ctx
+    [ZincRule.for_statement](ctx: ZincCstNode) {
+        //console.log(ZincRule.for_statement, ctx)
+        this.#token(ctx, ZincRule.for, TokenLegend.zinc_for)
+        this.#token(ctx, ZincRule.lparen, TokenLegend.zinc_lparen)
+        this.#token(ctx, ZincRule.rparen, TokenLegend.zinc_rparen)
+        this.#token(ctx, ZincRule.lcurlyparen, TokenLegend.zinc_lcurlyparen)
+        this.#token(ctx, ZincRule.rcurlyparen, TokenLegend.zinc_rcurlyparen)
+        this.#token(ctx, ZincRule.less, TokenLegend.zinc_less)
+        this.#token(ctx, ZincRule.lessorequal, TokenLegend.zinc_lessorequal)
+        this.#token(ctx, ZincRule.great, TokenLegend.zinc_great)
+        this.#token(ctx, ZincRule.greatorequal, TokenLegend.zinc_greatorequal)
+        this.#tokens(ctx, ZincRule.identifier, TokenLegend.zinc_variable_local)
+        this.#nodes(ctx, ZincRule.statement)
     }
 
     [ZincRule.return_statement](ctx: ZincCstNode) {

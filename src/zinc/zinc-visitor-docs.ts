@@ -84,7 +84,7 @@ export class ZincVisitorDocs extends ParserVisitor implements IVisitor {
         return ctx
     }
 
-    [ZincRule.loop_statement](ctx: ZincCstNode) {
+    [ZincRule.for_statement](ctx: ZincCstNode) {
         return ctx
     }
 

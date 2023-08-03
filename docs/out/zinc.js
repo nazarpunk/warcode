@@ -9247,7 +9247,7 @@ var ZincRule = /* @__PURE__ */ ((ZincRule2) => {
   ZincRule2["arrayaccess"] = "arrayaccess";
   ZincRule2["call_statement"] = "call_statement";
   ZincRule2["expression"] = "expression";
-  ZincRule2["loop_statement"] = "loop_statement";
+  ZincRule2["for_statement"] = "for_statement";
   ZincRule2["multiplication"] = "multiplication";
   ZincRule2["primary"] = "primary";
   ZincRule2["set_statement"] = "set_statement";
@@ -9263,12 +9263,11 @@ var ZincRule = /* @__PURE__ */ ((ZincRule2) => {
   ZincRule2["else"] = "else";
   ZincRule2["endfunction"] = "endfunction";
   ZincRule2["endglobals"] = "endglobals";
-  ZincRule2["endloop"] = "endloop";
   ZincRule2["extends"] = "extends";
   ZincRule2["function"] = "function";
   ZincRule2["globals"] = "globals";
   ZincRule2["if"] = "if";
-  ZincRule2["loop"] = "loop";
+  ZincRule2["for"] = "for";
   ZincRule2["not"] = "not";
   ZincRule2["or"] = "or";
   ZincRule2["returns"] = "returns";
@@ -9374,7 +9373,6 @@ var ZincTokens = {
   }),
   // keyword
   [zinc_rule_default.library]: keyword(zinc_rule_default.library),
-  [zinc_rule_default.and]: keyword(zinc_rule_default.and),
   [zinc_rule_default.public]: keyword(zinc_rule_default.public),
   [zinc_rule_default.private]: keyword(zinc_rule_default.private),
   [zinc_rule_default.constant]: keyword(zinc_rule_default.constant),
@@ -9382,14 +9380,11 @@ var ZincTokens = {
   [zinc_rule_default.else]: keyword(zinc_rule_default.else),
   [zinc_rule_default.endfunction]: keyword(zinc_rule_default.endfunction),
   [zinc_rule_default.endglobals]: keyword(zinc_rule_default.endglobals),
-  [zinc_rule_default.endloop]: keyword(zinc_rule_default.endloop),
   [zinc_rule_default.extends]: keyword(zinc_rule_default.extends),
   [zinc_rule_default.function]: keyword(zinc_rule_default.function),
   [zinc_rule_default.globals]: keyword(zinc_rule_default.globals),
   [zinc_rule_default.if]: keyword(zinc_rule_default.if),
-  [zinc_rule_default.loop]: keyword(zinc_rule_default.loop),
-  [zinc_rule_default.not]: keyword(zinc_rule_default.not),
-  [zinc_rule_default.or]: keyword(zinc_rule_default.or),
+  [zinc_rule_default.for]: keyword(zinc_rule_default.for),
   [zinc_rule_default.optional]: keyword(zinc_rule_default.optional),
   [zinc_rule_default.requires]: keyword(zinc_rule_default.requires),
   [zinc_rule_default.return]: keyword(zinc_rule_default.return),
@@ -9402,6 +9397,38 @@ var ZincTokens = {
     label: ",",
     line_breaks: false,
     color: "#FFFFFF"
+  }),
+  [zinc_rule_default.notequals]: add({
+    name: zinc_rule_default.notequals,
+    pattern: /!=/,
+    start_chars_hint: [33 /* Exclamation */],
+    line_breaks: false,
+    label: "!=",
+    color: operatorColor
+  }),
+  [zinc_rule_default.not]: add({
+    name: zinc_rule_default.not,
+    pattern: /!/,
+    start_chars_hint: [33 /* Exclamation */],
+    line_breaks: false,
+    label: "!",
+    color: operatorColor
+  }),
+  [zinc_rule_default.or]: add({
+    name: zinc_rule_default.or,
+    pattern: /\|\|/,
+    start_chars_hint: [124 /* VerticalBar */],
+    line_breaks: false,
+    label: "||",
+    color: operatorColor
+  }),
+  [zinc_rule_default.and]: add({
+    name: zinc_rule_default.and,
+    pattern: /&&/,
+    start_chars_hint: [38 /* Ampersand */],
+    line_breaks: false,
+    label: "&&",
+    color: operatorColor
   }),
   [zinc_rule_default.returns]: add({
     name: zinc_rule_default.returns,
@@ -9425,14 +9452,6 @@ var ZincTokens = {
     start_chars_hint: [61 /* Equal */],
     line_breaks: false,
     label: "=",
-    color: operatorColor
-  }),
-  [zinc_rule_default.notequals]: add({
-    name: zinc_rule_default.notequals,
-    pattern: /!=/,
-    start_chars_hint: [33 /* Exclamation */],
-    line_breaks: false,
-    label: "!=",
     color: operatorColor
   }),
   [zinc_rule_default.lessorequal]: add({
@@ -9739,10 +9758,41 @@ var ZincParser = class extends CstParser {
       $.SUBRULE($[zinc_rule_default.expression]);
       $.CONSUME(zinc_tokens_default[zinc_rule_default.semicolon]);
     });
-    $.RULE(zinc_rule_default.loop_statement, () => {
-      $.CONSUME(zinc_tokens_default[zinc_rule_default.loop]);
-      $.MANY(() => $.SUBRULE($[zinc_rule_default.statement]));
-      $.CONSUME(zinc_tokens_default[zinc_rule_default.endloop]);
+    $.RULE(zinc_rule_default.for_statement, () => {
+      $.CONSUME(zinc_tokens_default[zinc_rule_default.for]);
+      $.CONSUME(zinc_tokens_default[zinc_rule_default.lparen]);
+      $.OR([
+        { ALT: () => $.CONSUME(zinc_tokens_default[zinc_rule_default.integer]) },
+        { ALT: () => $.CONSUME(zinc_tokens_default[zinc_rule_default.identifier]) }
+      ]);
+      $.OR1([
+        { ALT: () => $.CONSUME(zinc_tokens_default[zinc_rule_default.less]) },
+        { ALT: () => $.CONSUME(zinc_tokens_default[zinc_rule_default.lessorequal]) },
+        { ALT: () => $.CONSUME(zinc_tokens_default[zinc_rule_default.great]) },
+        { ALT: () => $.CONSUME(zinc_tokens_default[zinc_rule_default.greatorequal]) }
+      ]);
+      $.CONSUME1(zinc_tokens_default[zinc_rule_default.identifier]);
+      $.OR2([
+        { ALT: () => $.CONSUME1(zinc_tokens_default[zinc_rule_default.less]) },
+        { ALT: () => $.CONSUME1(zinc_tokens_default[zinc_rule_default.lessorequal]) },
+        { ALT: () => $.CONSUME1(zinc_tokens_default[zinc_rule_default.great]) },
+        { ALT: () => $.CONSUME1(zinc_tokens_default[zinc_rule_default.greatorequal]) }
+      ]);
+      $.OR3([
+        { ALT: () => $.CONSUME1(zinc_tokens_default[zinc_rule_default.integer]) },
+        { ALT: () => $.CONSUME2(zinc_tokens_default[zinc_rule_default.identifier]) }
+      ]);
+      $.CONSUME(zinc_tokens_default[zinc_rule_default.rparen]);
+      $.OR4([
+        { ALT: () => $.SUBRULE($[zinc_rule_default.statement]) },
+        {
+          ALT: () => {
+            $.CONSUME(zinc_tokens_default[zinc_rule_default.lcurlyparen]);
+            $.MANY(() => $.SUBRULE1($[zinc_rule_default.statement]));
+            $.CONSUME(zinc_tokens_default[zinc_rule_default.rcurlyparen]);
+          }
+        }
+      ]);
     });
     $.RULE(zinc_rule_default.expression, () => {
       $.OR([
@@ -9871,7 +9921,7 @@ var ZincParser = class extends CstParser {
       $.OR4([
         { ALT: () => $.SUBRULE($[zinc_rule_default.call_statement]) },
         { ALT: () => $.SUBRULE($[zinc_rule_default.set_statement]) },
-        { ALT: () => $.SUBRULE($[zinc_rule_default.loop_statement]) },
+        { ALT: () => $.SUBRULE($[zinc_rule_default.for_statement]) },
         { ALT: () => $.SUBRULE($[zinc_rule_default.if_statement]) },
         { ALT: () => $.SUBRULE($[zinc_rule_default.return_statement]) }
       ]);
@@ -9933,7 +9983,7 @@ var ZincVisitorDocs = class extends ParserVisitor {
   [zinc_rule_default.set_statement](ctx) {
     return ctx;
   }
-  [zinc_rule_default.loop_statement](ctx) {
+  [zinc_rule_default.for_statement](ctx) {
     return ctx;
   }
   [zinc_rule_default.return_statement](ctx) {

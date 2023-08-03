@@ -27,7 +27,7 @@ export default class ZincParser extends CstParser {
     declare [ZincRule.primary]: ParserMethod<any, any>
     declare [ZincRule.call_statement]: ParserMethod<any, any>
     declare [ZincRule.set_statement]: ParserMethod<any, any>
-    declare [ZincRule.loop_statement]: ParserMethod<any, any>
+    declare [ZincRule.for_statement]: ParserMethod<any, any>
     declare [ZincRule.if_statement]: ParserMethod<any, any>
     declare [ZincRule.return_statement]: ParserMethod<any, any>
 
@@ -217,11 +217,42 @@ export default class ZincParser extends CstParser {
         })
         //endregion
 
-        //region loop
-        $.RULE(ZincRule.loop_statement, () => {
-            $.CONSUME(ZincTokens[ZincRule.loop])
-            $.MANY(() => $.SUBRULE($[ZincRule.statement]))
-            $.CONSUME(ZincTokens[ZincRule.endloop])
+        //region for_statement
+        $.RULE(ZincRule.for_statement, () => {
+            $.CONSUME(ZincTokens[ZincRule.for])
+            $.CONSUME(ZincTokens[ZincRule.lparen])
+            $.OR([
+                {ALT: () => $.CONSUME(ZincTokens[ZincRule.integer])},
+                {ALT: () => $.CONSUME(ZincTokens[ZincRule.identifier])},
+            ])
+            $.OR1([
+                {ALT: () => $.CONSUME(ZincTokens[ZincRule.less])},
+                {ALT: () => $.CONSUME(ZincTokens[ZincRule.lessorequal])},
+                {ALT: () => $.CONSUME(ZincTokens[ZincRule.great])},
+                {ALT: () => $.CONSUME(ZincTokens[ZincRule.greatorequal])},
+            ])
+            $.CONSUME1(ZincTokens[ZincRule.identifier])
+            $.OR2([
+                {ALT: () => $.CONSUME1(ZincTokens[ZincRule.less])},
+                {ALT: () => $.CONSUME1(ZincTokens[ZincRule.lessorequal])},
+                {ALT: () => $.CONSUME1(ZincTokens[ZincRule.great])},
+                {ALT: () => $.CONSUME1(ZincTokens[ZincRule.greatorequal])},
+            ])
+            $.OR3([
+                {ALT: () => $.CONSUME1(ZincTokens[ZincRule.integer])},
+                {ALT: () => $.CONSUME2(ZincTokens[ZincRule.identifier])},
+            ])
+            $.CONSUME(ZincTokens[ZincRule.rparen])
+            $.OR4([
+                {ALT: () => $.SUBRULE($[ZincRule.statement])},
+                {
+                    ALT: () => {
+                        $.CONSUME(ZincTokens[ZincRule.lcurlyparen])
+                        $.MANY(() => $.SUBRULE1($[ZincRule.statement]))
+                        $.CONSUME(ZincTokens[ZincRule.rcurlyparen])
+                    }
+                }
+            ])
         })
         //endregion
 
@@ -363,7 +394,7 @@ export default class ZincParser extends CstParser {
             $.OR4([
                 {ALT: () => $.SUBRULE($[ZincRule.call_statement])},
                 {ALT: () => $.SUBRULE($[ZincRule.set_statement])},
-                {ALT: () => $.SUBRULE($[ZincRule.loop_statement])},
+                {ALT: () => $.SUBRULE($[ZincRule.for_statement])},
                 {ALT: () => $.SUBRULE($[ZincRule.if_statement])},
                 {ALT: () => $.SUBRULE($[ZincRule.return_statement])},
             ])
