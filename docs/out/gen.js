@@ -9241,6 +9241,7 @@ var JassRule = /* @__PURE__ */ ((JassRule2) => {
   JassRule2["endloop"] = "endloop";
   JassRule2["exitwhen"] = "exitwhen";
   JassRule2["extends"] = "extends";
+  JassRule2["false"] = "false";
   JassRule2["function"] = "function";
   JassRule2["globals"] = "globals";
   JassRule2["if"] = "if";
@@ -9248,6 +9249,7 @@ var JassRule = /* @__PURE__ */ ((JassRule2) => {
   JassRule2["loop"] = "loop";
   JassRule2["native"] = "native";
   JassRule2["not"] = "not";
+  JassRule2["null"] = "null";
   JassRule2["nothing"] = "nothing";
   JassRule2["or"] = "or";
   JassRule2["returns"] = "returns";
@@ -9256,6 +9258,7 @@ var JassRule = /* @__PURE__ */ ((JassRule2) => {
   JassRule2["takes"] = "takes";
   JassRule2["then"] = "then";
   JassRule2["type"] = "type";
+  JassRule2["true"] = "true";
   JassRule2["comma"] = "comma";
   JassRule2["equals"] = "equals";
   JassRule2["assign"] = "assign";
@@ -9375,6 +9378,7 @@ var JassTokens = {
   [jass_rule_default.exitwhen]: keyword(jass_rule_default.exitwhen),
   [jass_rule_default.extends]: keyword(jass_rule_default.extends),
   [jass_rule_default.function]: keyword(jass_rule_default.function),
+  [jass_rule_default.false]: keyword(jass_rule_default.false),
   [jass_rule_default.globals]: keyword(jass_rule_default.globals),
   [jass_rule_default.if]: keyword(jass_rule_default.if),
   [jass_rule_default.local]: keyword(jass_rule_default.local),
@@ -9382,11 +9386,13 @@ var JassTokens = {
   [jass_rule_default.native]: keyword(jass_rule_default.native),
   [jass_rule_default.not]: keyword(jass_rule_default.not),
   [jass_rule_default.nothing]: keyword(jass_rule_default.nothing),
+  [jass_rule_default.null]: keyword(jass_rule_default.null),
   [jass_rule_default.or]: keyword(jass_rule_default.or),
   [jass_rule_default.returns]: keyword(jass_rule_default.returns),
   [jass_rule_default.return]: keyword(jass_rule_default.return),
   [jass_rule_default.set]: keyword(jass_rule_default.set),
   [jass_rule_default.takes]: keyword(jass_rule_default.takes),
+  [jass_rule_default.true]: keyword(jass_rule_default.true),
   [jass_rule_default.then]: keyword(jass_rule_default.then),
   [jass_rule_default.type]: keyword(jass_rule_default.type),
   // operator

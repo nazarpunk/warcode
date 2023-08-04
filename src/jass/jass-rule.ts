@@ -48,6 +48,7 @@ const enum JassRule {
     endloop = 'endloop',
     exitwhen = 'exitwhen',
     extends = 'extends',
+    false = 'false',
     function = 'function',
     globals = 'globals',
     if = 'if',
@@ -55,6 +56,7 @@ const enum JassRule {
     loop = 'loop',
     native = 'native',
     not = 'not',
+    null = 'null',
     nothing = 'nothing',
     or = 'or',
     returns = 'returns',
@@ -63,6 +65,7 @@ const enum JassRule {
     takes = 'takes',
     then = 'then',
     type = 'type',
+    true = 'true',
     // someone
     comma = 'comma',
     equals = 'equals',

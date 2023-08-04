@@ -487,21 +487,14 @@ export class JassVisitor extends ParserVisitor implements IVisitor {
         this.#token(ctx, JassRule.idliteral, TokenLegend.jass_idliteral)
         this.#token(ctx, JassRule.function, TokenLegend.jass_function)
         this.#token(ctx, JassRule.not, TokenLegend.jass_not)
-
+        this.#token(ctx, JassRule.null, TokenLegend.jass_null)
+        this.#token(ctx, JassRule.true, TokenLegend.jass_true)
+        this.#token(ctx, JassRule.false, TokenLegend.jass_false)
+        this.#token(ctx, JassRule.identifier, TokenLegend.jass_variable_local)
         this.#node(ctx, JassRule.arrayaccess)
         this.#node(ctx, JassRule.function_call)
         this.#node(ctx, JassRule.expression)
         this.#node(ctx, JassRule.primary)
-
-        const identifier = ctx[JassRule.identifier]?.[0]
-        if (identifier) {
-            if (['null', 'true', 'false'].indexOf(identifier.image) < 0) {
-                this.#mark(identifier, TokenLegend.jass_variable_local)
-            } else {
-                // TODO add colors
-                this.#mark(identifier, TokenLegend.jass_function)
-            }
-        }
     }
 
     [JassRule.addition](ctx: JassCstNode) {

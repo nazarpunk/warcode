@@ -349,7 +349,16 @@ export default class JassParser extends CstParser {
                 },
                 {
                     ALT: () => $.CONSUME3(JassTokens[JassRule.stringliteral])
-                }
+                },
+                {
+                    ALT: () => $.CONSUME3(JassTokens[JassRule.null])
+                },
+                {
+                    ALT: () => $.CONSUME3(JassTokens[JassRule.true])
+                },
+                {
+                    ALT: () => $.CONSUME3(JassTokens[JassRule.false])
+                },
             ])
         })
         //endregion

@@ -200,6 +200,10 @@
         "description": ""
       },
       {
+        "id": "jass_false",
+        "description": ""
+      },
+      {
         "id": "jass_globals",
         "description": ""
       },
@@ -228,6 +232,10 @@
         "description": ""
       },
       {
+        "id": "jass_null",
+        "description": ""
+      },
+      {
         "id": "jass_or",
         "description": ""
       },
@@ -245,6 +253,10 @@
       },
       {
         "id": "jass_takes",
+        "description": ""
+      },
+      {
+        "id": "jass_true",
         "description": ""
       },
       {
@@ -602,6 +614,7 @@
           "jass_exitwhen": "#2C7AD6",
           "jass_extends": "#2C7AD6",
           "jass_function": "#2C7AD6",
+          "jass_false": "#2C7AD6",
           "jass_globals": "#2C7AD6",
           "jass_if": "#2C7AD6",
           "jass_local": "#2C7AD6",
@@ -609,11 +622,13 @@
           "jass_native": "#2C7AD6",
           "jass_not": "#2C7AD6",
           "jass_nothing": "#2C7AD6",
+          "jass_null": "#2C7AD6",
           "jass_or": "#2C7AD6",
           "jass_returns": "#2C7AD6",
           "jass_return": "#2C7AD6",
           "jass_set": "#2C7AD6",
           "jass_takes": "#2C7AD6",
+          "jass_true": "#2C7AD6",
           "jass_then": "#2C7AD6",
           "jass_type": "#2C7AD6",
           "jass_comma": "#FFFFFF",
