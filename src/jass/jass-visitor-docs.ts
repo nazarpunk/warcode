@@ -40,6 +40,10 @@ export class JassVisitorDocs extends ParserVisitor {
         return ctx
     }
 
+    [JassRule.function_arg](ctx: JassCstNode) {
+        return ctx
+    }
+
     [JassRule.variable_declare](ctx: JassCstNode) {
         //console.log(JassRule.variable_declare, ctx);
         return ctx
@@ -51,10 +55,6 @@ export class JassVisitorDocs extends ParserVisitor {
     }
 
     [JassRule.type_declare](ctx: JassCstNode) {
-        return ctx
-    }
-
-    [JassRule.typedname](ctx: JassCstNode) {
         return ctx
     }
 

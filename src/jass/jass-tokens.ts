@@ -31,19 +31,29 @@ const keyword = (k: JassRule, color: string = '#2C7AD6'): TokenType => {
     return createToken({
         name: k,
         pattern: new RegExp(`\\b${k}\\b`),
-        //pattern: k,
         start_chars_hint: [k.charCodeAt(0)],
         line_breaks: false,
     })
 }
 
-const numberColor = '#e760cc'
-const operatorColor = '#e7be60'
+const operator = (k: JassRule, label: string, color: string = '#e7be60'): TokenType => {
+    JassColors[`jass_${k}`] = color
+    return createToken({
+        name: k,
+        pattern: new RegExp(`${label.split('').map(c => `\\${c}`).join('')}`),
+        start_chars_hint: [label.charCodeAt(0)],
+        label: label,
+        line_breaks: false,
+    })
+}
+
+const numberColor = '#99CEA8'
 const parenColor = '#e1d132'
 
 const JassTokens: Record<Exclude<JassRule,
     JassRule.identifier_name |
     JassRule.identifier_base |
+    JassRule.identifier_type |
     JassRule.identifier_returns |
     JassRule.takes_nothing |
     JassRule.returns_nothing |
@@ -55,6 +65,7 @@ const JassTokens: Record<Exclude<JassRule,
     JassRule.native_declare |
     JassRule.function_declare |
     JassRule.function_head |
+    JassRule.function_arg |
     JassRule.function_call |
     JassRule.return_statement |
     JassRule.if_statement |
@@ -65,7 +76,6 @@ const JassTokens: Record<Exclude<JassRule,
     JassRule.call_statement |
     JassRule.exitwhen_statement |
     JassRule.expression |
-    JassRule.typedname |
     JassRule.loop_statement |
     JassRule.multiplication |
     JassRule.primary |
@@ -128,134 +138,22 @@ const JassTokens: Record<Exclude<JassRule,
     [JassRule.then]: keyword(JassRule.then),
     [JassRule.type]: keyword(JassRule.type),
     // operator
-    [JassRule.comma]: add({
-        name: JassRule.comma,
-        pattern: /,/,
-        start_chars_hint: [CharCode.Comma],
-        label: ',',
-        line_breaks: false,
-        color: '#FFFFFF',
-    }),
-    [JassRule.equals]: add({
-        name: JassRule.equals,
-        pattern: /==/,
-        start_chars_hint: [CharCode.Equal],
-        line_breaks: false,
-        label: '==',
-        color: operatorColor,
-    }),
-    [JassRule.assign]: add({
-        name: JassRule.assign,
-        pattern: /=/,
-        start_chars_hint: [CharCode.Equal],
-        line_breaks: false,
-        label: '=',
-        color: operatorColor,
-    }),
-    [JassRule.notequals]: add({
-        name: JassRule.notequals,
-        pattern: /!=/,
-        start_chars_hint: [CharCode.Exclamation],
-        line_breaks: false,
-        label: '!=',
-        color: operatorColor,
-    }),
-    [JassRule.lessorequal]: add({
-        name: JassRule.lessorequal,
-        pattern: /<=/,
-        start_chars_hint: [CharCode.Less],
-        line_breaks: false,
-        label: '<=',
-        color: operatorColor,
-    }),
-    [JassRule.less]: add({
-        name: JassRule.less,
-        pattern: /</,
-        start_chars_hint: [CharCode.Less],
-        line_breaks: false,
-        label: '<',
-        color: operatorColor,
-    }),
-    [JassRule.greatorequal]: add({
-        name: JassRule.greatorequal,
-        pattern: />=/,
-        start_chars_hint: [CharCode.Greater],
-        line_breaks: false,
-        label: '>=',
-        color: operatorColor,
-    }),
-    [JassRule.great]: add({
-        name: JassRule.great,
-        pattern: />/,
-        start_chars_hint: [CharCode.Greater],
-        line_breaks: false,
-        label: '>',
-        color: operatorColor,
-    }),
-    [JassRule.add]: add({
-        name: JassRule.add,
-        pattern: /\+/,
-        start_chars_hint: [CharCode.Plus],
-        line_breaks: false,
-        label: '+',
-        color: operatorColor,
-    }),
-    [JassRule.sub]: add({
-        name: JassRule.sub,
-        pattern: /-/,
-        start_chars_hint: [CharCode.Minus],
-        line_breaks: false,
-        label: '-',
-        color: operatorColor,
-    }),
-    [JassRule.mult]: add({
-        name: JassRule.mult,
-        pattern: /\*/,
-        start_chars_hint: [CharCode.Asterisk],
-        line_breaks: false,
-        label: '*',
-        color: operatorColor,
-    }),
-    [JassRule.div]: add({
-        name: JassRule.div,
-        pattern: /\//,
-        start_chars_hint: [CharCode.Slash],
-        line_breaks: false,
-        label: '/',
-        color: operatorColor,
-    }),
-    [JassRule.lparen]: add({
-        name: JassRule.lparen,
-        pattern: /\(/,
-        start_chars_hint: [CharCode.LeftParenthesis],
-        line_breaks: false,
-        label: '(',
-        color: parenColor,
-    }),
-    [JassRule.rparen]: add({
-        name: JassRule.rparen,
-        pattern: /\)/,
-        start_chars_hint: [CharCode.RightParenthesis],
-        line_breaks: false,
-        label: ')',
-        color: parenColor,
-    }),
-    [JassRule.lsquareparen]: add({
-        name: JassRule.lsquareparen,
-        pattern: /\[/,
-        start_chars_hint: [CharCode.LeftSquareBracket],
-        line_breaks: false,
-        label: '[',
-        color: parenColor,
-    }),
-    [JassRule.rsquareparen]: add({
-        name: JassRule.rsquareparen,
-        pattern: /]/,
-        start_chars_hint: [CharCode.RightSquareBracket],
-        line_breaks: false,
-        label: ']',
-        color: parenColor,
-    }),
+    [JassRule.comma]: operator(JassRule.comma, ',', '#FFFFFF'),
+    [JassRule.equals]: operator(JassRule.equals, '=='),
+    [JassRule.assign]: operator(JassRule.assign, '='),
+    [JassRule.notequals]: operator(JassRule.notequals, '!='),
+    [JassRule.lessorequal]: operator(JassRule.lessorequal, '<='),
+    [JassRule.less]: operator(JassRule.less, '<'),
+    [JassRule.greatorequal]: operator(JassRule.greatorequal, '>='),
+    [JassRule.great]: operator(JassRule.great, '>'),
+    [JassRule.add]: operator(JassRule.add, '+'),
+    [JassRule.sub]: operator(JassRule.sub, '-'),
+    [JassRule.mult]: operator(JassRule.mult, '*'),
+    [JassRule.div]: operator(JassRule.div, '/'),
+    [JassRule.lparen]: operator(JassRule.lparen, '(', parenColor),
+    [JassRule.rparen]: operator(JassRule.rparen, ')', parenColor),
+    [JassRule.lsquareparen]: operator(JassRule.lsquareparen, '[', parenColor),
+    [JassRule.rsquareparen]: operator(JassRule.rsquareparen, ']', parenColor),
     //
     [JassRule.idliteral]: add({
         name: JassRule.idliteral,

@@ -5,6 +5,7 @@ const enum ZincRule {
     identifier_returns = 'identifier_returns',
     // rules
     zinc = 'zinc',
+    break_statement = 'break_statement',
     library = 'library',
     requires = 'requires',
     optional = 'optional',
@@ -36,7 +37,9 @@ const enum ZincRule {
     comment_multiline = 'comment_multiline',
     // keyword
     and = 'and',
+    break = 'break',
     constant = 'constant',
+    false = 'false',
     public = 'public',
     private = 'private',
     debug = 'debug',
@@ -49,10 +52,12 @@ const enum ZincRule {
     if = 'if',
     for = 'for',
     not = 'not',
+    null = 'null',
     or = 'or',
     returns = 'returns',
     return = 'return',
     type = 'type',
+    true = 'true',
     // someone
     comma = 'comma',
     equals = 'equals',

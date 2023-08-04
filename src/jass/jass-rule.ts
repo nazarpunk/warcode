@@ -2,6 +2,7 @@ const enum JassRule {
     // generic
     takes_nothing = 'takes_nothing',
     returns_nothing = 'returns_nothing',
+    identifier_type = 'identifier_type',
     identifier_name = 'identifier_name',
     identifier_base = 'identifier_base',
     identifier_returns = 'identifier_returns',
@@ -14,6 +15,7 @@ const enum JassRule {
     native_declare = 'native_declare',
     function_head = 'function_head',
     function_declare = 'function_declare',
+    function_arg = 'function_arg',
     function_call = 'function_call',
     return_statement = 'return_statement',
     if_statement = 'if_statement',
@@ -24,7 +26,6 @@ const enum JassRule {
     call_statement = 'call_statement',
     exitwhen_statement = 'exitwhen_statement',
     expression = 'expression',
-    typedname = 'typedname',
     loop_statement = 'loop_statement',
     multiplication = 'multiplication',
     primary = 'primary',

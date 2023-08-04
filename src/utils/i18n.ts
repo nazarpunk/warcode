@@ -14,9 +14,7 @@ export const enum i18n {
     earlyExit = 'earlyExit',
     // validator
     stringIndexRedeclareError = 'stringIndexRedeclareError',
-    localInGlobalsError = 'localInGlobalsError',
     multilineStringError = 'multilineStringError',
-    arrayInFunctionArgumentError = 'arrayInFunctionArgumentError',
     localRedeclareArgError = 'localRedeclareArgError',
     localRedeclareLocalError = 'localRedeclareLocalError',
     constantInFunctionError = 'constantInFunctionError',
@@ -38,9 +36,7 @@ const en: Record<i18n, string> = {
     [i18n.earlyExit]: `$t(${i18n.lexerError}) Early Exit.`,
     // validator
     [i18n.stringIndexRedeclareError]: 'String with index {{index}} redeclared.',
-    [i18n.localInGlobalsError]: 'Local variable not allowed in globals block.',
     [i18n.multilineStringError]: 'Avoid multiline strings. Use `|n` or `\\n` to linebreak.',
-    [i18n.arrayInFunctionArgumentError]: 'Array not allowed in function argument.',
     [i18n.localRedeclareArgError]: 'Local variable `{{name}}` redeclare argument.',
     [i18n.localRedeclareLocalError]: 'Local variable `{{name}}` redeclared.',
     [i18n.constantInFunctionError]: 'Constant not allowed in function.',
@@ -62,9 +58,7 @@ const ru: Record<i18n, string> = {
     [i18n.earlyExit]: `$t(${i18n.parserError}) Преждевременное завершение.`,
     // validator
     [i18n.stringIndexRedeclareError]: 'Строка с индексом {{index}} переопределена.',
-    [i18n.localInGlobalsError]: 'Локальные переменные нельзя объявлять в блоке globals.',
     [i18n.multilineStringError]: 'Избегайте многострочных строк. Используйте `|n` или `\\n` для переноса строки.',
-    [i18n.arrayInFunctionArgumentError]: 'Запрешено использовать массивы в аргументах функции.',
     [i18n.localRedeclareArgError]: 'Локальная переменная `{{name}}` переопределяет аргумент.',
     [i18n.localRedeclareLocalError]: 'Локальная переменная `{{name}}` объявлена повторно.',
     [i18n.constantInFunctionError]: 'Обявление констант в функции запрещено.',

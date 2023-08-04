@@ -460,11 +460,15 @@
         "description": ""
       },
       {
-        "id": "zinc_optional",
+        "id": "zinc_break",
         "description": ""
       },
       {
         "id": "zinc_requires",
+        "description": ""
+      },
+      {
+        "id": "zinc_optional",
         "description": ""
       },
       {
@@ -473,6 +477,18 @@
       },
       {
         "id": "zinc_type",
+        "description": ""
+      },
+      {
+        "id": "zinc_null",
+        "description": ""
+      },
+      {
+        "id": "zinc_true",
+        "description": ""
+      },
+      {
+        "id": "zinc_false",
         "description": ""
       },
       {
@@ -647,10 +663,10 @@
           "jass_rparen": "#e1d132",
           "jass_lsquareparen": "#e1d132",
           "jass_rsquareparen": "#e1d132",
-          "jass_idliteral": "#e760cc",
+          "jass_idliteral": "#99CEA8",
           "jass_stringliteral": "#CE9178",
-          "jass_real": "#e760cc",
-          "jass_integer": "#e760cc",
+          "jass_real": "#99CEA8",
+          "jass_integer": "#99CEA8",
           "jass_identifier": "#ff0026",
           "wts_string": "#5974c0",
           "wts_index": "#d828dc",
@@ -679,10 +695,14 @@
           "zinc_globals": "#2C7AD6",
           "zinc_if": "#2C7AD6",
           "zinc_for": "#2C7AD6",
-          "zinc_optional": "#2C7AD6",
+          "zinc_break": "#2C7AD6",
           "zinc_requires": "#2C7AD6",
+          "zinc_optional": "#2C7AD6",
           "zinc_return": "#2C7AD6",
           "zinc_type": "#2C7AD6",
+          "zinc_null": "#2C7AD6",
+          "zinc_true": "#2C7AD6",
+          "zinc_false": "#2C7AD6",
           "zinc_comma": "#FFFFFF",
           "zinc_notequals": "#e7be60",
           "zinc_not": "#e7be60",

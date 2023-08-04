@@ -165,6 +165,7 @@ export class ZincVisitor extends ParserVisitor implements IVisitor {
         this.#token(ctx, ZincRule.rparen, TokenLegend.zinc_rparen)
         this.#tokens(ctx, ZincRule.comma, TokenLegend.zinc_comma)
         this.#nodes(ctx, ZincRule.expression)
+        this.#nodes(ctx, ZincRule.function_declare)
     }
 
     [ZincRule.variable_declare](ctx: ZincCstNode) {
@@ -184,17 +185,10 @@ export class ZincVisitor extends ParserVisitor implements IVisitor {
         this.#nodes(ctx, ZincRule.expression)
     }
 
-    [ZincRule.statement](ctx: ZincCstNode) {
-        //console.log(ZincRule.statement, ctx)
-        this.#nodes(ctx, ZincRule.if_statement)
-        this.#nodes(ctx, ZincRule.set_statement)
-        this.#nodes(ctx, ZincRule.call_statement)
-        this.#nodes(ctx, ZincRule.for_statement)
-        this.#nodes(ctx, ZincRule.return_statement)
-    }
-
     [ZincRule.call_statement](ctx: ZincCstNode) {
-        return ctx
+        //console.log(ZincRule.call_statement, ctx)
+        this.#token(ctx, ZincRule.semicolon, TokenLegend.zinc_semicolon)
+        this.#node(ctx, ZincRule.function_call)
     }
 
     [ZincRule.set_statement](ctx: ZincCstNode) {
@@ -212,11 +206,12 @@ export class ZincVisitor extends ParserVisitor implements IVisitor {
         this.#token(ctx, ZincRule.rparen, TokenLegend.zinc_rparen)
         this.#token(ctx, ZincRule.lcurlyparen, TokenLegend.zinc_lcurlyparen)
         this.#token(ctx, ZincRule.rcurlyparen, TokenLegend.zinc_rcurlyparen)
-        this.#token(ctx, ZincRule.less, TokenLegend.zinc_less)
-        this.#token(ctx, ZincRule.lessorequal, TokenLegend.zinc_lessorequal)
-        this.#token(ctx, ZincRule.great, TokenLegend.zinc_great)
-        this.#token(ctx, ZincRule.greatorequal, TokenLegend.zinc_greatorequal)
-        this.#tokens(ctx, ZincRule.identifier, TokenLegend.zinc_variable_local)
+        this.#token(ctx, ZincRule.identifier, TokenLegend.zinc_variable_local)
+        this.#tokens(ctx, ZincRule.less, TokenLegend.zinc_less)
+        this.#tokens(ctx, ZincRule.lessorequal, TokenLegend.zinc_lessorequal)
+        this.#tokens(ctx, ZincRule.great, TokenLegend.zinc_great)
+        this.#tokens(ctx, ZincRule.greatorequal, TokenLegend.zinc_greatorequal)
+        this.#nodes(ctx, ZincRule.addition)
         this.#nodes(ctx, ZincRule.statement)
     }
 
@@ -244,6 +239,21 @@ export class ZincVisitor extends ParserVisitor implements IVisitor {
         this.#nodes(ctx, ZincRule.statement)
     }
 
+    [ZincRule.break_statement](ctx: ZincCstNode) {
+        this.#token(ctx, ZincRule.break, TokenLegend.zinc_break)
+        this.#token(ctx, ZincRule.semicolon, TokenLegend.zinc_semicolon)
+    }
+
+    [ZincRule.statement](ctx: ZincCstNode) {
+        //console.log(ZincRule.statement, ctx)
+        this.#nodes(ctx, ZincRule.if_statement)
+        this.#nodes(ctx, ZincRule.set_statement)
+        this.#nodes(ctx, ZincRule.call_statement)
+        this.#nodes(ctx, ZincRule.for_statement)
+        this.#nodes(ctx, ZincRule.return_statement)
+        this.#nodes(ctx, ZincRule.break_statement)
+    }
+
     [ZincRule.expression](ctx: ZincCstNode) {
         this.#tokens(ctx, ZincRule.and, TokenLegend.zinc_and)
         this.#tokens(ctx, ZincRule.or, TokenLegend.zinc_or)
@@ -263,21 +273,15 @@ export class ZincVisitor extends ParserVisitor implements IVisitor {
         this.#token(ctx, ZincRule.idliteral, TokenLegend.zinc_idliteral)
         this.#token(ctx, ZincRule.function, TokenLegend.zinc_function)
         this.#token(ctx, ZincRule.not, TokenLegend.zinc_not)
+        this.#token(ctx, ZincRule.null, TokenLegend.zinc_null)
+        this.#token(ctx, ZincRule.true, TokenLegend.zinc_true)
+        this.#token(ctx, ZincRule.false, TokenLegend.zinc_false)
+        this.#token(ctx, ZincRule.identifier, TokenLegend.zinc_variable_local)
 
         this.#node(ctx, ZincRule.arrayaccess)
         this.#node(ctx, ZincRule.function_call)
         this.#node(ctx, ZincRule.expression)
         this.#node(ctx, ZincRule.primary)
-
-        const identifier = ctx[ZincRule.identifier]?.[0]
-        if (identifier) {
-            if (['null', 'true', 'false'].indexOf(identifier.image) < 0) {
-                this.#mark(identifier, TokenLegend.zinc_variable_local)
-            } else {
-                // TODO add colors
-                this.#mark(identifier, TokenLegend.zinc_function)
-            }
-        }
     }
 
     [ZincRule.addition](ctx: ZincCstNode) {

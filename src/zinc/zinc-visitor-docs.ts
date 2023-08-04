@@ -92,6 +92,10 @@ export class ZincVisitorDocs extends ParserVisitor implements IVisitor {
         return ctx
     }
 
+    [ZincRule.break_statement](ctx: ZincCstNode) {
+        return ctx
+    }
+
     [ZincRule.if_statement](ctx: ZincCstNode) {
         return ctx
     }

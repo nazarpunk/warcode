@@ -24,14 +24,10 @@ import {CstNode} from 'chevrotain'
 const parser = new JassParser()
 const ParserVisitor = parser.getBaseCstVisitorConstructor()
 
-interface TypedName {
-    type: IToken,
-    name: IToken,
-    array?: IToken
-}
-
 interface Variable {
-    typedname: TypedName
+    type: IToken | null,
+    name: IToken | null,
+    array: IToken | null
 }
 
 interface FuncHead {
@@ -52,17 +48,17 @@ export class JassVisitor extends ParserVisitor implements IVisitor {
     declare symbols: DocumentSymbol[]
     declare foldings: FoldingRange[]
 
-    #mark(token: IToken | undefined, type: number) {
+    #mark(token: IToken | undefined | null, type: number) {
         if (!token || isNaN(token.startOffset)) return
         const p = this.document.positionAt(token.startOffset)
         this.builder.push(p.line, p.character, token.image.length, type)
     }
 
-    #token(ctx: JassCstNode, rule: JassRule, type: TokenLegend): IToken | null {
+    #token(ctx: JassCstNode, rule: JassRule, type?: TokenLegend): IToken | null {
         const token = ctx[rule]?.[0] as IToken
         if (!token || isNaN(token.startOffset) || token.isInsertedInRecovery) return null
         const p = this.document.positionAt(token.startOffset)
-        this.builder.push(p.line, p.character, token.image.length, type)
+        if (type != undefined) this.builder.push(p.line, p.character, token.image.length, type)
         return token
     }
 
@@ -81,10 +77,12 @@ export class JassVisitor extends ParserVisitor implements IVisitor {
         return this.visit(node, param)
     }
 
-    #nodes(ctx: JassCstNode, rule: JassRule) {
+    #nodes<T>(ctx: JassCstNode, rule: JassRule): T[] {
         const nodes = ctx[rule] as CstNode[]
-        if (!nodes) return
-        for (const node of nodes) this.visit(node)
+        const out = []
+        if (!nodes) return []
+        for (const node of nodes) out.push(this.visit(node))
+        return out
     }
 
     #string(ctx: JassCstNode) {
@@ -171,60 +169,49 @@ export class JassVisitor extends ParserVisitor implements IVisitor {
 
         // --- locals
         // keyword
-        const locals = ctx[JassRule.local]
-        if (locals) for (const local of locals) this.#mark(local, TokenLegend.jass_local)
+        this.#tokens(ctx, JassRule.local, TokenLegend.jass_local)
 
         // declare
-        const variableDeclare = ctx[JassRule.variable_declare]!
-        if (variableDeclare) {
-            for (const localDeclare of variableDeclare) {
-                const local = this.visit(localDeclare) as Variable | null
-                if (!local) continue
-                const {type, name} = local.typedname
-                this.#mark(type, TokenLegend.jass_type_name)
-                this.#mark(name, TokenLegend.jass_variable_local)
-                // local check: local redeclare arg
-                if (name) {
-                    (localMap[name.image] ??= []).push(name)
-                    const argList = argMap[name.image]
-                    if (argList) {
-                        for (const t of [name, ...argList]) {
-                            this.diagnostics.push({
-                                message: i18next.t(i18n.localRedeclareArgError, {name: t.image}),
-                                range: new Range(
-                                    this.document.positionAt(t.startOffset),
-                                    this.document.positionAt(t.startOffset + t.image.length)
-                                ),
-                                severity: DiagnosticSeverity.Warning
-                            })
-                        }
+        for (const variable of this.#nodes<Variable>(ctx, JassRule.variable_declare)) {
+            const {type, name} = variable
+            this.#mark(type, TokenLegend.jass_type_name)
+            this.#mark(name, TokenLegend.jass_variable_local)
+            // local check: local redeclare arg
+            if (name) {
+                (localMap[name.image] ??= []).push(name)
+                const argList = argMap[name.image]
+                if (argList) {
+                    for (const t of [name, ...argList]) {
+                        this.diagnostics.push({
+                            message: i18next.t(i18n.localRedeclareArgError, {name: t.image}),
+                            range: new Range(
+                                this.document.positionAt(t.startOffset),
+                                this.document.positionAt(t.startOffset + t.image.length)
+                            ),
+                            severity: DiagnosticSeverity.Warning
+                        })
                     }
                 }
             }
+        }
 
-            // local check: local redeclare arg
-            for (const locals of Object.values(localMap)) {
-                if (locals.length < 2) continue
-                for (const local of locals) {
-                    this.diagnostics.push({
-                        message: i18next.t(i18n.localRedeclareLocalError, {name: local.image}),
-                        range: new Range(
-                            this.document.positionAt(local.startOffset),
-                            this.document.positionAt(local.startOffset + local.image.length)
-                        ),
-                        severity: DiagnosticSeverity.Warning
-                    })
-                }
+        // local check: local redeclare arg
+        for (const locals of Object.values(localMap)) {
+            if (locals.length < 2) continue
+            for (const local of locals) {
+                this.diagnostics.push({
+                    message: i18next.t(i18n.localRedeclareLocalError, {name: local.image}),
+                    range: new Range(
+                        this.document.positionAt(local.startOffset),
+                        this.document.positionAt(local.startOffset + local.image.length)
+                    ),
+                    severity: DiagnosticSeverity.Warning
+                })
             }
         }
 
         // --- statement
-        const statements = ctx[JassRule.statement]
-        if (statements) {
-            for (const statement of statements) {
-                this.visit(statement)
-            }
-        }
+        this.#nodes(ctx, JassRule.statement)
     }
 
     [JassRule.function_head](ctx: JassCstNode, opts: { native?: boolean }): FuncHead {
@@ -238,33 +225,13 @@ export class JassVisitor extends ParserVisitor implements IVisitor {
 
         // --- arguments
         const argMap: Record<string, IToken[]> = {}
-        const takesNothing = ctx[JassRule.takes_nothing]?.[0]
-        if (takesNothing) {
-            this.#mark(takesNothing, TokenLegend.jass_type_name)
-        } else {
-            // commas
-            const commas = ctx[JassRule.comma]
-            if (commas) for (const comma of commas) this.#mark(comma, TokenLegend.jass_comma)
-            // typename
-            const typednames = ctx?.[JassRule.typedname]
-            if (typednames) for (const typedname of typednames) {
-                const typename = this.visit(typedname) as TypedName
-                if (typename) {
-                    const {type, name, array} = typename
-                    if (name) (argMap[name.image] ??= []).push(name)
-                    this.#mark(type, TokenLegend.jass_type_name)
-                    this.#mark(name, TokenLegend.jass_argument)
-                    if (array) {
-                        this.diagnostics.push({
-                            message: i18next.t(i18n.arrayInFunctionArgumentError),
-                            range: new Range(
-                                this.document.positionAt(array.startOffset),
-                                this.document.positionAt(array.startOffset + array.image.length)
-                            ),
-                            severity: DiagnosticSeverity.Error
-                        })
-                    }
-                }
+
+        if (!this.#token(ctx, JassRule.takes_nothing, TokenLegend.jass_type_name)) {
+            this.#tokens(ctx, JassRule.comma, TokenLegend.jass_comma)
+
+            for (const arg of this.#nodes<Variable>(ctx, JassRule.function_arg)) {
+                const {name} = arg
+                if (name) (argMap[name.image] ??= []).push(name)
             }
 
             // arguments check: same name
@@ -295,16 +262,21 @@ export class JassVisitor extends ParserVisitor implements IVisitor {
         }
     }
 
-    [JassRule.variable_declare](ctx: JassCstNode): Variable | null {
-        //console.log(JassRule.variable_declare, ctx);
-        const equals = ctx[JassRule.assign]?.[0]
-        const typedname = this.visit(ctx[JassRule.typedname]!)
-        if (!typedname) return null
+    [JassRule.function_arg](ctx: JassCstNode): Variable {
+        return {
+            type: this.#token(ctx, JassRule.identifier_type, TokenLegend.jass_type_name)!,
+            name: this.#token(ctx, JassRule.identifier_name, TokenLegend.jass_argument)!,
+            array: null
+        }
+    }
 
-        const array = typedname[JassRule.array]
+    [JassRule.variable_declare](ctx: JassCstNode): Variable {
+        //console.log(JassRule.variable_declare, ctx);
+        const assign = this.#token(ctx, JassRule.assign, TokenLegend.jass_assign)
+        const array = this.#token(ctx, JassRule.array, TokenLegend.jass_array)
 
         // check array assing
-        if (equals && array) {
+        if (assign && array) {
             this.diagnostics.push({
                 message: i18next.t(i18n.arrayInitializeError),
                 range: new Range(
@@ -315,11 +287,12 @@ export class JassVisitor extends ParserVisitor implements IVisitor {
             })
         }
 
-        this.#token(ctx, JassRule.assign, TokenLegend.jass_assign)
         this.#node(ctx, JassRule.expression)
 
         return {
-            typedname: typedname,
+            type: this.#token(ctx, JassRule.identifier_type),
+            name: this.#token(ctx, JassRule.identifier_name),
+            array: array,
         }
     }
 
@@ -336,33 +309,12 @@ export class JassVisitor extends ParserVisitor implements IVisitor {
             this.symbols.push(globalsSymbol)
         }
 
-        const vardecl = ctx[JassRule.variable_declare]
-
-        if (vardecl) {
-            for (const vd of vardecl) {
-                const variable = this.visit(vd)
-                const typedname = variable?.[JassRule.typedname]
-                const local: IToken = variable?.[JassRule.local]
-
-                if (local) {
-                    this.diagnostics.push({
-                        message: i18next.t(i18n.localInGlobalsError),
-                        range: new Range(
-                            this.document.positionAt(local.startOffset),
-                            this.document.positionAt(local.startOffset + local.image.length)
-                        ),
-                        severity: DiagnosticSeverity.Error
-                    })
-                }
-
-                if (typedname) {
-                    const {type, name} = typedname
-                    this.#mark(type, TokenLegend.jass_type_name)
-                    this.#mark(name, TokenLegend.jass_variable_global)
-                    if (globalsSymbol && type && name) {
-                        globalsSymbol.children.push(this.#documentSymbol(name.image, type.image, SymbolKind.Variable, type, undefined, name))
-                    }
-                }
+        for (const variable of this.#nodes<Variable>(ctx, JassRule.variable_declare)) {
+            const {type, name} = variable
+            this.#mark(type, TokenLegend.jass_type_name)
+            this.#mark(name, TokenLegend.jass_variable_global)
+            if (globalsSymbol && type && name) {
+                globalsSymbol.children.push(this.#documentSymbol(name.image, type.image, SymbolKind.Variable, type, undefined, name))
             }
         }
     }
@@ -374,23 +326,6 @@ export class JassVisitor extends ParserVisitor implements IVisitor {
 
         this.#token(ctx, JassRule.type, TokenLegend.jass_type)
         this.#token(ctx, JassRule.extends, TokenLegend.jass_extends)
-    }
-
-    [JassRule.typedname](ctx: JassCstNode): TypedName | null {
-        const array = ctx[JassRule.array]?.[0]
-        this.#mark(array, TokenLegend.jass_array)
-
-        const list = ctx[JassRule.identifier]
-        if (!list || list.length != 2) return null
-
-        const [type, name] = list
-        if (type.isInsertedInRecovery || name.isInsertedInRecovery) return null
-
-        return {
-            type: type,
-            name: name,
-            array: array
-        }
     }
 
     [JassRule.function_call](ctx: JassCstNode) {
@@ -467,7 +402,7 @@ export class JassVisitor extends ParserVisitor implements IVisitor {
     }
 
     [JassRule.expression](ctx: JassCstNode) {
-        //console.log(JassRule.expression, ctx);
+        //console.log(JassRule.expression, ctx)
         this.#tokens(ctx, JassRule.and, TokenLegend.jass_and)
         this.#tokens(ctx, JassRule.or, TokenLegend.jass_or)
         this.#tokens(ctx, JassRule.equals, TokenLegend.jass_equals)
@@ -491,6 +426,8 @@ export class JassVisitor extends ParserVisitor implements IVisitor {
         this.#token(ctx, JassRule.true, TokenLegend.jass_true)
         this.#token(ctx, JassRule.false, TokenLegend.jass_false)
         this.#token(ctx, JassRule.identifier, TokenLegend.jass_variable_local)
+        this.#token(ctx, JassRule.lparen, TokenLegend.jass_lparen)
+        this.#token(ctx, JassRule.rparen, TokenLegend.jass_rparen)
         this.#node(ctx, JassRule.arrayaccess)
         this.#node(ctx, JassRule.function_call)
         this.#node(ctx, JassRule.expression)

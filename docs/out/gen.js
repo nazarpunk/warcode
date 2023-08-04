@@ -9198,6 +9198,7 @@ applyMixins(Parser, [
 var JassRule = /* @__PURE__ */ ((JassRule2) => {
   JassRule2["takes_nothing"] = "takes_nothing";
   JassRule2["returns_nothing"] = "returns_nothing";
+  JassRule2["identifier_type"] = "identifier_type";
   JassRule2["identifier_name"] = "identifier_name";
   JassRule2["identifier_base"] = "identifier_base";
   JassRule2["identifier_returns"] = "identifier_returns";
@@ -9209,6 +9210,7 @@ var JassRule = /* @__PURE__ */ ((JassRule2) => {
   JassRule2["native_declare"] = "native_declare";
   JassRule2["function_head"] = "function_head";
   JassRule2["function_declare"] = "function_declare";
+  JassRule2["function_arg"] = "function_arg";
   JassRule2["function_call"] = "function_call";
   JassRule2["return_statement"] = "return_statement";
   JassRule2["if_statement"] = "if_statement";
@@ -9219,7 +9221,6 @@ var JassRule = /* @__PURE__ */ ((JassRule2) => {
   JassRule2["call_statement"] = "call_statement";
   JassRule2["exitwhen_statement"] = "exitwhen_statement";
   JassRule2["expression"] = "expression";
-  JassRule2["typedname"] = "typedname";
   JassRule2["loop_statement"] = "loop_statement";
   JassRule2["multiplication"] = "multiplication";
   JassRule2["primary"] = "primary";
@@ -9332,13 +9333,21 @@ var keyword = (k, color = "#2C7AD6") => {
   return createToken({
     name: k,
     pattern: new RegExp(`\\b${k}\\b`),
-    //pattern: k,
     start_chars_hint: [k.charCodeAt(0)],
     line_breaks: false
   });
 };
-var numberColor = "#e760cc";
-var operatorColor = "#e7be60";
+var operator = (k, label, color = "#e7be60") => {
+  JassColors[`jass_${k}`] = color;
+  return createToken({
+    name: k,
+    pattern: new RegExp(`${label.split("").map((c) => `\\${c}`).join("")}`),
+    start_chars_hint: [label.charCodeAt(0)],
+    label,
+    line_breaks: false
+  });
+};
+var numberColor = "#99CEA8";
 var parenColor = "#e1d132";
 var JassTokens = {
   [jass_rule_default.whitespace]: add({
@@ -9396,134 +9405,22 @@ var JassTokens = {
   [jass_rule_default.then]: keyword(jass_rule_default.then),
   [jass_rule_default.type]: keyword(jass_rule_default.type),
   // operator
-  [jass_rule_default.comma]: add({
-    name: jass_rule_default.comma,
-    pattern: /,/,
-    start_chars_hint: [44 /* Comma */],
-    label: ",",
-    line_breaks: false,
-    color: "#FFFFFF"
-  }),
-  [jass_rule_default.equals]: add({
-    name: jass_rule_default.equals,
-    pattern: /==/,
-    start_chars_hint: [61 /* Equal */],
-    line_breaks: false,
-    label: "==",
-    color: operatorColor
-  }),
-  [jass_rule_default.assign]: add({
-    name: jass_rule_default.assign,
-    pattern: /=/,
-    start_chars_hint: [61 /* Equal */],
-    line_breaks: false,
-    label: "=",
-    color: operatorColor
-  }),
-  [jass_rule_default.notequals]: add({
-    name: jass_rule_default.notequals,
-    pattern: /!=/,
-    start_chars_hint: [33 /* Exclamation */],
-    line_breaks: false,
-    label: "!=",
-    color: operatorColor
-  }),
-  [jass_rule_default.lessorequal]: add({
-    name: jass_rule_default.lessorequal,
-    pattern: /<=/,
-    start_chars_hint: [60 /* Less */],
-    line_breaks: false,
-    label: "<=",
-    color: operatorColor
-  }),
-  [jass_rule_default.less]: add({
-    name: jass_rule_default.less,
-    pattern: /</,
-    start_chars_hint: [60 /* Less */],
-    line_breaks: false,
-    label: "<",
-    color: operatorColor
-  }),
-  [jass_rule_default.greatorequal]: add({
-    name: jass_rule_default.greatorequal,
-    pattern: />=/,
-    start_chars_hint: [62 /* Greater */],
-    line_breaks: false,
-    label: ">=",
-    color: operatorColor
-  }),
-  [jass_rule_default.great]: add({
-    name: jass_rule_default.great,
-    pattern: />/,
-    start_chars_hint: [62 /* Greater */],
-    line_breaks: false,
-    label: ">",
-    color: operatorColor
-  }),
-  [jass_rule_default.add]: add({
-    name: jass_rule_default.add,
-    pattern: /\+/,
-    start_chars_hint: [43 /* Plus */],
-    line_breaks: false,
-    label: "+",
-    color: operatorColor
-  }),
-  [jass_rule_default.sub]: add({
-    name: jass_rule_default.sub,
-    pattern: /-/,
-    start_chars_hint: [45 /* Minus */],
-    line_breaks: false,
-    label: "-",
-    color: operatorColor
-  }),
-  [jass_rule_default.mult]: add({
-    name: jass_rule_default.mult,
-    pattern: /\*/,
-    start_chars_hint: [42 /* Asterisk */],
-    line_breaks: false,
-    label: "*",
-    color: operatorColor
-  }),
-  [jass_rule_default.div]: add({
-    name: jass_rule_default.div,
-    pattern: /\//,
-    start_chars_hint: [47 /* Slash */],
-    line_breaks: false,
-    label: "/",
-    color: operatorColor
-  }),
-  [jass_rule_default.lparen]: add({
-    name: jass_rule_default.lparen,
-    pattern: /\(/,
-    start_chars_hint: [40 /* LeftParenthesis */],
-    line_breaks: false,
-    label: "(",
-    color: parenColor
-  }),
-  [jass_rule_default.rparen]: add({
-    name: jass_rule_default.rparen,
-    pattern: /\)/,
-    start_chars_hint: [41 /* RightParenthesis */],
-    line_breaks: false,
-    label: ")",
-    color: parenColor
-  }),
-  [jass_rule_default.lsquareparen]: add({
-    name: jass_rule_default.lsquareparen,
-    pattern: /\[/,
-    start_chars_hint: [91 /* LeftSquareBracket */],
-    line_breaks: false,
-    label: "[",
-    color: parenColor
-  }),
-  [jass_rule_default.rsquareparen]: add({
-    name: jass_rule_default.rsquareparen,
-    pattern: /]/,
-    start_chars_hint: [93 /* RightSquareBracket */],
-    line_breaks: false,
-    label: "]",
-    color: parenColor
-  }),
+  [jass_rule_default.comma]: operator(jass_rule_default.comma, ",", "#FFFFFF"),
+  [jass_rule_default.equals]: operator(jass_rule_default.equals, "=="),
+  [jass_rule_default.assign]: operator(jass_rule_default.assign, "="),
+  [jass_rule_default.notequals]: operator(jass_rule_default.notequals, "!="),
+  [jass_rule_default.lessorequal]: operator(jass_rule_default.lessorequal, "<="),
+  [jass_rule_default.less]: operator(jass_rule_default.less, "<"),
+  [jass_rule_default.greatorequal]: operator(jass_rule_default.greatorequal, ">="),
+  [jass_rule_default.great]: operator(jass_rule_default.great, ">"),
+  [jass_rule_default.add]: operator(jass_rule_default.add, "+"),
+  [jass_rule_default.sub]: operator(jass_rule_default.sub, "-"),
+  [jass_rule_default.mult]: operator(jass_rule_default.mult, "*"),
+  [jass_rule_default.div]: operator(jass_rule_default.div, "/"),
+  [jass_rule_default.lparen]: operator(jass_rule_default.lparen, "(", parenColor),
+  [jass_rule_default.rparen]: operator(jass_rule_default.rparen, ")", parenColor),
+  [jass_rule_default.lsquareparen]: operator(jass_rule_default.lsquareparen, "[", parenColor),
+  [jass_rule_default.rsquareparen]: operator(jass_rule_default.rsquareparen, "]", parenColor),
   //
   [jass_rule_default.idliteral]: add({
     name: jass_rule_default.idliteral,
@@ -9567,6 +9464,7 @@ var ZincRule = /* @__PURE__ */ ((ZincRule2) => {
   ZincRule2["identifier_type"] = "identifier_type";
   ZincRule2["identifier_returns"] = "identifier_returns";
   ZincRule2["zinc"] = "zinc";
+  ZincRule2["break_statement"] = "break_statement";
   ZincRule2["library"] = "library";
   ZincRule2["requires"] = "requires";
   ZincRule2["optional"] = "optional";
@@ -9596,7 +9494,9 @@ var ZincRule = /* @__PURE__ */ ((ZincRule2) => {
   ZincRule2["comment"] = "comment";
   ZincRule2["comment_multiline"] = "comment_multiline";
   ZincRule2["and"] = "and";
+  ZincRule2["break"] = "break";
   ZincRule2["constant"] = "constant";
+  ZincRule2["false"] = "false";
   ZincRule2["public"] = "public";
   ZincRule2["private"] = "private";
   ZincRule2["debug"] = "debug";
@@ -9609,10 +9509,12 @@ var ZincRule = /* @__PURE__ */ ((ZincRule2) => {
   ZincRule2["if"] = "if";
   ZincRule2["for"] = "for";
   ZincRule2["not"] = "not";
+  ZincRule2["null"] = "null";
   ZincRule2["or"] = "or";
   ZincRule2["returns"] = "returns";
   ZincRule2["return"] = "return";
   ZincRule2["type"] = "type";
+  ZincRule2["true"] = "true";
   ZincRule2["comma"] = "comma";
   ZincRule2["equals"] = "equals";
   ZincRule2["assign"] = "assign";
@@ -9665,8 +9567,17 @@ var keyword2 = (k, color = "#2C7AD6") => {
     line_breaks: false
   });
 };
+var operator2 = (k, label, color = "#e7be60") => {
+  ZincColors[`zinc_${k}`] = color;
+  return createToken({
+    name: k,
+    pattern: new RegExp(`${label.split("").map((c) => `\\${c}`).join("")}`),
+    start_chars_hint: [label.charCodeAt(0)],
+    label,
+    line_breaks: false
+  });
+};
 var numberColor2 = "#e760cc";
-var operatorColor2 = "#e7be60";
 var parenColor2 = "#e1d132";
 var ZincTokens = {
   [zinc_rule_default.whitespace]: add2({
@@ -9706,195 +9617,38 @@ var ZincTokens = {
   [zinc_rule_default.globals]: keyword2(zinc_rule_default.globals),
   [zinc_rule_default.if]: keyword2(zinc_rule_default.if),
   [zinc_rule_default.for]: keyword2(zinc_rule_default.for),
-  [zinc_rule_default.optional]: keyword2(zinc_rule_default.optional),
+  [zinc_rule_default.break]: keyword2(zinc_rule_default.break),
   [zinc_rule_default.requires]: keyword2(zinc_rule_default.requires),
+  [zinc_rule_default.optional]: keyword2(zinc_rule_default.optional),
   [zinc_rule_default.return]: keyword2(zinc_rule_default.return),
   [zinc_rule_default.type]: keyword2(zinc_rule_default.type),
+  [zinc_rule_default.null]: keyword2(zinc_rule_default.null),
+  [zinc_rule_default.true]: keyword2(zinc_rule_default.true),
+  [zinc_rule_default.false]: keyword2(zinc_rule_default.false),
   // operator
-  [zinc_rule_default.comma]: add2({
-    name: zinc_rule_default.comma,
-    pattern: /,/,
-    start_chars_hint: [44 /* Comma */],
-    label: ",",
-    line_breaks: false,
-    color: "#FFFFFF"
-  }),
-  [zinc_rule_default.notequals]: add2({
-    name: zinc_rule_default.notequals,
-    pattern: /!=/,
-    start_chars_hint: [33 /* Exclamation */],
-    line_breaks: false,
-    label: "!=",
-    color: operatorColor2
-  }),
-  [zinc_rule_default.not]: add2({
-    name: zinc_rule_default.not,
-    pattern: /!/,
-    start_chars_hint: [33 /* Exclamation */],
-    line_breaks: false,
-    label: "!",
-    color: operatorColor2
-  }),
-  [zinc_rule_default.or]: add2({
-    name: zinc_rule_default.or,
-    pattern: /\|\|/,
-    start_chars_hint: [124 /* VerticalBar */],
-    line_breaks: false,
-    label: "||",
-    color: operatorColor2
-  }),
-  [zinc_rule_default.and]: add2({
-    name: zinc_rule_default.and,
-    pattern: /&&/,
-    start_chars_hint: [38 /* Ampersand */],
-    line_breaks: false,
-    label: "&&",
-    color: operatorColor2
-  }),
-  [zinc_rule_default.returns]: add2({
-    name: zinc_rule_default.returns,
-    pattern: /->/,
-    start_chars_hint: [45 /* Minus */],
-    line_breaks: false,
-    label: "->",
-    color: operatorColor2
-  }),
-  [zinc_rule_default.equals]: add2({
-    name: zinc_rule_default.equals,
-    pattern: /==/,
-    start_chars_hint: [61 /* Equal */],
-    line_breaks: false,
-    label: "==",
-    color: operatorColor2
-  }),
-  [zinc_rule_default.assign]: add2({
-    name: zinc_rule_default.assign,
-    pattern: /=/,
-    start_chars_hint: [61 /* Equal */],
-    line_breaks: false,
-    label: "=",
-    color: operatorColor2
-  }),
-  [zinc_rule_default.lessorequal]: add2({
-    name: zinc_rule_default.lessorequal,
-    pattern: /<=/,
-    start_chars_hint: [60 /* Less */],
-    line_breaks: false,
-    label: "<=",
-    color: operatorColor2
-  }),
-  [zinc_rule_default.less]: add2({
-    name: zinc_rule_default.less,
-    pattern: /</,
-    start_chars_hint: [60 /* Less */],
-    line_breaks: false,
-    label: "<",
-    color: operatorColor2
-  }),
-  [zinc_rule_default.greatorequal]: add2({
-    name: zinc_rule_default.greatorequal,
-    pattern: />=/,
-    start_chars_hint: [62 /* Greater */],
-    line_breaks: false,
-    label: ">=",
-    color: operatorColor2
-  }),
-  [zinc_rule_default.great]: add2({
-    name: zinc_rule_default.great,
-    pattern: />/,
-    start_chars_hint: [62 /* Greater */],
-    line_breaks: false,
-    label: ">",
-    color: operatorColor2
-  }),
-  [zinc_rule_default.add]: add2({
-    name: zinc_rule_default.add,
-    pattern: /\+/,
-    start_chars_hint: [43 /* Plus */],
-    line_breaks: false,
-    label: "+",
-    color: operatorColor2
-  }),
-  [zinc_rule_default.sub]: add2({
-    name: zinc_rule_default.sub,
-    pattern: /-/,
-    start_chars_hint: [45 /* Minus */],
-    line_breaks: false,
-    label: "-",
-    color: operatorColor2
-  }),
-  [zinc_rule_default.mult]: add2({
-    name: zinc_rule_default.mult,
-    pattern: /\*/,
-    start_chars_hint: [42 /* Asterisk */],
-    line_breaks: false,
-    label: "*",
-    color: operatorColor2
-  }),
-  [zinc_rule_default.div]: add2({
-    name: zinc_rule_default.div,
-    pattern: /\//,
-    start_chars_hint: [47 /* Slash */],
-    line_breaks: false,
-    label: "/",
-    color: operatorColor2
-  }),
-  [zinc_rule_default.semicolon]: add2({
-    name: zinc_rule_default.semicolon,
-    pattern: /;/,
-    start_chars_hint: [59 /* Semicolon */],
-    line_breaks: false,
-    label: ";",
-    color: operatorColor2
-  }),
-  [zinc_rule_default.lparen]: add2({
-    name: zinc_rule_default.lparen,
-    pattern: /\(/,
-    start_chars_hint: [40 /* LeftParenthesis */],
-    line_breaks: false,
-    label: "(",
-    color: parenColor2
-  }),
-  [zinc_rule_default.rparen]: add2({
-    name: zinc_rule_default.rparen,
-    pattern: /\)/,
-    start_chars_hint: [41 /* RightParenthesis */],
-    line_breaks: false,
-    label: ")",
-    color: parenColor2
-  }),
-  [zinc_rule_default.lcurlyparen]: add2({
-    name: zinc_rule_default.lcurlyparen,
-    pattern: /\{/,
-    start_chars_hint: [123 /* LeftCurlyBracket */],
-    line_breaks: false,
-    label: "{",
-    color: parenColor2
-  }),
-  [zinc_rule_default.rcurlyparen]: add2({
-    name: zinc_rule_default.rcurlyparen,
-    pattern: /}/,
-    start_chars_hint: [125 /* RightCurlyBracket */],
-    line_breaks: false,
-    label: "}",
-    color: parenColor2
-  }),
-  [zinc_rule_default.lsquareparen]: add2({
-    name: zinc_rule_default.lsquareparen,
-    pattern: /\[/,
-    start_chars_hint: [91 /* LeftSquareBracket */],
-    line_breaks: false,
-    label: "[",
-    color: parenColor2
-  }),
-  [zinc_rule_default.rsquareparen]: add2({
-    name: zinc_rule_default.rsquareparen,
-    pattern: /]/,
-    start_chars_hint: [93 /* RightSquareBracket */],
-    line_breaks: false,
-    label: "]",
-    color: parenColor2
-  }),
+  [zinc_rule_default.comma]: operator2(zinc_rule_default.comma, ",", "#FFFFFF"),
+  [zinc_rule_default.notequals]: operator2(zinc_rule_default.notequals, "!="),
+  [zinc_rule_default.not]: operator2(zinc_rule_default.not, "!"),
+  [zinc_rule_default.or]: operator2(zinc_rule_default.or, "||"),
+  [zinc_rule_default.and]: operator2(zinc_rule_default.and, "&&"),
+  [zinc_rule_default.returns]: operator2(zinc_rule_default.returns, "->"),
+  [zinc_rule_default.equals]: operator2(zinc_rule_default.equals, "=="),
+  [zinc_rule_default.assign]: operator2(zinc_rule_default.assign, "="),
+  [zinc_rule_default.lessorequal]: operator2(zinc_rule_default.lessorequal, "<="),
+  [zinc_rule_default.less]: operator2(zinc_rule_default.less, "<"),
+  [zinc_rule_default.greatorequal]: operator2(zinc_rule_default.greatorequal, ">="),
+  [zinc_rule_default.great]: operator2(zinc_rule_default.great, ">"),
+  [zinc_rule_default.add]: operator2(zinc_rule_default.add, "+"),
+  [zinc_rule_default.sub]: operator2(zinc_rule_default.sub, "-"),
+  [zinc_rule_default.mult]: operator2(zinc_rule_default.mult, "*"),
+  [zinc_rule_default.div]: operator2(zinc_rule_default.div, "/"),
+  [zinc_rule_default.semicolon]: operator2(zinc_rule_default.semicolon, ";"),
+  [zinc_rule_default.lparen]: operator2(zinc_rule_default.lparen, "(", parenColor2),
+  [zinc_rule_default.rparen]: operator2(zinc_rule_default.rparen, ")", parenColor2),
+  [zinc_rule_default.lcurlyparen]: operator2(zinc_rule_default.lcurlyparen, "{", parenColor2),
+  [zinc_rule_default.rcurlyparen]: operator2(zinc_rule_default.rcurlyparen, "}", parenColor2),
+  [zinc_rule_default.lsquareparen]: operator2(zinc_rule_default.lsquareparen, "[", parenColor2),
+  [zinc_rule_default.rsquareparen]: operator2(zinc_rule_default.rsquareparen, "]", parenColor2),
   //
   [zinc_rule_default.idliteral]: add2({
     name: zinc_rule_default.idliteral,

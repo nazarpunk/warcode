@@ -9,6 +9,7 @@ export default interface ZincCstNode extends CstNode {
     [ZincRule.identifier_returns]?: CstNode[],
     // node
     [ZincRule.zinc]?: CstNode[],
+    [ZincRule.break_statement]?: CstNode[],
     [ZincRule.library_declare]?: CstNode[],
     [ZincRule.library_requires]?: CstNode[],
     [ZincRule.library_root]?: CstNode[],
@@ -33,6 +34,7 @@ export default interface ZincCstNode extends CstNode {
     [ZincRule.addition]?: CstNode[],
     // token
     [ZincRule.whitespace]?: IToken[],
+    [ZincRule.break]?: IToken[],
     [ZincRule.requires]?: IToken[],
     [ZincRule.optional]?: IToken[],
     [ZincRule.less]?: IToken[],
@@ -64,6 +66,9 @@ export default interface ZincCstNode extends CstNode {
     [ZincRule.if]?: IToken[],
     [ZincRule.else]?: IToken[],
     [ZincRule.not]?: IToken[],
+    [ZincRule.null]?: IToken[],
+    [ZincRule.true]?: IToken[],
+    [ZincRule.false]?: IToken[],
     [ZincRule.sub]?: IToken[],
     [ZincRule.integer]?: IToken[],
     [ZincRule.real]?: IToken[],
