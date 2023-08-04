@@ -72,13 +72,13 @@ const JassTokens: Record<Exclude<JassRule,
     JassRule.else_statement |
     JassRule.elseif_statement |
     JassRule.addition |
-    JassRule.arrayaccess |
     JassRule.call_statement |
     JassRule.exitwhen_statement |
     JassRule.expression |
     JassRule.loop_statement |
     JassRule.multiplication |
     JassRule.primary |
+    JassRule.primary_sub |
     JassRule.set_statement |
     JassRule.statement |
     JassRule.end
@@ -155,8 +155,8 @@ const JassTokens: Record<Exclude<JassRule,
     [JassRule.lsquareparen]: operator(JassRule.lsquareparen, '[', parenColor),
     [JassRule.rsquareparen]: operator(JassRule.rsquareparen, ']', parenColor),
     //
-    [JassRule.idliteral]: add({
-        name: JassRule.idliteral,
+    [JassRule.rawcode]: add({
+        name: JassRule.rawcode,
         pattern: /'[^']*'/,
         line_breaks: true,
         start_chars_hint: [CharCode.Apostrophe],

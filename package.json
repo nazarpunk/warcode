@@ -332,7 +332,7 @@
         "description": ""
       },
       {
-        "id": "jass_idliteral",
+        "id": "jass_rawcode",
         "description": ""
       },
       {
@@ -663,7 +663,7 @@
           "jass_rparen": "#e1d132",
           "jass_lsquareparen": "#e1d132",
           "jass_rsquareparen": "#e1d132",
-          "jass_idliteral": "#99CEA8",
+          "jass_rawcode": "#99CEA8",
           "jass_stringliteral": "#CE9178",
           "jass_real": "#99CEA8",
           "jass_integer": "#99CEA8",

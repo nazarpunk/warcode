@@ -17,21 +17,21 @@ export default class JassParser extends CstParser {
     declare [JassRule.globals_declare]: ParserMethod<any, any>
     declare [JassRule.end]: ParserMethod<any, any>
     declare [JassRule.statement]: ParserMethod<any, any>
-    declare [JassRule.expression]: ParserMethod<any, any>
     declare [JassRule.variable_declare]: ParserMethod<any, any>
     declare [JassRule.elseif_statement]: ParserMethod<any, any>
     declare [JassRule.else_statement]: ParserMethod<any, any>
     declare [JassRule.function_call]: ParserMethod<any, any>
-    declare [JassRule.arrayaccess]: ParserMethod<any, any>
-    declare [JassRule.addition]: ParserMethod<any, any>
-    declare [JassRule.multiplication]: ParserMethod<any, any>
-    declare [JassRule.primary]: ParserMethod<any, any>
     declare [JassRule.call_statement]: ParserMethod<any, any>
     declare [JassRule.set_statement]: ParserMethod<any, any>
     declare [JassRule.loop_statement]: ParserMethod<any, any>
     declare [JassRule.exitwhen_statement]: ParserMethod<any, any>
     declare [JassRule.if_statement]: ParserMethod<any, any>
     declare [JassRule.return_statement]: ParserMethod<any, any>
+    declare [JassRule.expression]: ParserMethod<any, any>
+    declare [JassRule.addition]: ParserMethod<any, any>
+    declare [JassRule.multiplication]: ParserMethod<any, any>
+    declare [JassRule.primary]: ParserMethod<any, any>
+    declare [JassRule.primary_sub]: ParserMethod<any, any>
 
     constructor(config?: IParserConfig) {
         super(JassTokensList, config)
@@ -131,9 +131,9 @@ export default class JassParser extends CstParser {
         //region type_declare
         $.RULE(JassRule.type_declare, () => {
             $.CONSUME(JassTokens[JassRule.type])
-            $.CONSUME(JassTokens[JassRule.identifier],{LABEL: JassRule.identifier_name})
+            $.CONSUME(JassTokens[JassRule.identifier], {LABEL: JassRule.identifier_name})
             $.CONSUME(JassTokens[JassRule.extends])
-            $.CONSUME2(JassTokens[JassRule.identifier],{LABEL: JassRule.identifier_base})
+            $.CONSUME2(JassTokens[JassRule.identifier], {LABEL: JassRule.identifier_base})
             $.SUBRULE($[JassRule.end])
         })
         //endregion
@@ -209,9 +209,13 @@ export default class JassParser extends CstParser {
         $.RULE(JassRule.set_statement, () => {
             $.CONSUME(JassTokens[JassRule.set])
             $.CONSUME(JassTokens[JassRule.identifier])
-            $.OPTION(() => $.SUBRULE($[JassRule.arrayaccess]))
+            $.OPTION(() => {
+                $.CONSUME(JassTokens[JassRule.lsquareparen])
+                $.SUBRULE($[JassRule.addition])
+                $.CONSUME(JassTokens[JassRule.rsquareparen])
+            })
             $.CONSUME(JassTokens[JassRule.assign])
-            $.SUBRULE($[JassRule.expression])
+            $.SUBRULE1($[JassRule.expression])
             $.SUBRULE($[JassRule.end])
         })
         //endregion
@@ -231,14 +235,6 @@ export default class JassParser extends CstParser {
             $.CONSUME(JassTokens[JassRule.exitwhen])
             $.SUBRULE($[JassRule.expression])
             $.SUBRULE($[JassRule.end])
-        })
-        //endregion
-
-        //region arrayaccess
-        $.RULE(JassRule.arrayaccess, () => {
-            $.CONSUME(JassTokens[JassRule.lsquareparen])
-            $.SUBRULE($[JassRule.expression])
-            $.CONSUME(JassTokens[JassRule.rsquareparen])
         })
         //endregion
 
@@ -334,12 +330,7 @@ export default class JassParser extends CstParser {
         //region primary
         $.RULE(JassRule.primary, () => {
             $.OR([
-                {
-                    ALT: () => {
-                        $.OPTION(() => $.CONSUME(JassTokens[JassRule.sub]))
-                        $.CONSUME(JassTokens[JassRule.integer])
-                    }
-                },
+                {ALT: () => $.SUBRULE($[JassRule.primary_sub])},
                 {
                     ALT: () => {
                         $.CONSUME(JassTokens[JassRule.not])
@@ -348,55 +339,44 @@ export default class JassParser extends CstParser {
                 },
                 {
                     ALT: () => {
-                        $.OPTION5(() => $.CONSUME3(JassTokens[JassRule.sub]))
-                        $.SUBRULE($[JassRule.function_call])
-                    }
-                },
-                {
-                    ALT: () => {
-                        $.OPTION6(() => $.CONSUME6(JassTokens[JassRule.sub]))
-                        $.CONSUME(JassTokens[JassRule.lparen])
-                        $.SUBRULE2($[JassRule.expression])
-                        $.CONSUME(JassTokens[JassRule.rparen])
-                    }
-                },
-                {
-                    ALT: () => {
-                        $.OPTION3(() => $.CONSUME5(JassTokens[JassRule.sub]))
-                        $.CONSUME3(JassTokens[JassRule.identifier])
-                        $.OPTION4(() => $.SUBRULE($[JassRule.arrayaccess]))
-                    }
-                },
-                {
-                    ALT: () => {
                         $.CONSUME(JassTokens[JassRule.function])
-                        $.CONSUME4(JassTokens[JassRule.identifier])
+                        $.CONSUME(JassTokens[JassRule.identifier])
                     }
                 },
-                {
-                    ALT: () => {
-                        $.OPTION2(() => $.CONSUME2(JassTokens[JassRule.sub]))
-                        $.CONSUME3(JassTokens[JassRule.real])
-                    }
-                },
-                {
-                    ALT: () => $.CONSUME3(JassTokens[JassRule.idliteral])
-                },
-                {
-                    ALT: () => $.CONSUME3(JassTokens[JassRule.stringliteral])
-                },
-                {
-                    ALT: () => $.CONSUME3(JassTokens[JassRule.null])
-                },
-                {
-                    ALT: () => $.CONSUME3(JassTokens[JassRule.true])
-                },
-                {
-                    ALT: () => $.CONSUME3(JassTokens[JassRule.false])
-                },
+                {ALT: () => $.CONSUME(JassTokens[JassRule.stringliteral])},
+                {ALT: () => $.CONSUME(JassTokens[JassRule.null])},
+                {ALT: () => $.CONSUME(JassTokens[JassRule.true])},
+                {ALT: () => $.CONSUME(JassTokens[JassRule.false])},
             ])
         })
         //endregion
+
+        $.RULE(JassRule.primary_sub, () => {
+            $.OPTION(() => $.CONSUME(JassTokens[JassRule.sub]))
+            $.OR([
+                {ALT: () => $.CONSUME(JassTokens[JassRule.integer])},
+                {ALT: () => $.CONSUME(JassTokens[JassRule.real])},
+                {ALT: () => $.CONSUME(JassTokens[JassRule.rawcode])},
+                {ALT: () => $.SUBRULE($[JassRule.function_call])},
+                {
+                    ALT: () => {
+                        $.CONSUME(JassTokens[JassRule.identifier])
+                        $.OPTION1(() => {
+                            $.CONSUME(JassTokens[JassRule.lsquareparen])
+                            $.SUBRULE($[JassRule.addition])
+                            $.CONSUME(JassTokens[JassRule.rsquareparen])
+                        })
+                    }
+                },
+                {
+                    ALT: () => {
+                        $.CONSUME(JassTokens[JassRule.lparen])
+                        $.SUBRULE($[JassRule.expression])
+                        $.CONSUME(JassTokens[JassRule.rparen])
+                    }
+                },
+            ])
+        })
 
         //region end
         $.RULE(JassRule.end, () => {

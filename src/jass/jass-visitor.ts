@@ -177,20 +177,19 @@ export class JassVisitor extends ParserVisitor implements IVisitor {
             this.#mark(type, TokenLegend.jass_type_name)
             this.#mark(name, TokenLegend.jass_variable_local)
             // local check: local redeclare arg
-            if (name) {
-                (localMap[name.image] ??= []).push(name)
-                const argList = argMap[name.image]
-                if (argList) {
-                    for (const t of [name, ...argList]) {
-                        this.diagnostics.push({
-                            message: i18next.t(i18n.localRedeclareArgError, {name: t.image}),
-                            range: new Range(
-                                this.document.positionAt(t.startOffset),
-                                this.document.positionAt(t.startOffset + t.image.length)
-                            ),
-                            severity: DiagnosticSeverity.Warning
-                        })
-                    }
+            if (!name) continue
+            (localMap[name.image] ??= []).push(name)
+            const argList = argMap[name.image]
+            if (argList) {
+                for (const t of [name, ...argList]) {
+                    this.diagnostics.push({
+                        message: i18next.t(i18n.localRedeclareArgError, {name: t.image}),
+                        range: new Range(
+                            this.document.positionAt(t.startOffset),
+                            this.document.positionAt(t.startOffset + t.image.length)
+                        ),
+                        severity: DiagnosticSeverity.Warning
+                    })
                 }
             }
         }
@@ -358,8 +357,10 @@ export class JassVisitor extends ParserVisitor implements IVisitor {
         this.#token(ctx, JassRule.set, TokenLegend.jass_set)
         this.#token(ctx, JassRule.identifier, TokenLegend.jass_variable_local)
         this.#token(ctx, JassRule.assign, TokenLegend.jass_assign)
+        this.#token(ctx, JassRule.lsquareparen, TokenLegend.jass_lsquareparen)
+        this.#token(ctx, JassRule.rsquareparen, TokenLegend.jass_rsquareparen)
+        this.#node(ctx, JassRule.addition)
         this.#node(ctx, JassRule.expression)
-        this.#node(ctx, JassRule.arrayaccess)
     }
 
     [JassRule.loop_statement](ctx: JassCstNode) {
@@ -416,22 +417,29 @@ export class JassVisitor extends ParserVisitor implements IVisitor {
     [JassRule.primary](ctx: JassCstNode) {
         //console.log(JassRule.primary, ctx);
         this.#string(ctx)
-        this.#token(ctx, JassRule.sub, TokenLegend.jass_sub)
-        this.#token(ctx, JassRule.integer, TokenLegend.jass_integer)
-        this.#token(ctx, JassRule.real, TokenLegend.jass_real)
-        this.#token(ctx, JassRule.idliteral, TokenLegend.jass_idliteral)
-        this.#token(ctx, JassRule.function, TokenLegend.jass_function)
+        this.#token(ctx, JassRule.identifier, TokenLegend.jass_variable_local)
         this.#token(ctx, JassRule.not, TokenLegend.jass_not)
         this.#token(ctx, JassRule.null, TokenLegend.jass_null)
         this.#token(ctx, JassRule.true, TokenLegend.jass_true)
         this.#token(ctx, JassRule.false, TokenLegend.jass_false)
-        this.#token(ctx, JassRule.identifier, TokenLegend.jass_variable_local)
+        this.#node(ctx, JassRule.primary)
+        this.#node(ctx, JassRule.primary_sub)
+    }
+
+    [JassRule.primary_sub](ctx: JassCstNode) {
+        this.#token(ctx, JassRule.sub, TokenLegend.jass_sub)
+        this.#token(ctx, JassRule.integer, TokenLegend.jass_integer)
+        this.#token(ctx, JassRule.real, TokenLegend.jass_real)
+        this.#token(ctx, JassRule.rawcode, TokenLegend.jass_rawcode)
         this.#token(ctx, JassRule.lparen, TokenLegend.jass_lparen)
         this.#token(ctx, JassRule.rparen, TokenLegend.jass_rparen)
-        this.#node(ctx, JassRule.arrayaccess)
-        this.#node(ctx, JassRule.function_call)
+        this.#token(ctx, JassRule.lsquareparen, TokenLegend.jass_lsquareparen)
+        this.#token(ctx, JassRule.rsquareparen, TokenLegend.jass_rsquareparen)
+        this.#token(ctx, JassRule.identifier, TokenLegend.jass_variable_local)
+        this.#token(ctx, JassRule.function, TokenLegend.jass_function)
+        this.#node(ctx, JassRule.addition)
         this.#node(ctx, JassRule.expression)
-        this.#node(ctx, JassRule.primary)
+        this.#node(ctx, JassRule.function_call)
     }
 
     [JassRule.addition](ctx: JassCstNode) {
@@ -446,13 +454,6 @@ export class JassVisitor extends ParserVisitor implements IVisitor {
         this.#tokens(ctx, JassRule.mult, TokenLegend.jass_mult)
         this.#tokens(ctx, JassRule.div, TokenLegend.jass_div)
         this.#nodes(ctx, JassRule.primary)
-    }
-
-    [JassRule.arrayaccess](ctx: JassCstNode) {
-        // console.log(JassRule.arrayaccess, ctx);
-        this.#token(ctx, JassRule.lsquareparen, TokenLegend.jass_lsquareparen)
-        this.#token(ctx, JassRule.rsquareparen, TokenLegend.jass_rsquareparen)
-        this.#node(ctx, JassRule.expression)
     }
 
     [JassRule.end]() {

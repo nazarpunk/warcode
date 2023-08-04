@@ -55,7 +55,7 @@ const enum TokenLegend {
     jass_rparen = 53,
     jass_lsquareparen = 54,
     jass_rsquareparen = 55,
-    jass_idliteral = 56,
+    jass_rawcode = 56,
     jass_stringliteral = 57,
     jass_real = 58,
     jass_integer = 59,

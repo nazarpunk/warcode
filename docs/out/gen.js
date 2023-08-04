@@ -9217,13 +9217,13 @@ var JassRule = /* @__PURE__ */ ((JassRule2) => {
   JassRule2["else_statement"] = "else_statement";
   JassRule2["elseif_statement"] = "elseif_statement";
   JassRule2["addition"] = "addition";
-  JassRule2["arrayaccess"] = "arrayaccess";
   JassRule2["call_statement"] = "call_statement";
   JassRule2["exitwhen_statement"] = "exitwhen_statement";
   JassRule2["expression"] = "expression";
   JassRule2["loop_statement"] = "loop_statement";
   JassRule2["multiplication"] = "multiplication";
   JassRule2["primary"] = "primary";
+  JassRule2["primary_sub"] = "primary_sub";
   JassRule2["set_statement"] = "set_statement";
   JassRule2["statement"] = "statement";
   JassRule2["end"] = "end";
@@ -9279,7 +9279,7 @@ var JassRule = /* @__PURE__ */ ((JassRule2) => {
   JassRule2["real"] = "real";
   JassRule2["integer"] = "integer";
   JassRule2["linebreak"] = "linebreak";
-  JassRule2["idliteral"] = "idliteral";
+  JassRule2["rawcode"] = "rawcode";
   JassRule2["stringliteral"] = "stringliteral";
   JassRule2["identifier"] = "identifier";
   return JassRule2;
@@ -9422,8 +9422,8 @@ var JassTokens = {
   [jass_rule_default.lsquareparen]: operator(jass_rule_default.lsquareparen, "[", parenColor),
   [jass_rule_default.rsquareparen]: operator(jass_rule_default.rsquareparen, "]", parenColor),
   //
-  [jass_rule_default.idliteral]: add({
-    name: jass_rule_default.idliteral,
+  [jass_rule_default.rawcode]: add({
+    name: jass_rule_default.rawcode,
     pattern: /'[^']*'/,
     line_breaks: true,
     start_chars_hint: [39 /* Apostrophe */],

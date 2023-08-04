@@ -9244,13 +9244,13 @@ var JassRule = /* @__PURE__ */ ((JassRule2) => {
   JassRule2["else_statement"] = "else_statement";
   JassRule2["elseif_statement"] = "elseif_statement";
   JassRule2["addition"] = "addition";
-  JassRule2["arrayaccess"] = "arrayaccess";
   JassRule2["call_statement"] = "call_statement";
   JassRule2["exitwhen_statement"] = "exitwhen_statement";
   JassRule2["expression"] = "expression";
   JassRule2["loop_statement"] = "loop_statement";
   JassRule2["multiplication"] = "multiplication";
   JassRule2["primary"] = "primary";
+  JassRule2["primary_sub"] = "primary_sub";
   JassRule2["set_statement"] = "set_statement";
   JassRule2["statement"] = "statement";
   JassRule2["end"] = "end";
@@ -9306,7 +9306,7 @@ var JassRule = /* @__PURE__ */ ((JassRule2) => {
   JassRule2["real"] = "real";
   JassRule2["integer"] = "integer";
   JassRule2["linebreak"] = "linebreak";
-  JassRule2["idliteral"] = "idliteral";
+  JassRule2["rawcode"] = "rawcode";
   JassRule2["stringliteral"] = "stringliteral";
   JassRule2["identifier"] = "identifier";
   return JassRule2;
@@ -9440,8 +9440,8 @@ var JassTokens = {
   [jass_rule_default.lsquareparen]: operator(jass_rule_default.lsquareparen, "[", parenColor),
   [jass_rule_default.rsquareparen]: operator(jass_rule_default.rsquareparen, "]", parenColor),
   //
-  [jass_rule_default.idliteral]: add({
-    name: jass_rule_default.idliteral,
+  [jass_rule_default.rawcode]: add({
+    name: jass_rule_default.rawcode,
     pattern: /'[^']*'/,
     line_breaks: true,
     start_chars_hint: [39 /* Apostrophe */],
@@ -9612,9 +9612,13 @@ var JassParser = class extends CstParser {
     $.RULE(jass_rule_default.set_statement, () => {
       $.CONSUME(jass_tokens_default[jass_rule_default.set]);
       $.CONSUME(jass_tokens_default[jass_rule_default.identifier]);
-      $.OPTION(() => $.SUBRULE($[jass_rule_default.arrayaccess]));
+      $.OPTION(() => {
+        $.CONSUME(jass_tokens_default[jass_rule_default.lsquareparen]);
+        $.SUBRULE($[jass_rule_default.addition]);
+        $.CONSUME(jass_tokens_default[jass_rule_default.rsquareparen]);
+      });
       $.CONSUME(jass_tokens_default[jass_rule_default.assign]);
-      $.SUBRULE($[jass_rule_default.expression]);
+      $.SUBRULE1($[jass_rule_default.expression]);
       $.SUBRULE($[jass_rule_default.end]);
     });
     $.RULE(jass_rule_default.loop_statement, () => {
@@ -9628,11 +9632,6 @@ var JassParser = class extends CstParser {
       $.CONSUME(jass_tokens_default[jass_rule_default.exitwhen]);
       $.SUBRULE($[jass_rule_default.expression]);
       $.SUBRULE($[jass_rule_default.end]);
-    });
-    $.RULE(jass_rule_default.arrayaccess, () => {
-      $.CONSUME(jass_tokens_default[jass_rule_default.lsquareparen]);
-      $.SUBRULE($[jass_rule_default.expression]);
-      $.CONSUME(jass_tokens_default[jass_rule_default.rsquareparen]);
     });
     $.RULE(jass_rule_default.function_call, () => {
       $.CONSUME(jass_tokens_default[jass_rule_default.identifier]);
@@ -9710,12 +9709,7 @@ var JassParser = class extends CstParser {
     });
     $.RULE(jass_rule_default.primary, () => {
       $.OR([
-        {
-          ALT: () => {
-            $.OPTION(() => $.CONSUME(jass_tokens_default[jass_rule_default.sub]));
-            $.CONSUME(jass_tokens_default[jass_rule_default.integer]);
-          }
-        },
+        { ALT: () => $.SUBRULE($[jass_rule_default.primary_sub]) },
         {
           ALT: () => {
             $.CONSUME(jass_tokens_default[jass_rule_default.not]);
@@ -9724,51 +9718,39 @@ var JassParser = class extends CstParser {
         },
         {
           ALT: () => {
-            $.OPTION5(() => $.CONSUME3(jass_tokens_default[jass_rule_default.sub]));
-            $.SUBRULE($[jass_rule_default.function_call]);
+            $.CONSUME(jass_tokens_default[jass_rule_default.function]);
+            $.CONSUME(jass_tokens_default[jass_rule_default.identifier]);
+          }
+        },
+        { ALT: () => $.CONSUME(jass_tokens_default[jass_rule_default.stringliteral]) },
+        { ALT: () => $.CONSUME(jass_tokens_default[jass_rule_default.null]) },
+        { ALT: () => $.CONSUME(jass_tokens_default[jass_rule_default.true]) },
+        { ALT: () => $.CONSUME(jass_tokens_default[jass_rule_default.false]) }
+      ]);
+    });
+    $.RULE(jass_rule_default.primary_sub, () => {
+      $.OPTION(() => $.CONSUME(jass_tokens_default[jass_rule_default.sub]));
+      $.OR([
+        { ALT: () => $.CONSUME(jass_tokens_default[jass_rule_default.integer]) },
+        { ALT: () => $.CONSUME(jass_tokens_default[jass_rule_default.real]) },
+        { ALT: () => $.CONSUME(jass_tokens_default[jass_rule_default.rawcode]) },
+        { ALT: () => $.SUBRULE($[jass_rule_default.function_call]) },
+        {
+          ALT: () => {
+            $.CONSUME(jass_tokens_default[jass_rule_default.identifier]);
+            $.OPTION1(() => {
+              $.CONSUME(jass_tokens_default[jass_rule_default.lsquareparen]);
+              $.SUBRULE($[jass_rule_default.addition]);
+              $.CONSUME(jass_tokens_default[jass_rule_default.rsquareparen]);
+            });
           }
         },
         {
           ALT: () => {
-            $.OPTION6(() => $.CONSUME6(jass_tokens_default[jass_rule_default.sub]));
             $.CONSUME(jass_tokens_default[jass_rule_default.lparen]);
-            $.SUBRULE2($[jass_rule_default.expression]);
+            $.SUBRULE($[jass_rule_default.expression]);
             $.CONSUME(jass_tokens_default[jass_rule_default.rparen]);
           }
-        },
-        {
-          ALT: () => {
-            $.OPTION3(() => $.CONSUME5(jass_tokens_default[jass_rule_default.sub]));
-            $.CONSUME3(jass_tokens_default[jass_rule_default.identifier]);
-            $.OPTION4(() => $.SUBRULE($[jass_rule_default.arrayaccess]));
-          }
-        },
-        {
-          ALT: () => {
-            $.CONSUME(jass_tokens_default[jass_rule_default.function]);
-            $.CONSUME4(jass_tokens_default[jass_rule_default.identifier]);
-          }
-        },
-        {
-          ALT: () => {
-            $.OPTION2(() => $.CONSUME2(jass_tokens_default[jass_rule_default.sub]));
-            $.CONSUME3(jass_tokens_default[jass_rule_default.real]);
-          }
-        },
-        {
-          ALT: () => $.CONSUME3(jass_tokens_default[jass_rule_default.idliteral])
-        },
-        {
-          ALT: () => $.CONSUME3(jass_tokens_default[jass_rule_default.stringliteral])
-        },
-        {
-          ALT: () => $.CONSUME3(jass_tokens_default[jass_rule_default.null])
-        },
-        {
-          ALT: () => $.CONSUME3(jass_tokens_default[jass_rule_default.true])
-        },
-        {
-          ALT: () => $.CONSUME3(jass_tokens_default[jass_rule_default.false])
         }
       ]);
     });
@@ -9855,13 +9837,13 @@ var JassVisitorDocs = class extends ParserVisitor {
   [jass_rule_default.primary](ctx) {
     return ctx;
   }
+  [jass_rule_default.primary_sub](ctx) {
+    return ctx;
+  }
   [jass_rule_default.addition](ctx) {
     return ctx;
   }
   [jass_rule_default.multiplication](ctx) {
-    return ctx;
-  }
-  [jass_rule_default.arrayaccess](ctx) {
     return ctx;
   }
   [jass_rule_default.end](ctx) {

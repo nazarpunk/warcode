@@ -106,15 +106,15 @@ export class JassVisitorDocs extends ParserVisitor {
         return ctx
     }
 
+    [JassRule.primary_sub](ctx: JassCstNode) {
+        return ctx
+    }
+
     [JassRule.addition](ctx: JassCstNode) {
         return ctx
     }
 
     [JassRule.multiplication](ctx: JassCstNode) {
-        return ctx
-    }
-
-    [JassRule.arrayaccess](ctx: JassCstNode) {
         return ctx
     }
 
