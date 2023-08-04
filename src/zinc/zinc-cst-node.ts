@@ -9,7 +9,6 @@ export default interface ZincCstNode extends CstNode {
     [ZincRule.identifier_returns]?: CstNode[],
     // node
     [ZincRule.zinc]?: CstNode[],
-    [ZincRule.break_statement]?: CstNode[],
     [ZincRule.library_declare]?: CstNode[],
     [ZincRule.library_requires]?: CstNode[],
     [ZincRule.library_root]?: CstNode[],
@@ -24,13 +23,14 @@ export default interface ZincCstNode extends CstNode {
     [ZincRule.expression]?: CstNode[],
     [ZincRule.if_statement]?: CstNode[],
     [ZincRule.set_statement]?: CstNode[],
-    [ZincRule.call_statement]?: CstNode[],
     [ZincRule.for_statement]?: CstNode[],
     [ZincRule.return_statement]?: CstNode[],
     [ZincRule.else_statement]?: CstNode[],
+    [ZincRule.while_statement]?: CstNode[],
     [ZincRule.arrayaccess]?: CstNode[],
     [ZincRule.multiplication]?: CstNode[],
     [ZincRule.primary]?: CstNode[],
+    [ZincRule.primary_div]?: CstNode[],
     [ZincRule.addition]?: CstNode[],
     // token
     [ZincRule.whitespace]?: IToken[],
@@ -72,7 +72,7 @@ export default interface ZincCstNode extends CstNode {
     [ZincRule.sub]?: IToken[],
     [ZincRule.integer]?: IToken[],
     [ZincRule.real]?: IToken[],
-    [ZincRule.idliteral]?: IToken[],
+    [ZincRule.rawcode]?: IToken[],
     [ZincRule.add]?: IToken[],
     [ZincRule.mult]?: IToken[],
     [ZincRule.div]?: IToken[],
@@ -85,4 +85,5 @@ export default interface ZincCstNode extends CstNode {
     [ZincRule.lessorequal]?: IToken[],
     [ZincRule.great]?: IToken[],
     [ZincRule.greatorequal]?: IToken[],
+    [ZincRule.while]?: IToken[],
 }

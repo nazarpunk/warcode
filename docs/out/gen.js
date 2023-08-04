@@ -9464,7 +9464,6 @@ var ZincRule = /* @__PURE__ */ ((ZincRule2) => {
   ZincRule2["identifier_type"] = "identifier_type";
   ZincRule2["identifier_returns"] = "identifier_returns";
   ZincRule2["zinc"] = "zinc";
-  ZincRule2["break_statement"] = "break_statement";
   ZincRule2["library"] = "library";
   ZincRule2["requires"] = "requires";
   ZincRule2["optional"] = "optional";
@@ -9481,13 +9480,14 @@ var ZincRule = /* @__PURE__ */ ((ZincRule2) => {
   ZincRule2["return_statement"] = "return_statement";
   ZincRule2["if_statement"] = "if_statement";
   ZincRule2["else_statement"] = "else_statement";
+  ZincRule2["while_statement"] = "while_statement";
   ZincRule2["addition"] = "addition";
   ZincRule2["arrayaccess"] = "arrayaccess";
-  ZincRule2["call_statement"] = "call_statement";
   ZincRule2["expression"] = "expression";
   ZincRule2["for_statement"] = "for_statement";
   ZincRule2["multiplication"] = "multiplication";
   ZincRule2["primary"] = "primary";
+  ZincRule2["primary_div"] = "primary_div";
   ZincRule2["set_statement"] = "set_statement";
   ZincRule2["statement"] = "statement";
   ZincRule2["whitespace"] = "whitespace";
@@ -9515,6 +9515,7 @@ var ZincRule = /* @__PURE__ */ ((ZincRule2) => {
   ZincRule2["return"] = "return";
   ZincRule2["type"] = "type";
   ZincRule2["true"] = "true";
+  ZincRule2["while"] = "while";
   ZincRule2["comma"] = "comma";
   ZincRule2["equals"] = "equals";
   ZincRule2["assign"] = "assign";
@@ -9536,7 +9537,7 @@ var ZincRule = /* @__PURE__ */ ((ZincRule2) => {
   ZincRule2["rsquareparen"] = "rsquareparen";
   ZincRule2["real"] = "real";
   ZincRule2["integer"] = "integer";
-  ZincRule2["idliteral"] = "idliteral";
+  ZincRule2["rawcode"] = "rawcode";
   ZincRule2["stringliteral"] = "stringliteral";
   ZincRule2["identifier"] = "identifier";
   return ZincRule2;
@@ -9625,6 +9626,7 @@ var ZincTokens = {
   [zinc_rule_default.null]: keyword2(zinc_rule_default.null),
   [zinc_rule_default.true]: keyword2(zinc_rule_default.true),
   [zinc_rule_default.false]: keyword2(zinc_rule_default.false),
+  [zinc_rule_default.while]: keyword2(zinc_rule_default.while),
   // operator
   [zinc_rule_default.comma]: operator2(zinc_rule_default.comma, ",", "#FFFFFF"),
   [zinc_rule_default.notequals]: operator2(zinc_rule_default.notequals, "!="),
@@ -9650,8 +9652,8 @@ var ZincTokens = {
   [zinc_rule_default.lsquareparen]: operator2(zinc_rule_default.lsquareparen, "[", parenColor2),
   [zinc_rule_default.rsquareparen]: operator2(zinc_rule_default.rsquareparen, "]", parenColor2),
   //
-  [zinc_rule_default.idliteral]: add2({
-    name: zinc_rule_default.idliteral,
+  [zinc_rule_default.rawcode]: add2({
+    name: zinc_rule_default.rawcode,
     pattern: /'[^']*'/,
     line_breaks: true,
     start_chars_hint: [39 /* Apostrophe */],

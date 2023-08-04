@@ -55,7 +55,6 @@ const ZincTokens: Record<Exclude<ZincRule,
     ZincRule.identifier_type |
     ZincRule.identifier_returns |
     ZincRule.zinc |
-    ZincRule.break_statement |
     ZincRule.library_declare |
     ZincRule.library_requires |
     ZincRule.library_root |
@@ -69,13 +68,14 @@ const ZincTokens: Record<Exclude<ZincRule,
     ZincRule.return_statement |
     ZincRule.if_statement |
     ZincRule.else_statement |
+    ZincRule.while_statement |
     ZincRule.addition |
     ZincRule.arrayaccess |
-    ZincRule.call_statement |
     ZincRule.expression |
     ZincRule.for_statement |
     ZincRule.multiplication |
     ZincRule.primary |
+    ZincRule.primary_div |
     ZincRule.set_statement |
     ZincRule.statement
 >, TokenType> = {
@@ -124,6 +124,7 @@ const ZincTokens: Record<Exclude<ZincRule,
     [ZincRule.null]: keyword(ZincRule.null),
     [ZincRule.true]: keyword(ZincRule.true),
     [ZincRule.false]: keyword(ZincRule.false),
+    [ZincRule.while]: keyword(ZincRule.while),
     // operator
     [ZincRule.comma]: operator(ZincRule.comma, ',', '#FFFFFF'),
     [ZincRule.notequals]: operator(ZincRule.notequals, '!='),
@@ -149,8 +150,8 @@ const ZincTokens: Record<Exclude<ZincRule,
     [ZincRule.lsquareparen]: operator(ZincRule.lsquareparen, '[', parenColor),
     [ZincRule.rsquareparen]: operator(ZincRule.rsquareparen, ']', parenColor),
     //
-    [ZincRule.idliteral]: add({
-        name: ZincRule.idliteral,
+    [ZincRule.rawcode]: add({
+        name: ZincRule.rawcode,
         pattern: /'[^']*'/,
         line_breaks: true,
         start_chars_hint: [CharCode.Apostrophe],

@@ -492,6 +492,10 @@
         "description": ""
       },
       {
+        "id": "zinc_while",
+        "description": ""
+      },
+      {
         "id": "zinc_comma",
         "description": ""
       },
@@ -584,7 +588,7 @@
         "description": ""
       },
       {
-        "id": "zinc_idliteral",
+        "id": "zinc_rawcode",
         "description": ""
       },
       {
@@ -703,6 +707,7 @@
           "zinc_null": "#2C7AD6",
           "zinc_true": "#2C7AD6",
           "zinc_false": "#2C7AD6",
+          "zinc_while": "#2C7AD6",
           "zinc_comma": "#FFFFFF",
           "zinc_notequals": "#e7be60",
           "zinc_not": "#e7be60",
@@ -726,7 +731,7 @@
           "zinc_rcurlyparen": "#e1d132",
           "zinc_lsquareparen": "#e1d132",
           "zinc_rsquareparen": "#e1d132",
-          "zinc_idliteral": "#e760cc",
+          "zinc_rawcode": "#e760cc",
           "zinc_stringliteral": "#CE9178",
           "zinc_real": "#e760cc",
           "zinc_integer": "#e760cc",

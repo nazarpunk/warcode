@@ -20,17 +20,17 @@ export default class ZincParser extends CstParser {
     declare [ZincRule.variable_declare]: ParserMethod<any, any>
     declare [ZincRule.variable_set]: ParserMethod<any, any>
     declare [ZincRule.else_statement]: ParserMethod<any, any>
+    declare [ZincRule.while_statement]: ParserMethod<any, any>
     declare [ZincRule.function_call]: ParserMethod<any, any>
     declare [ZincRule.arrayaccess]: ParserMethod<any, any>
     declare [ZincRule.addition]: ParserMethod<any, any>
     declare [ZincRule.multiplication]: ParserMethod<any, any>
     declare [ZincRule.primary]: ParserMethod<any, any>
-    declare [ZincRule.call_statement]: ParserMethod<any, any>
+    declare [ZincRule.primary_div]: ParserMethod<any, any>
     declare [ZincRule.set_statement]: ParserMethod<any, any>
     declare [ZincRule.for_statement]: ParserMethod<any, any>
     declare [ZincRule.if_statement]: ParserMethod<any, any>
     declare [ZincRule.return_statement]: ParserMethod<any, any>
-    declare [ZincRule.break_statement]: ParserMethod<any, any>
 
     constructor(config?: IParserConfig) {
         super(ZincTokensList, config)
@@ -116,15 +116,11 @@ export default class ZincParser extends CstParser {
 
         //region variable_set
         $.RULE(ZincRule.variable_set, () => {
-            $.CONSUME2(ZincTokens[ZincRule.identifier])
-            $.MANY(() => {
-                $.CONSUME(ZincTokens[ZincRule.lsquareparen])
-                $.OPTION(() => $.SUBRULE($[ZincRule.expression]))
-                $.CONSUME(ZincTokens[ZincRule.rsquareparen])
-            })
-            $.OPTION3(() => {
+            $.CONSUME(ZincTokens[ZincRule.identifier])
+            $.OPTION(() => $.SUBRULE($[ZincRule.arrayaccess]))
+            $.OPTION1(() => {
                 $.CONSUME(ZincTokens[ZincRule.assign])
-                $.SUBRULE2($[ZincRule.expression])
+                $.SUBRULE($[ZincRule.expression])
             })
         })
         //endregion
@@ -177,7 +173,7 @@ export default class ZincParser extends CstParser {
         })
         //endregion
 
-        //region else
+        //region else_statement
         $.RULE(ZincRule.else_statement, () => {
             $.CONSUME(ZincTokens[ZincRule.else])
             $.OR([
@@ -193,10 +189,22 @@ export default class ZincParser extends CstParser {
         })
         //endregion
 
-        //region call_statement
-        $.RULE(ZincRule.call_statement, () => {
-            $.SUBRULE($[ZincRule.function_call])
-            $.CONSUME(ZincTokens[ZincRule.semicolon])
+        //region while_statement
+        $.RULE(ZincRule.while_statement, () => {
+            $.CONSUME(ZincTokens[ZincRule.while])
+            $.CONSUME(ZincTokens[ZincRule.lparen])
+            $.SUBRULE($[ZincRule.expression])
+            $.CONSUME(ZincTokens[ZincRule.rparen])
+            $.OR([
+                {ALT: () => $.SUBRULE($[ZincRule.statement])},
+                {
+                    ALT: () => {
+                        $.CONSUME(ZincTokens[ZincRule.lcurlyparen])
+                        $.MANY(() => $.SUBRULE1($[ZincRule.statement]))
+                        $.CONSUME(ZincTokens[ZincRule.rcurlyparen])
+                    }
+                }
+            ])
         })
         //endregion
 
@@ -266,32 +274,28 @@ export default class ZincParser extends CstParser {
         })
         //endregion
 
-        //region call_statement
-        $.RULE(ZincRule.break_statement, () => {
-            $.CONSUME(ZincTokens[ZincRule.break])
-            $.CONSUME(ZincTokens[ZincRule.semicolon])
-        })
-        //endregion
-
         //region statement
         $.RULE(ZincRule.statement, () => {
             $.OR4([
-                {ALT: () => $.SUBRULE($[ZincRule.call_statement])},
                 {ALT: () => $.SUBRULE($[ZincRule.set_statement])},
                 {ALT: () => $.SUBRULE($[ZincRule.for_statement])},
                 {ALT: () => $.SUBRULE($[ZincRule.if_statement])},
                 {ALT: () => $.SUBRULE($[ZincRule.return_statement])},
-                {ALT: () => $.SUBRULE($[ZincRule.break_statement])},
+                {ALT: () => $.SUBRULE($[ZincRule.while_statement])},
+                {
+                    ALT: () => {
+                        $.SUBRULE($[ZincRule.function_call])
+                        $.CONSUME(ZincTokens[ZincRule.semicolon])
+                    }
+                },
+                {
+                    ALT: () => {
+                        $.CONSUME(ZincTokens[ZincRule.break])
+                        $.CONSUME1(ZincTokens[ZincRule.semicolon])
+                    }
+                },
             ])
         })
-        //endregion
-
-        //region arrayaccess
-        $.RULE(ZincRule.arrayaccess, () => $.AT_LEAST_ONE(() => {
-            $.CONSUME(ZincTokens[ZincRule.lsquareparen])
-            $.SUBRULE($[ZincRule.expression])
-            $.CONSUME(ZincTokens[ZincRule.rsquareparen])
-        }))
         //endregion
 
         //region function_call
@@ -306,6 +310,19 @@ export default class ZincParser extends CstParser {
                 ])
             })
             $.CONSUME3(ZincTokens[ZincRule.rparen])
+        })
+        //endregion
+
+        //region arrayaccess
+        $.RULE(ZincRule.arrayaccess, () => {
+            $.CONSUME(ZincTokens[ZincRule.lsquareparen])
+            $.OPTION(() => $.SUBRULE($[ZincRule.addition]))
+            $.CONSUME(ZincTokens[ZincRule.rsquareparen])
+            $.OPTION1(() => {
+                $.CONSUME1(ZincTokens[ZincRule.lsquareparen])
+                $.OPTION2(() => $.SUBRULE1($[ZincRule.addition]))
+                $.CONSUME1(ZincTokens[ZincRule.rsquareparen])
+            })
         })
         //endregion
 
@@ -371,12 +388,7 @@ export default class ZincParser extends CstParser {
         //region primary
         $.RULE(ZincRule.primary, () => {
             $.OR([
-                {
-                    ALT: () => {
-                        $.OPTION(() => $.CONSUME(ZincTokens[ZincRule.sub]))
-                        $.CONSUME(ZincTokens[ZincRule.integer])
-                    }
-                },
+                {ALT: () => $.SUBRULE($[ZincRule.primary_div])},
                 {
                     ALT: () => {
                         $.CONSUME(ZincTokens[ZincRule.not])
@@ -385,55 +397,41 @@ export default class ZincParser extends CstParser {
                 },
                 {
                     ALT: () => {
-                        $.OPTION5(() => $.CONSUME3(ZincTokens[ZincRule.sub]))
-                        $.SUBRULE($[ZincRule.function_call])
+                        $.CONSUME(ZincTokens[ZincRule.function])
+                        $.CONSUME4(ZincTokens[ZincRule.identifier])
                     }
                 },
+                {ALT: () => $.CONSUME3(ZincTokens[ZincRule.stringliteral])},
+                {ALT: () => $.CONSUME3(ZincTokens[ZincRule.null])},
+                {ALT: () => $.CONSUME3(ZincTokens[ZincRule.true])},
+                {ALT: () => $.CONSUME3(ZincTokens[ZincRule.false])},
+            ])
+        })
+        //endregion
+
+        $.RULE(ZincRule.primary_div, () => {
+            $.OPTION(() => $.CONSUME(ZincTokens[ZincRule.sub]))
+            $.OR([
+                {ALT: () => $.CONSUME(ZincTokens[ZincRule.integer])},
+                {ALT: () => $.CONSUME3(ZincTokens[ZincRule.real])},
+                {ALT: () => $.CONSUME3(ZincTokens[ZincRule.rawcode])},
+                {ALT: () => $.SUBRULE($[ZincRule.function_call])},
                 {
                     ALT: () => {
-                        $.OPTION6(() => $.CONSUME6(ZincTokens[ZincRule.sub]))
-                        $.CONSUME(ZincTokens[ZincRule.lparen])
-                        $.SUBRULE2($[ZincRule.expression])
-                        $.CONSUME(ZincTokens[ZincRule.rparen])
-                    }
-                },
-                {
-                    ALT: () => {
-                        $.OPTION3(() => $.CONSUME5(ZincTokens[ZincRule.sub]))
                         $.CONSUME3(ZincTokens[ZincRule.identifier])
                         $.OPTION4(() => $.SUBRULE($[ZincRule.arrayaccess]))
                     }
                 },
                 {
                     ALT: () => {
-                        $.CONSUME(ZincTokens[ZincRule.function])
-                        $.CONSUME4(ZincTokens[ZincRule.identifier])
+                        $.CONSUME(ZincTokens[ZincRule.lparen])
+                        $.SUBRULE2($[ZincRule.expression])
+                        $.CONSUME(ZincTokens[ZincRule.rparen])
                     }
-                },
-                {
-                    ALT: () => {
-                        $.OPTION2(() => $.CONSUME2(ZincTokens[ZincRule.sub]))
-                        $.CONSUME3(ZincTokens[ZincRule.real])
-                    }
-                },
-                {
-                    ALT: () => $.CONSUME3(ZincTokens[ZincRule.idliteral])
-                },
-                {
-                    ALT: () => $.CONSUME3(ZincTokens[ZincRule.stringliteral])
-                },
-                {
-                    ALT: () => $.CONSUME3(ZincTokens[ZincRule.null])
-                },
-                {
-                    ALT: () => $.CONSUME3(ZincTokens[ZincRule.true])
-                },
-                {
-                    ALT: () => $.CONSUME3(ZincTokens[ZincRule.false])
                 },
             ])
+
         })
-        //endregion
 
         this.performSelfAnalysis()
     }

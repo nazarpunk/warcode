@@ -5,7 +5,6 @@ const enum ZincRule {
     identifier_returns = 'identifier_returns',
     // rules
     zinc = 'zinc',
-    break_statement = 'break_statement',
     library = 'library',
     requires = 'requires',
     optional = 'optional',
@@ -22,13 +21,14 @@ const enum ZincRule {
     return_statement = 'return_statement',
     if_statement = 'if_statement',
     else_statement = 'else_statement',
+    while_statement = 'while_statement',
     addition = 'addition',
     arrayaccess = 'arrayaccess',
-    call_statement = 'call_statement',
     expression = 'expression',
     for_statement = 'for_statement',
     multiplication = 'multiplication',
     primary = 'primary',
+    primary_div = 'primary_div',
     set_statement = 'set_statement',
     statement = 'statement',
     // tokens
@@ -58,6 +58,7 @@ const enum ZincRule {
     return = 'return',
     type = 'type',
     true = 'true',
+    while = 'while',
     // someone
     comma = 'comma',
     equals = 'equals',
@@ -80,7 +81,7 @@ const enum ZincRule {
     rsquareparen = 'rsquareparen',
     real = 'real',
     integer = 'integer',
-    idliteral = 'idliteral',
+    rawcode = 'rawcode',
     stringliteral = 'stringliteral',
     identifier = 'identifier',
 }

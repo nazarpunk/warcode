@@ -337,12 +337,12 @@ export class JassVisitor extends ParserVisitor implements IVisitor {
     }
 
     [JassRule.statement](ctx: JassCstNode) {
-        this.#nodes(ctx, JassRule.if_statement)
-        this.#nodes(ctx, JassRule.set_statement)
-        this.#nodes(ctx, JassRule.call_statement)
-        this.#nodes(ctx, JassRule.loop_statement)
-        this.#nodes(ctx, JassRule.exitwhen_statement)
-        this.#nodes(ctx, JassRule.return_statement)
+        this.#node(ctx, JassRule.if_statement)
+        this.#node(ctx, JassRule.set_statement)
+        this.#node(ctx, JassRule.call_statement)
+        this.#node(ctx, JassRule.loop_statement)
+        this.#node(ctx, JassRule.exitwhen_statement)
+        this.#node(ctx, JassRule.return_statement)
     }
 
     [JassRule.call_statement](ctx: JassCstNode) {
