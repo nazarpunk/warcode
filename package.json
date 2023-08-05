@@ -175,11 +175,11 @@
         "description": ""
       },
       {
-        "id": "jass_else",
+        "id": "jass_elseif",
         "description": ""
       },
       {
-        "id": "jass_elseif",
+        "id": "jass_else",
         "description": ""
       },
       {
@@ -235,11 +235,11 @@
         "description": ""
       },
       {
-        "id": "jass_not",
+        "id": "jass_nothing",
         "description": ""
       },
       {
-        "id": "jass_nothing",
+        "id": "jass_not",
         "description": ""
       },
       {
@@ -555,7 +555,15 @@
         "description": ""
       },
       {
+        "id": "zinc_add_assign",
+        "description": ""
+      },
+      {
         "id": "zinc_add",
+        "description": ""
+      },
+      {
+        "id": "zinc_sub_assign",
         "description": ""
       },
       {
@@ -563,7 +571,15 @@
         "description": ""
       },
       {
+        "id": "zinc_mult_assign",
+        "description": ""
+      },
+      {
         "id": "zinc_mult",
+        "description": ""
+      },
+      {
+        "id": "zinc_div_assign",
         "description": ""
       },
       {
@@ -636,8 +652,8 @@
           "jass_call": "#2C7AD6",
           "jass_constant": "#2C7AD6",
           "jass_debug": "#2C7AD6",
-          "jass_else": "#2C7AD6",
           "jass_elseif": "#2C7AD6",
+          "jass_else": "#2C7AD6",
           "jass_endfunction": "#2C7AD6",
           "jass_endglobals": "#2C7AD6",
           "jass_endif": "#2C7AD6",
@@ -651,8 +667,8 @@
           "jass_local": "#2C7AD6",
           "jass_loop": "#2C7AD6",
           "jass_native": "#2C7AD6",
-          "jass_not": "#2C7AD6",
           "jass_nothing": "#2C7AD6",
+          "jass_not": "#2C7AD6",
           "jass_null": "#2C7AD6",
           "jass_or": "#2C7AD6",
           "jass_returns": "#2C7AD6",
@@ -686,7 +702,7 @@
           "wts_string": "#5974c0",
           "wts_index": "#d828dc",
           "wts_comment": "#9b9b9b",
-          "wts_paren": "#7fc036",
+          "wts_paren": "#cbc317",
           "wts_text": "#66c9a2",
           "zinc_argument": "#9A9A9A",
           "zinc_variable_global": "#DADADA",
@@ -731,9 +747,13 @@
           "zinc_less": "#e7be60",
           "zinc_greatorequal": "#e7be60",
           "zinc_great": "#e7be60",
+          "zinc_add_assign": "#e7be60",
           "zinc_add": "#e7be60",
+          "zinc_sub_assign": "#e7be60",
           "zinc_sub": "#e7be60",
+          "zinc_mult_assign": "#e7be60",
           "zinc_mult": "#e7be60",
+          "zinc_div_assign": "#e7be60",
           "zinc_div": "#e7be60",
           "zinc_semicolon": "#e7be60",
           "zinc_lparen": "#e1d132",

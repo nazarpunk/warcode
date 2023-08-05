@@ -43,13 +43,13 @@ export const VisitTokens = (
     if (!tokens) return []
     for (const token of tokens) {
         if (!token || isNaN(token.startOffset) || token.isInsertedInRecovery) continue
+        out.push(token)
         if (type != undefined) {
             for (const range of ITokenToRanges(token, document)) {
                 semantic.push(range.start.line, range.start.character, range.end.character - range.start.character, type)
             }
         }
     }
-
     return out
 }
 
@@ -92,7 +92,7 @@ export const SemanticIToken = (
     return token
 }
 
-export const  SymbolIToken = (
+export const SymbolIToken = (
     document: TextDocument,
     foldings: FoldingRange[],
     name: string,

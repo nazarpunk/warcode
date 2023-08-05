@@ -220,7 +220,13 @@ export default class ZincParser extends CstParser {
         $.RULE(ZincRule.set_statement, () => {
             $.CONSUME(ZincTokens[ZincRule.identifier])
             $.OPTION(() => $.SUBRULE($[ZincRule.arrayaccess]))
-            $.CONSUME(ZincTokens[ZincRule.assign])
+            $.OR([
+                {ALT: () => $.CONSUME(ZincTokens[ZincRule.assign])},
+                {ALT: () => $.CONSUME(ZincTokens[ZincRule.add_assign])},
+                {ALT: () => $.CONSUME(ZincTokens[ZincRule.sub_assign])},
+                {ALT: () => $.CONSUME(ZincTokens[ZincRule.mult_assign])},
+                {ALT: () => $.CONSUME(ZincTokens[ZincRule.div_assign])}
+            ])
             $.SUBRULE($[ZincRule.expression])
             $.CONSUME(ZincTokens[ZincRule.semicolon])
         })

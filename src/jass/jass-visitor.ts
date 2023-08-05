@@ -21,6 +21,7 @@ import {CstNode} from 'chevrotain'
 import ExtSettings from '../utils/ext-settings'
 import {SemanticIToken, SymbolIToken, VisitNode, VisitNodes, VisitToken, VisitTokens} from '../utils/ext-visitor'
 import ITokenToRanges from '../utils/vscode/i-token-to-ranges'
+import {CharCode, CharCodeWhitespaceList} from '../utils/char-code'
 
 const parser = new JassParser()
 const ParserVisitor = parser.getBaseCstVisitorConstructor()
@@ -330,12 +331,24 @@ export class JassVisitor extends ParserVisitor implements IVisitor {
     [JassRule.if_statement](ctx: CstNode) {
         // console.log(JassRule.if_statement, ctx);
         this.#token(ctx, JassRule.if, TokenLegend.jass_if)
-        this.#token(ctx, JassRule.then, TokenLegend.jass_then)
         this.#token(ctx, JassRule.endif, TokenLegend.jass_endif)
         this.#node(ctx, JassRule.expression)
         this.#nodes(ctx, JassRule.statement)
         this.#nodes(ctx, JassRule.elseif_statement)
         this.#node(ctx, JassRule.else_statement)
+
+        const then = this.#token(ctx, JassRule.then, TokenLegend.jass_then)
+        if (then) {
+            const start = this.document.positionAt(then.startOffset - 1)
+            const s = this.document.getText(new Range(start, this.document.positionAt(then.startOffset)))
+            if ([CharCode.RightParenthesis, ...CharCodeWhitespaceList].indexOf(s.charCodeAt(0)) < 0) {
+                this.diagnostics.push({
+                    message: i18next.t(i18n.missingWhitespaceError),
+                    range: new Range(start, this.document.positionAt(then.startOffset + then.image.length)),
+                    severity: DiagnosticSeverity.Warning
+                })
+            }
+        }
     }
 
     [JassRule.elseif_statement](ctx: CstNode) {

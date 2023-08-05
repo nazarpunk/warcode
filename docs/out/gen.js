@@ -9328,11 +9328,11 @@ var add = (config) => {
   JassColors[`jass_${config.name}`] = color;
   return createToken(config);
 };
-var keyword = (k, color = "#2C7AD6") => {
+var keyword = (k, color = "#2C7AD6", pattern) => {
   JassColors[`jass_${k}`] = color;
   return createToken({
     name: k,
-    pattern: new RegExp(`\\b${k}\\b`),
+    pattern: pattern ?? new RegExp(`\\b${k}\\b`),
     start_chars_hint: [k.charCodeAt(0)],
     line_breaks: false
   });
@@ -9378,8 +9378,8 @@ var JassTokens = {
   [jass_rule_default.call]: keyword(jass_rule_default.call),
   [jass_rule_default.constant]: keyword(jass_rule_default.constant),
   [jass_rule_default.debug]: keyword(jass_rule_default.debug),
-  [jass_rule_default.else]: keyword(jass_rule_default.else),
   [jass_rule_default.elseif]: keyword(jass_rule_default.elseif),
+  [jass_rule_default.else]: keyword(jass_rule_default.else),
   [jass_rule_default.endfunction]: keyword(jass_rule_default.endfunction),
   [jass_rule_default.endglobals]: keyword(jass_rule_default.endglobals),
   [jass_rule_default.endif]: keyword(jass_rule_default.endif),
@@ -9393,8 +9393,8 @@ var JassTokens = {
   [jass_rule_default.local]: keyword(jass_rule_default.local),
   [jass_rule_default.loop]: keyword(jass_rule_default.loop),
   [jass_rule_default.native]: keyword(jass_rule_default.native),
-  [jass_rule_default.not]: keyword(jass_rule_default.not),
   [jass_rule_default.nothing]: keyword(jass_rule_default.nothing),
+  [jass_rule_default.not]: keyword(jass_rule_default.not),
   [jass_rule_default.null]: keyword(jass_rule_default.null),
   [jass_rule_default.or]: keyword(jass_rule_default.or),
   [jass_rule_default.returns]: keyword(jass_rule_default.returns),
@@ -9402,7 +9402,7 @@ var JassTokens = {
   [jass_rule_default.set]: keyword(jass_rule_default.set),
   [jass_rule_default.takes]: keyword(jass_rule_default.takes),
   [jass_rule_default.true]: keyword(jass_rule_default.true),
-  [jass_rule_default.then]: keyword(jass_rule_default.then),
+  [jass_rule_default.then]: keyword(jass_rule_default.then, void 0, /then\b/),
   [jass_rule_default.type]: keyword(jass_rule_default.type),
   // operator
   [jass_rule_default.comma]: operator(jass_rule_default.comma, ",", "#FFFFFF"),
@@ -9445,7 +9445,7 @@ var JassTokens = {
   }),
   [jass_rule_default.integer]: add({
     name: jass_rule_default.integer,
-    pattern: /\b0x[0-9a-z]+|\$[0-9a-z]+|\d+\b/i,
+    pattern: /0x[0-9a-z]+|\$[0-9a-z]+|\d+/i,
     start_chars_hint: [36 /* Dollar */, ...CharCodeDigitList],
     line_breaks: false,
     color: numberColor
@@ -9525,9 +9525,13 @@ var ZincRule = /* @__PURE__ */ ((ZincRule2) => {
   ZincRule2["greatorequal"] = "greatorequal";
   ZincRule2["great"] = "great";
   ZincRule2["add"] = "add";
+  ZincRule2["add_assign"] = "add_assign";
   ZincRule2["sub"] = "sub";
+  ZincRule2["sub_assign"] = "sub_assign";
   ZincRule2["mult"] = "mult";
+  ZincRule2["mult_assign"] = "mult_assign";
   ZincRule2["div"] = "div";
+  ZincRule2["div_assign"] = "div_assign";
   ZincRule2["semicolon"] = "semicolon";
   ZincRule2["lparen"] = "lparen";
   ZincRule2["rparen"] = "rparen";
@@ -9640,9 +9644,13 @@ var ZincTokens = {
   [zinc_rule_default.less]: operator2(zinc_rule_default.less, "<"),
   [zinc_rule_default.greatorequal]: operator2(zinc_rule_default.greatorequal, ">="),
   [zinc_rule_default.great]: operator2(zinc_rule_default.great, ">"),
+  [zinc_rule_default.add_assign]: operator2(zinc_rule_default.add_assign, "+="),
   [zinc_rule_default.add]: operator2(zinc_rule_default.add, "+"),
+  [zinc_rule_default.sub_assign]: operator2(zinc_rule_default.sub_assign, "-="),
   [zinc_rule_default.sub]: operator2(zinc_rule_default.sub, "-"),
+  [zinc_rule_default.mult_assign]: operator2(zinc_rule_default.mult_assign, "*="),
   [zinc_rule_default.mult]: operator2(zinc_rule_default.mult, "*"),
+  [zinc_rule_default.div_assign]: operator2(zinc_rule_default.div_assign, "/="),
   [zinc_rule_default.div]: operator2(zinc_rule_default.div, "/"),
   [zinc_rule_default.semicolon]: operator2(zinc_rule_default.semicolon, ";"),
   [zinc_rule_default.lparen]: operator2(zinc_rule_default.lparen, "(", parenColor2),
@@ -9708,7 +9716,7 @@ var WtsColors = {
   wts_string: "#5974c0",
   wts_index: "#d828dc",
   wts_comment: "#9b9b9b",
-  wts_paren: "#7fc036",
+  wts_paren: "#cbc317",
   wts_text: "#66c9a2"
 };
 var whitespacePattern = (text, startOffset, tokens) => {
@@ -9802,9 +9810,9 @@ for (const [name, color] of Object.entries(legendMap)) {
   legendList.push(name);
 }
 writeLegendMap("}\n export default TokenLegend");
-writeLegendList(`import {SemanticTokensLegend} from 'vscode';
+writeLegendList(`import {SemanticTokensLegend} from 'vscode'
 
-export default new SemanticTokensLegend([${legendList.map((s) => `'${s}'`).join(", ")}], []);`, "w+");
+export default new SemanticTokensLegend([${legendList.map((s) => `'${s}'`).join(", ")}], [])`, "w+");
 fs.writeFileSync(packagePath, JSON.stringify(json, null, 2), { flag: "w+" });
 /*! Bundled license information:
 

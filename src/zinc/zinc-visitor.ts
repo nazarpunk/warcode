@@ -149,6 +149,10 @@ export class ZincVisitor extends ParserVisitor implements IVisitor {
     [ZincRule.set_statement](ctx: CstNode) {
         //console.log(ZincRule.set_statement, ctx)
         this.#token(ctx, ZincRule.assign, TokenLegend.zinc_assign)
+        this.#token(ctx, ZincRule.add_assign, TokenLegend.zinc_add_assign)
+        this.#token(ctx, ZincRule.sub_assign, TokenLegend.zinc_sub_assign)
+        this.#token(ctx, ZincRule.mult_assign, TokenLegend.zinc_mult_assign)
+        this.#token(ctx, ZincRule.div_assign, TokenLegend.zinc_div_assign)
         this.#token(ctx, ZincRule.identifier, TokenLegend.zinc_variable_local)
         this.#node(ctx, ZincRule.expression)
         this.#nodes(ctx, ZincRule.arrayaccess)

@@ -9346,11 +9346,11 @@ var add = (config) => {
   JassColors[`jass_${config.name}`] = color;
   return createToken(config);
 };
-var keyword = (k, color = "#2C7AD6") => {
+var keyword = (k, color = "#2C7AD6", pattern) => {
   JassColors[`jass_${k}`] = color;
   return createToken({
     name: k,
-    pattern: new RegExp(`\\b${k}\\b`),
+    pattern: pattern ?? new RegExp(`\\b${k}\\b`),
     start_chars_hint: [k.charCodeAt(0)],
     line_breaks: false
   });
@@ -9396,8 +9396,8 @@ var JassTokens = {
   [jass_rule_default.call]: keyword(jass_rule_default.call),
   [jass_rule_default.constant]: keyword(jass_rule_default.constant),
   [jass_rule_default.debug]: keyword(jass_rule_default.debug),
-  [jass_rule_default.else]: keyword(jass_rule_default.else),
   [jass_rule_default.elseif]: keyword(jass_rule_default.elseif),
+  [jass_rule_default.else]: keyword(jass_rule_default.else),
   [jass_rule_default.endfunction]: keyword(jass_rule_default.endfunction),
   [jass_rule_default.endglobals]: keyword(jass_rule_default.endglobals),
   [jass_rule_default.endif]: keyword(jass_rule_default.endif),
@@ -9411,8 +9411,8 @@ var JassTokens = {
   [jass_rule_default.local]: keyword(jass_rule_default.local),
   [jass_rule_default.loop]: keyword(jass_rule_default.loop),
   [jass_rule_default.native]: keyword(jass_rule_default.native),
-  [jass_rule_default.not]: keyword(jass_rule_default.not),
   [jass_rule_default.nothing]: keyword(jass_rule_default.nothing),
+  [jass_rule_default.not]: keyword(jass_rule_default.not),
   [jass_rule_default.null]: keyword(jass_rule_default.null),
   [jass_rule_default.or]: keyword(jass_rule_default.or),
   [jass_rule_default.returns]: keyword(jass_rule_default.returns),
@@ -9420,7 +9420,7 @@ var JassTokens = {
   [jass_rule_default.set]: keyword(jass_rule_default.set),
   [jass_rule_default.takes]: keyword(jass_rule_default.takes),
   [jass_rule_default.true]: keyword(jass_rule_default.true),
-  [jass_rule_default.then]: keyword(jass_rule_default.then),
+  [jass_rule_default.then]: keyword(jass_rule_default.then, void 0, /then\b/),
   [jass_rule_default.type]: keyword(jass_rule_default.type),
   // operator
   [jass_rule_default.comma]: operator(jass_rule_default.comma, ",", "#FFFFFF"),
@@ -9463,7 +9463,7 @@ var JassTokens = {
   }),
   [jass_rule_default.integer]: add({
     name: jass_rule_default.integer,
-    pattern: /\b0x[0-9a-z]+|\$[0-9a-z]+|\d+\b/i,
+    pattern: /0x[0-9a-z]+|\$[0-9a-z]+|\d+/i,
     start_chars_hint: [36 /* Dollar */, ...CharCodeDigitList],
     line_breaks: false,
     color: numberColor

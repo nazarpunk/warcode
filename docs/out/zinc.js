@@ -9288,9 +9288,13 @@ var ZincRule = /* @__PURE__ */ ((ZincRule2) => {
   ZincRule2["greatorequal"] = "greatorequal";
   ZincRule2["great"] = "great";
   ZincRule2["add"] = "add";
+  ZincRule2["add_assign"] = "add_assign";
   ZincRule2["sub"] = "sub";
+  ZincRule2["sub_assign"] = "sub_assign";
   ZincRule2["mult"] = "mult";
+  ZincRule2["mult_assign"] = "mult_assign";
   ZincRule2["div"] = "div";
+  ZincRule2["div_assign"] = "div_assign";
   ZincRule2["semicolon"] = "semicolon";
   ZincRule2["lparen"] = "lparen";
   ZincRule2["rparen"] = "rparen";
@@ -9422,9 +9426,13 @@ var ZincTokens = {
   [zinc_rule_default.less]: operator(zinc_rule_default.less, "<"),
   [zinc_rule_default.greatorequal]: operator(zinc_rule_default.greatorequal, ">="),
   [zinc_rule_default.great]: operator(zinc_rule_default.great, ">"),
+  [zinc_rule_default.add_assign]: operator(zinc_rule_default.add_assign, "+="),
   [zinc_rule_default.add]: operator(zinc_rule_default.add, "+"),
+  [zinc_rule_default.sub_assign]: operator(zinc_rule_default.sub_assign, "-="),
   [zinc_rule_default.sub]: operator(zinc_rule_default.sub, "-"),
+  [zinc_rule_default.mult_assign]: operator(zinc_rule_default.mult_assign, "*="),
   [zinc_rule_default.mult]: operator(zinc_rule_default.mult, "*"),
+  [zinc_rule_default.div_assign]: operator(zinc_rule_default.div_assign, "/="),
   [zinc_rule_default.div]: operator(zinc_rule_default.div, "/"),
   [zinc_rule_default.semicolon]: operator(zinc_rule_default.semicolon, ";"),
   [zinc_rule_default.lparen]: operator(zinc_rule_default.lparen, "(", parenColor),
@@ -9621,7 +9629,13 @@ var ZincParser = class extends CstParser {
     $.RULE(zinc_rule_default.set_statement, () => {
       $.CONSUME(zinc_tokens_default[zinc_rule_default.identifier]);
       $.OPTION(() => $.SUBRULE($[zinc_rule_default.arrayaccess]));
-      $.CONSUME(zinc_tokens_default[zinc_rule_default.assign]);
+      $.OR([
+        { ALT: () => $.CONSUME(zinc_tokens_default[zinc_rule_default.assign]) },
+        { ALT: () => $.CONSUME(zinc_tokens_default[zinc_rule_default.add_assign]) },
+        { ALT: () => $.CONSUME(zinc_tokens_default[zinc_rule_default.sub_assign]) },
+        { ALT: () => $.CONSUME(zinc_tokens_default[zinc_rule_default.mult_assign]) },
+        { ALT: () => $.CONSUME(zinc_tokens_default[zinc_rule_default.div_assign]) }
+      ]);
       $.SUBRULE($[zinc_rule_default.expression]);
       $.CONSUME(zinc_tokens_default[zinc_rule_default.semicolon]);
     });

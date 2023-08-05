@@ -21,6 +21,7 @@ export const enum i18n {
     misssingLocalKeywordError = 'misssingLocalKeywordError',
     sameNameArgumentError = 'sameNameArgumentError',
     arrayInitializeError = 'arrayInitializeError',
+    missingWhitespaceError = 'missingWhitespaceError'
 }
 
 const en: Record<i18n, string> = {
@@ -43,6 +44,7 @@ const en: Record<i18n, string> = {
     [i18n.misssingLocalKeywordError]: 'Missing local keyword.',
     [i18n.sameNameArgumentError]: 'Arguments with same name `{{name}}`.',
     [i18n.arrayInitializeError]: 'Array varriables can\'t be initialised.',
+    [i18n.missingWhitespaceError]: 'Missing whitespace.',
 }
 
 const ru: Record<i18n, string> = {
@@ -65,6 +67,7 @@ const ru: Record<i18n, string> = {
     [i18n.misssingLocalKeywordError]: 'Не достаёт ключевого слова `local`.',
     [i18n.sameNameArgumentError]: 'Аргументы с одинаковым именем `{{name}}`.',
     [i18n.arrayInitializeError]: 'Массивы нельзя инициализировать.',
+    [i18n.missingWhitespaceError]: 'Пропущен пробел.',
 }
 
 i18next.init({

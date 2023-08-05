@@ -7,7 +7,7 @@ export const WtsColors: Record<string, string> = {
     wts_string: '#5974c0',
     wts_index: '#d828dc',
     wts_comment: '#9b9b9b',
-    wts_paren: '#7fc036',
+    wts_paren: '#cbc317',
     wts_text: '#66c9a2',
 }
 
