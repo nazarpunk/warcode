@@ -204,6 +204,7 @@ export class ZincVisitor extends ParserVisitor implements IVisitor {
         this.#token(ctx, ZincRule.rparen, TokenLegend.zinc_rparen)
         this.#token(ctx, ZincRule.lcurlyparen, TokenLegend.zinc_lcurlyparen)
         this.#token(ctx, ZincRule.rcurlyparen, TokenLegend.zinc_rcurlyparen)
+        this.#nodes(ctx, ZincRule.expression)
         this.#nodes(ctx, ZincRule.statement)
     }
 
