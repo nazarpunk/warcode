@@ -5,7 +5,6 @@ import {
     DiagnosticSeverity,
     DocumentSymbol,
     FoldingRange,
-    FoldingRangeKind,
     Range,
     SemanticTokensBuilder,
     SymbolKind,
@@ -14,12 +13,14 @@ import {
 import TokenLegend from '../semantic/token-legend'
 import JassRule from './jass-rule'
 import {type IToken} from '@chevrotain/types'
-import type JassCstNode from './jass-cst-node'
 import JassParser from './jass-parser'
 import i18next from 'i18next'
 import {i18n} from '../utils/i18n'
 import {IVisitor} from '../utils/ext-provider'
 import {CstNode} from 'chevrotain'
+import ExtSettings from '../utils/ext-settings'
+import {SemanticIToken, SymbolIToken, VisitNode, VisitNodes, VisitToken, VisitTokens} from '../utils/ext-visitor'
+import ITokenToRanges from '../utils/vscode/i-token-to-ranges'
 
 const parser = new JassParser()
 const ParserVisitor = parser.getBaseCstVisitorConstructor()
@@ -43,126 +44,73 @@ export class JassVisitor extends ParserVisitor implements IVisitor {
     }
 
     declare document: TextDocument
-    declare builder: SemanticTokensBuilder
+    declare semantic: SemanticTokensBuilder
     declare diagnostics: Diagnostic[]
     declare symbols: DocumentSymbol[]
     declare foldings: FoldingRange[]
+    declare settings: ExtSettings
 
-    #mark(token: IToken | undefined | null, type: number) {
-        if (!token || isNaN(token.startOffset)) return
-        const p = this.document.positionAt(token.startOffset)
-        this.builder.push(p.line, p.character, token.image.length, type)
+    #semantic(token: IToken | null, type: number) {
+        return SemanticIToken(this.document, this.semantic, token, type)
     }
 
-    #token(ctx: JassCstNode, rule: JassRule, type?: TokenLegend): IToken | null {
-        const token = ctx[rule]?.[0] as IToken
-        if (!token || isNaN(token.startOffset) || token.isInsertedInRecovery) return null
-        const p = this.document.positionAt(token.startOffset)
-        if (type != undefined) this.builder.push(p.line, p.character, token.image.length, type)
-        return token
+    #token(ctx: CstNode, rule: JassRule, type?: TokenLegend): IToken | null {
+        return VisitToken(this.document, this.semantic, ctx, rule, type)
     }
 
-    #tokens(ctx: JassCstNode, rule: JassRule, type: TokenLegend) {
-        const tokens = ctx[rule] as IToken[]
-        if (!tokens) return
-        for (const token of tokens) {
-            const p = this.document.positionAt(token.startOffset)
-            this.builder.push(p.line, p.character, token.image.length, type)
-        }
+    #tokens(ctx: CstNode, rule: JassRule, type?: TokenLegend): IToken[] {
+        return VisitTokens(this.document, this.semantic, ctx, rule, type)
     }
 
-    #node(ctx: JassCstNode, rule: JassRule, param?: any) {
-        const node = ctx[rule]?.[0] as CstNode
-        if (!node) return
-        return this.visit(node, param)
+    #node<T>(ctx: CstNode, rule: JassRule, param?: any): T | null {
+        return VisitNode(this, ctx, rule, param)
     }
 
-    #nodes<T>(ctx: JassCstNode, rule: JassRule): T[] {
-        const nodes = ctx[rule] as CstNode[]
-        const out = []
-        if (!nodes) return []
-        for (const node of nodes) out.push(this.visit(node))
-        return out
+    #nodes<T>(ctx: CstNode, rule: JassRule, param?: any): T[] {
+        return VisitNodes(this, ctx, rule, param)
     }
 
-    #string(ctx: JassCstNode) {
-        const strings = ctx[JassRule.stringliteral]
-        if (!strings) return
-
-        for (const string of strings) {
-            const start = this.document.positionAt(string.startOffset)
-            const end = this.document.positionAt(string.startOffset + string.image.length)
-            if (start.line === end.line) {
-                this.#mark(string, TokenLegend.jass_stringliteral)
-                continue
-            }
-            if (string) {
-                this.diagnostics.push({
-                    message: i18next.t(i18n.multilineStringError),
-                    range: new Range(
-                        this.document.positionAt(string.startOffset),
-                        this.document.positionAt(string.startOffset + string.image.length),
-                    ),
-                    severity: DiagnosticSeverity.Warning
-                })
-            }
-        }
+    #symbol(name: string, detail: string, kind: SymbolKind, start: IToken, end?: IToken, selection?: IToken): DocumentSymbol {
+        return SymbolIToken(this.document, this.foldings, name, detail, kind, start, end, selection)
     }
 
-    #documentSymbol(name: string, detail: string, kind: SymbolKind, start: IToken, end?: IToken, selection?: IToken): DocumentSymbol {
-        let range: Range
-        const startPos = this.document.positionAt(start.startOffset)
-        selection ??= start
-        if (end) {
-            const endPos = this.document.positionAt(end!.startOffset + end!.image.length)
-            range = new Range(startPos, endPos)
-            if (startPos.line !== endPos.line) this.foldings.push(new FoldingRange(startPos.line, endPos.line, FoldingRangeKind.Region))
-        } else {
-            range = this.document.lineAt(startPos.line).range
-        }
-        return new DocumentSymbol(name, detail, kind, range, new Range(
-            this.document.positionAt(selection.startOffset),
-            this.document.positionAt(selection.startOffset + selection.image.length),
-        ))
-    }
-
-    [JassRule.jass](ctx: JassCstNode) {
-        delete ctx[JassRule.linebreak]
+    [JassRule.jass](ctx: CstNode) {
         //console.log(JassRule.jass, ctx)
         this.#nodes(ctx, JassRule.jass_constant)
         this.#nodes(ctx, JassRule.type_declare)
         this.#nodes(ctx, JassRule.globals_declare)
     }
 
-    [JassRule.jass_constant](ctx: JassCstNode) {
+    [JassRule.jass_constant](ctx: CstNode) {
         //console.log(JassRule.jass_constant, ctx)
         const constant = this.#token(ctx, JassRule.constant, TokenLegend.jass_constant)
         this.#node(ctx, JassRule.function_declare, {constant: constant})
         this.#node(ctx, JassRule.native_declare, {constant: constant})
     }
 
-    [JassRule.native_declare](ctx: JassCstNode) {
+    [JassRule.native_declare](ctx: CstNode) {
         //console.log(JassRule.native_declare, ctx)
         this.#token(ctx, JassRule.native, TokenLegend.jass_native)
-        const head = this.visit(ctx[JassRule.function_head]!, {native: true}) as FuncHead
+        const head = this.#node<FuncHead>(ctx, JassRule.function_head, {native: true})
+        if (!head) return
         const {name, returns} = head
-        if (name && returns) this.symbols.push(this.#documentSymbol(name.image, returns.image, SymbolKind.Function, name))
+        if (name && returns) this.symbols.push(this.#symbol(name.image, returns.image, SymbolKind.Function, name))
     }
 
-    [JassRule.function_declare](ctx: JassCstNode) {
+    [JassRule.function_declare](ctx: CstNode) {
         //console.log(JassRule.function_declare, ctx)
 
         // Cannot return value from function that returns nothing
 
         // --- head
-        const head = this.visit(ctx[JassRule.function_head]!) as FuncHead
+        const head = this.#node<FuncHead>(ctx, JassRule.function_head)!
         const {name, argMap, returns} = head
 
         const func = this.#token(ctx, JassRule.function, TokenLegend.jass_function)
         const endfunc = this.#token(ctx, JassRule.endfunction, TokenLegend.jass_endfunction)
 
         if (func && endfunc && name && returns) {
-            this.symbols.push(this.#documentSymbol(name.image, returns.image, SymbolKind.Function, func, endfunc, name))
+            this.symbols.push(this.#symbol(name.image, returns.image, SymbolKind.Function, func, endfunc, name))
         }
 
         const localMap: Record<string, IToken[]> = {}
@@ -174,8 +122,8 @@ export class JassVisitor extends ParserVisitor implements IVisitor {
         // declare
         for (const variable of this.#nodes<Variable>(ctx, JassRule.variable_declare)) {
             const {type, name} = variable
-            this.#mark(type, TokenLegend.jass_type_name)
-            this.#mark(name, TokenLegend.jass_variable_local)
+            this.#semantic(type, TokenLegend.jass_type_name)
+            this.#semantic(name, TokenLegend.jass_variable_local)
             // local check: local redeclare arg
             if (!name) continue
             (localMap[name.image] ??= []).push(name)
@@ -213,7 +161,7 @@ export class JassVisitor extends ParserVisitor implements IVisitor {
         this.#nodes(ctx, JassRule.statement)
     }
 
-    [JassRule.function_head](ctx: JassCstNode, opts: { native?: boolean }): FuncHead {
+    [JassRule.function_head](ctx: CstNode, opts: { native?: boolean }): FuncHead {
         //console.log(JassRule.function_head, ctx)
         // --- keywords
         this.#token(ctx, JassRule.takes, TokenLegend.jass_takes)
@@ -261,7 +209,7 @@ export class JassVisitor extends ParserVisitor implements IVisitor {
         }
     }
 
-    [JassRule.function_arg](ctx: JassCstNode): Variable {
+    [JassRule.function_arg](ctx: CstNode): Variable {
         return {
             type: this.#token(ctx, JassRule.identifier_type, TokenLegend.jass_type_name)!,
             name: this.#token(ctx, JassRule.identifier_name, TokenLegend.jass_argument)!,
@@ -269,7 +217,7 @@ export class JassVisitor extends ParserVisitor implements IVisitor {
         }
     }
 
-    [JassRule.variable_declare](ctx: JassCstNode): Variable {
+    [JassRule.variable_declare](ctx: CstNode): Variable {
         //console.log(JassRule.variable_declare, ctx);
         const assign = this.#token(ctx, JassRule.assign, TokenLegend.jass_assign)
         const array = this.#token(ctx, JassRule.array, TokenLegend.jass_array)
@@ -295,7 +243,7 @@ export class JassVisitor extends ParserVisitor implements IVisitor {
         }
     }
 
-    [JassRule.globals_declare](ctx: JassCstNode) {
+    [JassRule.globals_declare](ctx: CstNode) {
         this.#tokens(ctx, JassRule.constant, TokenLegend.jass_takes)
 
         const globals = this.#token(ctx, JassRule.globals, TokenLegend.jass_globals)
@@ -304,30 +252,30 @@ export class JassVisitor extends ParserVisitor implements IVisitor {
         let globalsSymbol: DocumentSymbol | undefined
 
         if (globals && endglobals) {
-            globalsSymbol = this.#documentSymbol(globals.image, '', SymbolKind.Namespace, globals, endglobals)
+            globalsSymbol = this.#symbol(globals.image, '', SymbolKind.Namespace, globals, endglobals)
             this.symbols.push(globalsSymbol)
         }
 
         for (const variable of this.#nodes<Variable>(ctx, JassRule.variable_declare)) {
             const {type, name} = variable
-            this.#mark(type, TokenLegend.jass_type_name)
-            this.#mark(name, TokenLegend.jass_variable_global)
+            this.#semantic(type, TokenLegend.jass_type_name)
+            this.#semantic(name, TokenLegend.jass_variable_global)
             if (globalsSymbol && type && name) {
-                globalsSymbol.children.push(this.#documentSymbol(name.image, type.image, SymbolKind.Variable, type, undefined, name))
+                globalsSymbol.children.push(this.#symbol(name.image, type.image, SymbolKind.Variable, type, undefined, name))
             }
         }
     }
 
-    [JassRule.type_declare](ctx: JassCstNode) {
+    [JassRule.type_declare](ctx: CstNode) {
         const name = this.#token(ctx, JassRule.identifier_name, TokenLegend.jass_type_name)
         const base = this.#token(ctx, JassRule.identifier_base, TokenLegend.jass_type_name)
-        if (name && base) this.symbols.push(this.#documentSymbol(name.image, base.image, SymbolKind.TypeParameter, name))
+        if (name && base) this.symbols.push(this.#symbol(name.image, base.image, SymbolKind.TypeParameter, name))
 
         this.#token(ctx, JassRule.type, TokenLegend.jass_type)
         this.#token(ctx, JassRule.extends, TokenLegend.jass_extends)
     }
 
-    [JassRule.function_call](ctx: JassCstNode) {
+    [JassRule.function_call](ctx: CstNode) {
         // console.log(JassRule.function_call, ctx);
         this.#token(ctx, JassRule.identifier, TokenLegend.jass_function_user)
         this.#token(ctx, JassRule.lparen, TokenLegend.jass_lparen)
@@ -336,7 +284,7 @@ export class JassVisitor extends ParserVisitor implements IVisitor {
         this.#nodes(ctx, JassRule.expression)
     }
 
-    [JassRule.statement](ctx: JassCstNode) {
+    [JassRule.statement](ctx: CstNode) {
         this.#node(ctx, JassRule.if_statement)
         this.#node(ctx, JassRule.set_statement)
         this.#node(ctx, JassRule.call_statement)
@@ -345,14 +293,14 @@ export class JassVisitor extends ParserVisitor implements IVisitor {
         this.#node(ctx, JassRule.return_statement)
     }
 
-    [JassRule.call_statement](ctx: JassCstNode) {
+    [JassRule.call_statement](ctx: CstNode) {
         //console.log(JassRule.call_statement, ctx)
         this.#token(ctx, JassRule.debug, TokenLegend.jass_debug)
         this.#token(ctx, JassRule.call, TokenLegend.jass_call)
         this.#node(ctx, JassRule.function_call)
     }
 
-    [JassRule.set_statement](ctx: JassCstNode) {
+    [JassRule.set_statement](ctx: CstNode) {
         // console.log(JassRule.set_statement, ctx);
         this.#token(ctx, JassRule.set, TokenLegend.jass_set)
         this.#token(ctx, JassRule.identifier, TokenLegend.jass_variable_local)
@@ -363,23 +311,23 @@ export class JassVisitor extends ParserVisitor implements IVisitor {
         this.#node(ctx, JassRule.expression)
     }
 
-    [JassRule.loop_statement](ctx: JassCstNode) {
+    [JassRule.loop_statement](ctx: CstNode) {
         this.#token(ctx, JassRule.loop, TokenLegend.jass_loop)
         this.#token(ctx, JassRule.endloop, TokenLegend.jass_endloop)
-        ctx[JassRule.statement]?.map(item => this.visit(item))
+        this.#nodes(ctx, JassRule.statement)
     }
 
-    [JassRule.exitwhen_statement](ctx: JassCstNode) {
+    [JassRule.exitwhen_statement](ctx: CstNode) {
         this.#token(ctx, JassRule.exitwhen, TokenLegend.jass_loop)
         this.#node(ctx, JassRule.expression)
     }
 
-    [JassRule.return_statement](ctx: JassCstNode) {
+    [JassRule.return_statement](ctx: CstNode) {
         this.#token(ctx, JassRule.return, TokenLegend.jass_return)
         this.#node(ctx, JassRule.expression)
     }
 
-    [JassRule.if_statement](ctx: JassCstNode) {
+    [JassRule.if_statement](ctx: CstNode) {
         // console.log(JassRule.if_statement, ctx);
         this.#token(ctx, JassRule.if, TokenLegend.jass_if)
         this.#token(ctx, JassRule.then, TokenLegend.jass_then)
@@ -390,19 +338,19 @@ export class JassVisitor extends ParserVisitor implements IVisitor {
         this.#node(ctx, JassRule.else_statement)
     }
 
-    [JassRule.elseif_statement](ctx: JassCstNode) {
-        this.visit(ctx[JassRule.expression]!)
+    [JassRule.elseif_statement](ctx: CstNode) {
         this.#token(ctx, JassRule.elseif, TokenLegend.jass_elseif)
         this.#token(ctx, JassRule.then, TokenLegend.jass_then)
+        this.#node(ctx, JassRule.expression)
         this.#nodes(ctx, JassRule.statement)
     }
 
-    [JassRule.else_statement](ctx: JassCstNode) {
-        this.#mark(ctx[JassRule.else]?.[0], TokenLegend.jass_else)
+    [JassRule.else_statement](ctx: CstNode) {
+        this.#token(ctx, JassRule.else, TokenLegend.jass_else)
         this.#nodes(ctx, JassRule.statement)
     }
 
-    [JassRule.expression](ctx: JassCstNode) {
+    [JassRule.expression](ctx: CstNode) {
         //console.log(JassRule.expression, ctx)
         this.#tokens(ctx, JassRule.and, TokenLegend.jass_and)
         this.#tokens(ctx, JassRule.or, TokenLegend.jass_or)
@@ -414,9 +362,8 @@ export class JassVisitor extends ParserVisitor implements IVisitor {
         this.#nodes(ctx, JassRule.addition)
     }
 
-    [JassRule.primary](ctx: JassCstNode) {
+    [JassRule.primary](ctx: CstNode) {
         //console.log(JassRule.primary, ctx);
-        this.#string(ctx)
         this.#token(ctx, JassRule.identifier, TokenLegend.jass_variable_local)
         this.#token(ctx, JassRule.not, TokenLegend.jass_not)
         this.#token(ctx, JassRule.null, TokenLegend.jass_null)
@@ -424,9 +371,24 @@ export class JassVisitor extends ParserVisitor implements IVisitor {
         this.#token(ctx, JassRule.false, TokenLegend.jass_false)
         this.#node(ctx, JassRule.primary)
         this.#node(ctx, JassRule.primary_sub)
+
+        const string = this.#token(ctx, JassRule.stringliteral, TokenLegend.jass_stringliteral)
+        if (string && !this.settings.allowMultiline) {
+            const ranges = ITokenToRanges(string, this.document)
+            if (ranges.length > 1) {
+                this.diagnostics.push({
+                    message: i18next.t(i18n.multilineStringError),
+                    range: new Range(
+                        this.document.positionAt(string.startOffset),
+                        this.document.positionAt(string.startOffset + string.image.length),
+                    ),
+                    severity: DiagnosticSeverity.Warning
+                })
+            }
+        }
     }
 
-    [JassRule.primary_sub](ctx: JassCstNode) {
+    [JassRule.primary_sub](ctx: CstNode) {
         this.#token(ctx, JassRule.sub, TokenLegend.jass_sub)
         this.#token(ctx, JassRule.integer, TokenLegend.jass_integer)
         this.#token(ctx, JassRule.real, TokenLegend.jass_real)
@@ -442,14 +404,14 @@ export class JassVisitor extends ParserVisitor implements IVisitor {
         this.#node(ctx, JassRule.function_call)
     }
 
-    [JassRule.addition](ctx: JassCstNode) {
+    [JassRule.addition](ctx: CstNode) {
         // console.log(JassRule.addition, ctx);
         this.#tokens(ctx, JassRule.add, TokenLegend.jass_add)
         this.#tokens(ctx, JassRule.sub, TokenLegend.jass_sub)
         this.#nodes(ctx, JassRule.multiplication)
     }
 
-    [JassRule.multiplication](ctx: JassCstNode) {
+    [JassRule.multiplication](ctx: CstNode) {
         // console.log(JassRule.multiplication, ctx);
         this.#tokens(ctx, JassRule.mult, TokenLegend.jass_mult)
         this.#tokens(ctx, JassRule.div, TokenLegend.jass_div)

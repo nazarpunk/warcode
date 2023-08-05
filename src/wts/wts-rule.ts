@@ -10,4 +10,4 @@ const enum WtsRule {
     text = 'text'
 }
 
-export default WtsRule;
+export default WtsRule

@@ -57,6 +57,17 @@
     }
   },
   "contributes": {
+    "configuration": {
+      "id": "jass-vanilla",
+      "title": "JASS Vanilla",
+      "properties": {
+        "AllowMultiline": {
+          "type": "boolean",
+          "default": false,
+          "description": "%settings.AllowMultiline%"
+        }
+      }
+    },
     "languages": [
       {
         "id": "jass",

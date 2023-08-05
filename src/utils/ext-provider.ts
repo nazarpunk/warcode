@@ -17,6 +17,8 @@ import {IParserConfig, TokenType} from '@chevrotain/types'
 import i18next from 'i18next'
 import {i18n} from './i18n'
 import TokenLegend from '../semantic/token-legend'
+import ITokenToRanges from './vscode/i-token-to-ranges'
+import ExtSettings from './ext-settings'
 
 interface IParserConstructor {
     new(config?: IParserConfig): CstParser;
@@ -24,10 +26,11 @@ interface IParserConstructor {
 
 export interface IVisitor extends ICstVisitor<any, any> {
     document: TextDocument
-    builder: SemanticTokensBuilder
+    semantic: SemanticTokensBuilder
     diagnostics: Diagnostic[]
     symbols: SymbolInformation[] | DocumentSymbol[]
     foldings: FoldingRange[]
+    settings: ExtSettings
 }
 
 interface IVisitorConstructor {
@@ -120,9 +123,9 @@ class DocumentHolder {
 
         const comments = lexing.groups['comments']
         if (comments) for (const comment of comments) {
-            const start = this.document.positionAt(comment.startOffset)
-            const end = this.document.positionAt(comment.startOffset + comment.image.length)
-            if (start.line === end.line) this.semanticTokensBuilder.push(start.line, start.character, comment.image.length, TokenLegend.jass_comment)
+            for (const range of ITokenToRanges(comment, this.document)) {
+                this.semanticTokensBuilder.push(range.start.line, range.start.character, range.end.character - range.start.character, TokenLegend.zinc_comment)
+            }
         }
 
         // === parsing
@@ -142,10 +145,11 @@ class DocumentHolder {
 
         // === visiting
         this.visitor.document = this.document
-        this.visitor.builder = this.semanticTokensBuilder
+        this.visitor.semantic = this.semanticTokensBuilder
         this.visitor.diagnostics = this.diagnostics
         this.visitor.symbols = this.symbols
         this.visitor.foldings = this.foldings
+        this.visitor.settings = new ExtSettings(this.document)
         this.visitor.visit(parsing)
 
         if (this.diagnostics.length > 0) this.collection.set(this.document.uri, this.diagnostics)

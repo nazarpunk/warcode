@@ -5,7 +5,6 @@ import {
     DiagnosticSeverity,
     DocumentSymbol,
     FoldingRange,
-    FoldingRangeKind,
     Range,
     SemanticTokensBuilder,
     SymbolKind,
@@ -15,14 +14,20 @@ import {WtsParser} from './wts-parser'
 import TokenLegend from '../semantic/token-legend'
 import {IToken} from '@chevrotain/types'
 import WtsRule from './wts-rule'
-import WtsCstNode from './wts-cst-node'
 import {i18n} from '../utils/i18n'
 import i18next from 'i18next'
 import {IVisitor} from '../utils/ext-provider'
+import ExtSettings from '../utils/ext-settings'
+import {SymbolIToken, VisitNodes, VisitToken, VisitTokens} from '../utils/ext-visitor'
+import {CstNode} from 'chevrotain'
 
 const parser = new WtsParser()
 
 const BaseCstVisitor = parser.getBaseCstVisitorConstructor()
+
+interface Block {
+    index: IToken | null
+}
 
 export class WtsVisitor extends BaseCstVisitor implements IVisitor {
     constructor() {
@@ -31,52 +36,34 @@ export class WtsVisitor extends BaseCstVisitor implements IVisitor {
     }
 
     declare document: TextDocument
-    declare builder: SemanticTokensBuilder
+    declare semantic: SemanticTokensBuilder
     declare diagnostics: Diagnostic[]
     declare symbols: DocumentSymbol[]
     declare foldings: FoldingRange[]
+    declare settings: ExtSettings
 
-    #mark(token: IToken | undefined, type: number) {
-        if (!token || isNaN(token.startOffset)) return
-        const p = this.document.positionAt(token.startOffset)
-        this.builder.push(p.line, p.character, token.image.length, type)
+    #token(ctx: CstNode, rule: WtsRule, type: TokenLegend): IToken | null {
+        return VisitToken(this.document, this.semantic, ctx, rule, type)
     }
 
-    #token(ctx: WtsCstNode, rule: WtsRule, type: TokenLegend): IToken | null {
-        const token = ctx[rule]?.[0] as IToken
-        if (!token || isNaN(token.startOffset) || token.isInsertedInRecovery) return null
-        const p = this.document.positionAt(token.startOffset)
-        this.builder.push(p.line, p.character, token.image.length, type)
-        return token
+    #tokens(ctx: CstNode, rule: WtsRule, type: TokenLegend) {
+        return VisitTokens(this.document, this.semantic, ctx, rule, type)
     }
 
-    #documentSymbol(name: string, detail: string, kind: SymbolKind, start: IToken, end?: IToken, selection?: IToken): DocumentSymbol {
-        let range: Range
-        const startPos = this.document.positionAt(start.startOffset)
-        selection ??= start
-        if (end) {
-            const endPos = this.document.positionAt(end!.startOffset + end!.image.length)
-            range = new Range(startPos, endPos)
-            if (startPos.line !== endPos.line) this.foldings.push(new FoldingRange(startPos.line, endPos.line, FoldingRangeKind.Region))
-        } else {
-            range = this.document.lineAt(startPos.line).range
-        }
-        return new DocumentSymbol(name, detail, kind, range, new Range(
-            this.document.positionAt(selection.startOffset),
-            this.document.positionAt(selection.startOffset + selection.image.length),
-        ))
+    #nodes<T>(ctx: CstNode, rule: WtsRule, param?: any): T[] {
+        return VisitNodes(this, ctx, rule, param)
     }
 
-    [WtsRule.wts](ctx: WtsCstNode) {
+    #symbol(name: string, detail: string, kind: SymbolKind, start: IToken, end?: IToken, selection?: IToken): DocumentSymbol {
+        return SymbolIToken(this.document, this.foldings, name, detail, kind, start, end, selection)
+    }
+
+    [WtsRule.wts](ctx: CstNode) {
         //console.log(WtsRule.wts, ctx);
-        const blocks = ctx[WtsRule.block]
         const indexMap: Record<string, IToken[]> = {}
-        if (blocks) {
-            for (const item of blocks) {
-                const block = this.visit(item)
-                const index: IToken = block.index
-                if (index) (indexMap[index.image] ??= []).push(index)
-            }
+
+        for (const block of this.#nodes<Block>(ctx, WtsRule.block)) {
+            if (block.index) (indexMap[block.index.image] ??= []).push(block.index)
         }
 
         for (const tokens of Object.values(indexMap)) {
@@ -96,7 +83,7 @@ export class WtsVisitor extends BaseCstVisitor implements IVisitor {
         return null
     }
 
-    [WtsRule.block](ctx: WtsCstNode) {
+    [WtsRule.block](ctx: CstNode): Block {
         //console.log(Rule.block, ctx);
 
         const index = this.#token(ctx, WtsRule.index, TokenLegend.wts_index)
@@ -108,14 +95,12 @@ export class WtsVisitor extends BaseCstVisitor implements IVisitor {
         let stringSymbol: DocumentSymbol | undefined
 
         if (index && string && rparen) {
-            stringSymbol = this.#documentSymbol(index.image, string.image, SymbolKind.String, string, rparen, index)
+            stringSymbol = this.#symbol(index.image, string.image, SymbolKind.String, string, rparen, index)
             this.symbols.push(stringSymbol)
         }
 
-        const comments = ctx[WtsRule.comment]
-        if (comments) for (const comment of comments) {
-            this.#mark(comment, TokenLegend.wts_comment)
-            if (stringSymbol) stringSymbol.children.push(this.#documentSymbol(comment.image.replace(/^\s*\/\/\s*/, ''), '', SymbolKind.String, comment))
+        for (const comment of this.#tokens(ctx, WtsRule.comment, TokenLegend.wts_comment)) {
+            if (stringSymbol) stringSymbol.children.push(this.#symbol(comment.image.replace(/^\s*\/\/\s*/, ''), '', SymbolKind.String, comment))
         }
 
         return {

@@ -1,5 +1,6 @@
 // https://en.wikipedia.org/wiki/Basic_Latin_(Unicode_block)
 export const enum CharCode {
+    // noinspection JSUnusedGlobalSymbols
     HorizontalTab = 0x9,
     LineFeed = 0xA,
     LineTabulation = 0xB,

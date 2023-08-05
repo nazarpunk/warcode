@@ -1,10 +1,11 @@
 // noinspection DuplicatedCode
 
 import ZincRule from './zinc-rule'
-import type ZincCstNode from './zinc-cst-node'
 import ZincParser from './zinc-parser'
 import {Diagnostic, DocumentSymbol, FoldingRange, SemanticTokensBuilder, TextDocument} from 'vscode'
 import {IVisitor} from '../utils/ext-provider'
+import {CstNode} from 'chevrotain'
+import ExtSettings from '../utils/ext-settings'
 
 const parser = new ZincParser()
 const ParserVisitor = parser.getBaseCstVisitorConstructor()
@@ -16,111 +17,116 @@ export class ZincVisitorDocs extends ParserVisitor implements IVisitor {
     }
 
     declare document: TextDocument
-    declare builder: SemanticTokensBuilder
+    declare semantic: SemanticTokensBuilder
     declare diagnostics: Diagnostic[]
     declare symbols: DocumentSymbol[]
     declare foldings: FoldingRange[]
+    declare settings: ExtSettings
 
-    [ZincRule.zinc](ctx: ZincCstNode) {
+    [ZincRule.zinc](ctx: CstNode) {
         //console.log(ZincRule.zinc, ctx);
+        // @ts-ignore
         ctx[ZincRule.library_declare]?.map(item => this.visit(item))
     }
 
-    [ZincRule.library_declare](ctx: ZincCstNode) {
+    [ZincRule.library_declare](ctx: CstNode) {
         //console.log(ZincRule.library_declare, ctx);
+        // @ts-ignore
         ctx[ZincRule.library_root]?.map(item => this.visit(item))
         return ctx
     }
 
-    [ZincRule.library_constant](ctx: ZincCstNode) {
+    [ZincRule.library_constant](ctx: CstNode) {
         //console.log(ZincRule.library_constant, ctx)
         //ctx[ZincRule.access_scope]?.map(item => this.visit(item))
         return ctx
     }
 
-    [ZincRule.access_scope](ctx: ZincCstNode) {
+    [ZincRule.access_scope](ctx: CstNode) {
+        // @ts-ignore
         ctx[ZincRule.library_root]?.map(item => this.visit(item))
         return ctx
     }
 
-    [ZincRule.library_root](ctx: ZincCstNode) {
+    [ZincRule.library_root](ctx: CstNode) {
+        // @ts-ignore
         ctx[ZincRule.access_scope]?.map(item => this.visit(item))
         return ctx
     }
 
-    [ZincRule.library_requires](ctx: ZincCstNode) {
+    [ZincRule.library_requires](ctx: CstNode) {
         return ctx
     }
 
-    [ZincRule.function_declare](ctx: ZincCstNode) {
+    [ZincRule.function_declare](ctx: CstNode) {
         return ctx
     }
 
-    [ZincRule.function_call](ctx: ZincCstNode) {
+    [ZincRule.function_call](ctx: CstNode) {
         return ctx
     }
 
-    [ZincRule.function_arg](ctx: ZincCstNode) {
+    [ZincRule.function_arg](ctx: CstNode) {
         return ctx
     }
 
-    [ZincRule.variable_declare](ctx: ZincCstNode) {
+    [ZincRule.variable_declare](ctx: CstNode) {
         return ctx
     }
 
-    [ZincRule.variable_set](ctx: ZincCstNode) {
+    [ZincRule.variable_set](ctx: CstNode) {
         return ctx
     }
 
-    [ZincRule.statement](ctx: ZincCstNode) {
+    [ZincRule.statement](ctx: CstNode) {
         return ctx
     }
 
-    [ZincRule.set_statement](ctx: ZincCstNode) {
+    [ZincRule.set_statement](ctx: CstNode) {
         return ctx
     }
 
-    [ZincRule.for_statement](ctx: ZincCstNode) {
+    [ZincRule.for_statement](ctx: CstNode) {
         return ctx
     }
 
-    [ZincRule.return_statement](ctx: ZincCstNode) {
+    [ZincRule.return_statement](ctx: CstNode) {
         return ctx
     }
 
-    [ZincRule.if_statement](ctx: ZincCstNode) {
+    [ZincRule.if_statement](ctx: CstNode) {
         return ctx
     }
 
-    [ZincRule.else_statement](ctx: ZincCstNode) {
+    [ZincRule.else_statement](ctx: CstNode) {
         return ctx
     }
 
-    [ZincRule.while_statement](ctx: ZincCstNode) {
+    [ZincRule.while_statement](ctx: CstNode) {
         return ctx
     }
 
-    [ZincRule.expression](ctx: ZincCstNode) {
+    [ZincRule.expression](ctx: CstNode) {
         return ctx
     }
 
-    [ZincRule.addition](ctx: ZincCstNode) {
+    [ZincRule.addition](ctx: CstNode) {
         return ctx
     }
 
-    [ZincRule.multiplication](ctx: ZincCstNode) {
+    [ZincRule.multiplication](ctx: CstNode) {
         return ctx
     }
 
-    [ZincRule.arrayaccess](ctx: ZincCstNode) {
+    [ZincRule.arrayaccess](ctx: CstNode) {
         return ctx
     }
 
-    [ZincRule.primary](ctx: ZincCstNode) {
+    [ZincRule.primary](ctx: CstNode) {
         return ctx
     }
 
-    [ZincRule.primary_div](ctx: ZincCstNode) {
+    [ZincRule.primary_div](ctx: CstNode) {
         return ctx
     }
 }

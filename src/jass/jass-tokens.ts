@@ -26,11 +26,11 @@ const add = (config: ITokenConfig & {
     return createToken(config)
 }
 
-const keyword = (k: JassRule, color: string = '#2C7AD6'): TokenType => {
+const keyword = (k: JassRule, color: string = '#2C7AD6', pattern?: RegExp): TokenType => {
     JassColors[`jass_${k}`] = color
     return createToken({
         name: k,
-        pattern: new RegExp(`\\b${k}\\b`),
+        pattern: pattern ?? new RegExp(`\\b${k}\\b`),
         start_chars_hint: [k.charCodeAt(0)],
         line_breaks: false,
     })
@@ -126,8 +126,8 @@ const JassTokens: Record<Exclude<JassRule,
     [JassRule.local]: keyword(JassRule.local),
     [JassRule.loop]: keyword(JassRule.loop),
     [JassRule.native]: keyword(JassRule.native),
-    [JassRule.not]: keyword(JassRule.not),
     [JassRule.nothing]: keyword(JassRule.nothing),
+    [JassRule.not]: keyword(JassRule.not),
     [JassRule.null]: keyword(JassRule.null),
     [JassRule.or]: keyword(JassRule.or),
     [JassRule.returns]: keyword(JassRule.returns),
@@ -135,7 +135,7 @@ const JassTokens: Record<Exclude<JassRule,
     [JassRule.set]: keyword(JassRule.set),
     [JassRule.takes]: keyword(JassRule.takes),
     [JassRule.true]: keyword(JassRule.true),
-    [JassRule.then]: keyword(JassRule.then),
+    [JassRule.then]: keyword(JassRule.then, undefined, /then\b/),
     [JassRule.type]: keyword(JassRule.type),
     // operator
     [JassRule.comma]: operator(JassRule.comma, ',', '#FFFFFF'),
@@ -178,7 +178,7 @@ const JassTokens: Record<Exclude<JassRule,
     }),
     [JassRule.integer]: add({
         name: JassRule.integer,
-        pattern: /\b0x[0-9a-z]+|\$[0-9a-z]+|\d+\b/i,
+        pattern: /0x[0-9a-z]+|\$[0-9a-z]+|\d+/i,
         start_chars_hint: [CharCode.Dollar, ...CharCodeDigitList],
         line_breaks: false,
         color: numberColor,

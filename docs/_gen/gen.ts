@@ -39,9 +39,9 @@ for (const [name, color] of Object.entries(legendMap)) {
 }
 writeLegendMap('}\n export default TokenLegend')
 
-writeLegendList(`import {SemanticTokensLegend} from 'vscode';
+writeLegendList(`import {SemanticTokensLegend} from 'vscode'
 
-export default new SemanticTokensLegend([${legendList.map(s => `'${s}'`).join(', ')}], []);`, 'w+')
+export default new SemanticTokensLegend([${legendList.map(s => `'${s}'`).join(', ')}], [])`, 'w+')
 
 fs.writeFileSync(packagePath, JSON.stringify(json, null, 2), {flag: 'w+'})
 
