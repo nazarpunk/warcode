@@ -99,12 +99,9 @@ export class WtsVisitor extends BaseCstVisitor implements IVisitor {
             this.symbols.push(stringSymbol)
         }
 
-        console.log(this.#tokens(ctx, WtsRule.comment, TokenLegend.wts_comment))
-
-        //for (const comment of this.#tokens(ctx, WtsRule.comment, TokenLegend.wts_comment)) {
-            //console.log(comment)
-            //if (stringSymbol) stringSymbol.children.push(this.#symbol(comment.image.replace(/^\s*\/\/\s*/, ''), '', SymbolKind.String, comment))
-        //}
+        for (const comment of this.#tokens(ctx, WtsRule.comment, TokenLegend.wts_comment)) {
+            if (stringSymbol) stringSymbol.children.push(this.#symbol(comment.image.replace(/^\s*\/\/\s*/, ''), '', SymbolKind.String, comment))
+        }
 
         this.#token(ctx, WtsRule.text, TokenLegend.wts_text)
 
