@@ -12,9 +12,7 @@
   "keywords": [
     "jass",
     "zinc",
-    "warcraft",
-    ".wts",
-    ".slk"
+    "warcraft"
   ],
   "engines": {
     "vscode": "^1.81.0"
