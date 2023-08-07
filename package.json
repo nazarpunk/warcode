@@ -11,8 +11,10 @@
   "icon": "images/logo.png",
   "keywords": [
     "jass",
+    "zinc",
     "warcraft",
-    ".wts"
+    ".wts",
+    ".slk"
   ],
   "engines": {
     "vscode": "^1.81.0"
@@ -69,15 +71,6 @@
       }
     },
     "customEditors": [
-      {
-        "viewType": "catCustoms.catScratch",
-        "displayName": "Cat Scratch",
-        "selector": [
-          {
-            "filenamePattern": "*.cscratch"
-          }
-        ]
-      },
       {
         "viewType": "slkGrid.slk",
         "displayName": "SLK Grid",

@@ -1,3 +1,6 @@
+import SlkPostMessage from '../model/slk-post-message'
+import {Slk} from '../parser/Slk'
+
 type VSCode = {
     postMessage(message: any): void;
     getState(): any;
@@ -9,17 +12,54 @@ type VSCode = {
     const vscode: VSCode = acquireVsCodeApi()
 
     const updateContent = (text: string) => {
-        document.body.textContent = text
+        document.body.textContent = ''
+        const slk = new Slk(text)
+        slk.read()
+        if (slk.errors.length > 0) {
+            for (const error of slk.errors) {
+                document.body.innerHTML += `<div>${error}</div>`
+            }
+            return
+        }
+
+        if (!slk.header) {
+            document.body.innerHTML += '<div>Missing header</div>'
+            return
+        }
+
+        const table = document.createElement('table')
+        document.body.appendChild(table)
+
+        // head
+        const thead = document.createElement('thead')
+        table.appendChild(thead)
+        const theadRow = document.createElement('tr')
+        thead.appendChild(theadRow)
+        for (const v of slk.header) {
+            const th = document.createElement('th')
+            theadRow.appendChild(th)
+            if (v) th.textContent = v.toString()
+        }
+
+        // body
+        const tbody = document.createElement('tbody')
+        table.appendChild(tbody)
+        for (const list of slk.list) {
+            const tr = document.createElement('tr')
+            tbody.appendChild(tr)
+            for (let i = 0; i < slk.header.length; i++) {
+                const td = document.createElement('td')
+                td.textContent = list?.[i]?.toString() ?? ''
+                tr.appendChild(td)
+            }
+        }
+
     }
 
     window.addEventListener('message', (event: MessageEvent) => {
-
-        //vscode.postMessage({type: SlkPostMessage.log, log: event})
-
         const message = event.data
         switch (message.type) {
-            //case SlkPostMessage.update:
-            case 'update':
+            case SlkPostMessage.update:
                 const text = message.text
                 updateContent(text)
                 vscode.setState({text})

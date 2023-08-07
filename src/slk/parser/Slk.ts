@@ -21,7 +21,6 @@ export class Slk {
     errors: Error[] = []
 
     list: SlkData[][] = []
-    maps = []
 
     header?: SlkData[]
 
@@ -35,8 +34,8 @@ export class Slk {
         const _value = (s: string): string | number => {
             if (s.substring(0, 1) === '"') {
                 const v = s.split('')
-                if (v.shift() !== '"') throw new Error('Wrong string begining')
-                if (v.pop() !== '"') throw new Error('Wrong string ending')
+                if (v.shift() !== '"') throw new Error('Wrong string begining.')
+                if (v.pop() !== '"') throw new Error('Wrong string ending.')
                 return v.join('')
             }
             return Number(s)
@@ -62,7 +61,7 @@ export class Slk {
                                 def = _value(v)
                         }
                     }
-                    if (this.width < 0 || this.height < 0) throw new Error('Missing size chunk')
+                    if (this.width < 0 || this.height < 0) throw new Error('Missing size chunk.')
                     for (let h = 0; h < this.height; h++) {
                         const list = []
                         for (let w = 0; w < this.width; w++) {
@@ -72,7 +71,7 @@ export class Slk {
                     }
                     break
                 case SlkKey.Cell:
-                    if (this.width < 0 || this.height < 0) throw new Error('Missing table size')
+                    if (this.width < 0 || this.height < 0) throw new Error('Missing table size.')
 
                     let x = -1
                     let value = def
@@ -91,35 +90,19 @@ export class Slk {
                                 value = _value(v)
                         }
                     }
-                    if (value === undefined) throw new Error('Missing value')
+                    if (value === undefined) throw new Error('Missing value.')
                     this.list[y][x] = value
                     break
             }
         }
         this.header = this.list.shift()
-        for (let i = this.list.length - 1; i >= 0; i--) {
-            const length = this.list[i].reduce((a, v) => a + (v === def ? 1 : 0), 0)
-            if (length === this.list[i].length) this.list.pop()
-        }
     }
 
-    read(map = false) {
+    read() {
         try {
             this.#read()
         } catch (e) {
-            this.errors.push(e)
-            return
-        }
-
-        if (!map) return
-        for (const item of this.list) {
-            const m = {}
-            if (this.header) {
-                for (let i = 0; i < this.header.length; i++) {
-                    m[this.header[i]] = item[i]
-                }
-            }
-            this.maps.push(m)
+            if (e instanceof Error) this.errors.push(e)
         }
     }
 }

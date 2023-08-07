@@ -8,11 +8,7 @@ import {
     workspace
 } from 'vscode'
 import nonceGen from '../utils/nonce-gen'
-
-export const enum SlkPostMessage {
-    update = 'update',
-    log = 'log',
-}
+import SlkPostMessage from './model/slk-post-message'
 
 export class SlkGridEditorProvider implements CustomTextEditorProvider {
 
@@ -38,8 +34,7 @@ export class SlkGridEditorProvider implements CustomTextEditorProvider {
         webviewPanel.webview.html = this.#getHtmlForWebview(webviewPanel.webview)
 
         const updateWebview = () => webviewPanel.webview.postMessage({
-            //type: SlkPostMessage.update,
-            type: 'update',
+            type: SlkPostMessage.update,
             text: document.getText(),
         })
 
@@ -50,17 +45,6 @@ export class SlkGridEditorProvider implements CustomTextEditorProvider {
         webviewPanel.onDidDispose(() => {
             documentDisposable.dispose()
         })
-
-        /*
-        webviewPanel.webview.onDidReceiveMessage(e => {
-            switch (e.type as SlkPostMessage) {
-                case SlkPostMessage.log:
-                    console.log(e)
-                    return
-            }
-        })
-
-         */
 
         updateWebview()
     }
