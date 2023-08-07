@@ -34,7 +34,7 @@
   "l10n": "./l10n",
   "scripts": {
     "esbuild-docs": "esbuild jass=docs/main.ts zinc=docs/zinc/main.ts wts=docs/wts/main.ts calculator=docs/calculator/main.mjs gen=docs/_gen/gen.ts --outdir=docs/out --target=es2020 --bundle --external:vscode --external:fs --format=cjs --platform=browser --tree-shaking=true --sourcemap --watch",
-    "esbuild-base": "esbuild src/extension.ts --outfile=out/extension.js --tsconfig=src/tsconfig.json --target=es2020 --bundle --external:vscode --external:fs --format=cjs --platform=node --tree-shaking=true --sourcemap",
+    "esbuild-base": "esbuild extension=src/extension.ts slkGrid=src/slk/js/main.ts --outdir=out --tsconfig=src/tsconfig.json --target=es2020 --bundle --external:vscode --external:fs --format=cjs --platform=node --tree-shaking=true --sourcemap",
     "esbuild": "npm run esbuild-base",
     "vscode:prepublish": "npm run esbuild-base",
     "build": "vsce package",
@@ -68,6 +68,26 @@
         }
       }
     },
+    "customEditors": [
+      {
+        "viewType": "catCustoms.catScratch",
+        "displayName": "Cat Scratch",
+        "selector": [
+          {
+            "filenamePattern": "*.cscratch"
+          }
+        ]
+      },
+      {
+        "viewType": "slkGrid.slk",
+        "displayName": "SLK Grid",
+        "selector": [
+          {
+            "filenamePattern": "*.slk"
+          }
+        ]
+      }
+    ],
     "languages": [
       {
         "id": "jass",

@@ -10,6 +10,8 @@ import WtsTokensList from './wts/wts-tokens-list'
 import ZincTokensList from './zinc/zinc-tokens-list'
 import ZincParser from './zinc/zinc-parser'
 import {ZincVisitor} from './zinc/zinc-visitor'
+import {CatScratchEditorProvider} from './slk/catScratchEditor'
+import {SlkGridEditorProvider} from './slk/slk-grid-editor-provider'
 
 // noinspection JSUnusedGlobalSymbols
 export function activate(context: ExtensionContext) {
@@ -27,5 +29,8 @@ export function activate(context: ExtensionContext) {
         languages.registerDocumentSemanticTokensProvider({language: wts.languageName}, wts, ExtSemanticTokensLegend),
         languages.registerDocumentSymbolProvider({language: wts.languageName}, wts),
         languages.registerFoldingRangeProvider({language: wts.languageName}, wts),
+
+        CatScratchEditorProvider.register(context),
+        SlkGridEditorProvider.register(context),
     )
 }
