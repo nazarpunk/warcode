@@ -111,6 +111,13 @@
           "wts"
         ],
         "configuration": "./src/wts/syntaxes/language-configuration.json"
+      },
+      {
+        "id": "slk",
+        "aliases": [],
+        "extensions": [
+          "slk"
+        ]
       }
     ],
     "grammars": [
