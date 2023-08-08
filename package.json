@@ -2,11 +2,11 @@
   "version": "0.0.20",
   "license": "MIT",
   "author": "nazarpunk",
-  "publisher": "nazarpunk",
-  "name": "jass-vanilla",
-  "displayName": "jass-vanilla",
+  "publisher": "XGM",
+  "name": "warcode",
+  "displayName": "WarCode",
   "contributors": [],
-  "description": "Vanilla JASS syntax.",
+  "description": "Tools for develop WarCraft III maps.",
   "private": false,
   "icon": "images/logo.png",
   "pricing": "Free",
@@ -20,16 +20,15 @@
   },
   "categories": [
     "Programming Languages",
-    "Snippets",
-    "Formatters"
+    "Snippets"
   ],
   "activationEvents": [],
   "repository": {
     "type": "git",
-    "url": "https://github.com/nazarpunk/vscode-jass-vanilla"
+    "url": "https://github.com/nazarpunk/warcode"
   },
   "bugs": {
-    "url": "https://github.com/nazarpunk/vscode-jass-vanilla/issues"
+    "url": "https://github.com/nazarpunk/warcode/issues"
   },
   "main": "./out/extension.js",
   "scripts": {
@@ -43,12 +42,12 @@
   "devDependencies": {
     "@types/node": "^20.4.8",
     "@types/vscode": "^1.81.0",
-    "@typescript-eslint/eslint-plugin": "^6.2.1",
+    "@typescript-eslint/eslint-plugin": "^6.3.0",
     "@vscode/vsce": "^2.20.1",
     "chevrotain": "^11.0.2",
-    "esbuild": "^0.18.17",
+    "esbuild": "^0.18.20",
     "eslint": "^8.46.0",
-    "i18next": "^23.4.1",
+    "i18next": "^23.4.2",
     "typescript": "^5.1.6"
   },
   "configurationDefaults": {
@@ -58,8 +57,8 @@
   },
   "contributes": {
     "configuration": {
-      "id": "jass-vanilla",
-      "title": "JASS Vanilla",
+      "id": "warcode",
+      "title": "WarCode",
       "properties": {
         "AllowMultiline": {
           "type": "boolean",
