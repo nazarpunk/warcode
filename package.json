@@ -11,16 +11,13 @@
   "icon": "images/logo.png",
   "pricing": "Free",
   "keywords": [
-    "jass",
-    "zinc",
     "warcraft"
   ],
   "engines": {
     "vscode": "^1.81.0"
   },
   "categories": [
-    "Programming Languages",
-    "Snippets"
+    "Programming Languages"
   ],
   "activationEvents": [],
   "repository": {
