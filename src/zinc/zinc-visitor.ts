@@ -22,9 +22,9 @@ import {VisitNode, VisitNodes, VisitToken, VisitTokens} from '../utils/ext-visit
 import ITokenToRanges from '../utils/vscode/i-token-to-ranges'
 
 const parser = new ZincParser()
-const ParserVisitor = parser.getBaseCstVisitorConstructor()
+const visitor = parser.getBaseCstVisitorConstructor()
 
-export class ZincVisitor extends ParserVisitor implements IVisitor {
+export default class ZincVisitor extends visitor implements IVisitor {
     constructor() {
         super()
         this.validateVisitor()

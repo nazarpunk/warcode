@@ -9,6 +9,7 @@
   "description": "Vanilla JASS syntax.",
   "private": false,
   "icon": "images/logo.png",
+  "pricing": "Free",
   "keywords": [
     "jass",
     "zinc",
@@ -69,11 +70,29 @@
     },
     "customEditors": [
       {
-        "viewType": "slkGrid.slk",
-        "displayName": "SLK Grid",
+        "viewType": "SlkTable",
+        "displayName": "SLK table",
         "selector": [
           {
             "filenamePattern": "*.slk"
+          }
+        ]
+      },
+      {
+        "viewType": "BinaryEdit",
+        "displayName": "Binary text editor",
+        "selector": [
+          {
+            "filenamePattern": "*.w3a"
+          }
+        ]
+      },
+      {
+        "viewType": "catCustoms.pawDraw",
+        "displayName": "Paw Draw",
+        "selector": [
+          {
+            "filenamePattern": "*.pawdraw"
           }
         ]
       }
@@ -114,6 +133,13 @@
         "aliases": [],
         "extensions": [
           "slk"
+        ]
+      },
+      {
+        "id": "binary",
+        "aliases": [],
+        "extensions": [
+          "w3a"
         ]
       }
     ],

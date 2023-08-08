@@ -1,12 +1,12 @@
-import {WtsParser} from "../../src/wts/wts-parser";
-import {createSyntaxDiagramsCode} from "chevrotain";
-import {WtsVisitor} from "../../src/wts/wts-visitor";
-import WtsRule from "../../src/wts/wts-rule";
+import {createSyntaxDiagramsCode} from 'chevrotain'
+//import WtsRule from '../../src/wts/wts-rule'
+import WtsParser from '../../src/wts/wts-parser'
+//import WtsVisitor from '../../src/wts/wts-visitor'
 
-const parser = new WtsParser();
-const iframe = document.createElement('iframe');
-iframe.src = 'data:text/html;charset=utf-8,' + encodeURI(createSyntaxDiagramsCode(parser.getSerializedGastProductions()));
-document.body.appendChild(iframe);
+const parser = new WtsParser()
+const iframe = document.createElement('iframe')
+iframe.src = 'data:text/html;charset=utf-8,' + encodeURI(createSyntaxDiagramsCode(parser.getSerializedGastProductions()))
+document.body.appendChild(iframe)
 
 /*
 (async () => {

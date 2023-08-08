@@ -1,16 +1,18 @@
-import {ExtensionContext, languages} from 'vscode'
+import {ExtensionContext, languages, window} from 'vscode'
 import ExtProvider from './utils/ext-provider'
-import {JassVisitor} from './jass/jass-visitor'
-import {WtsParser} from './wts/wts-parser'
-import {WtsVisitor} from './wts/wts-visitor'
 import ExtSemanticTokensLegend from './semantic/ext-semantic-tokens-legend'
-import JassParser from './jass/jass-parser'
 import JassTokensList from './jass/jass-tokens-list'
-import WtsTokensList from './wts/wts-tokens-list'
+import JassParser from './jass/jass-parser'
+import JassVisitor from './jass/jass-visitor'
 import ZincTokensList from './zinc/zinc-tokens-list'
 import ZincParser from './zinc/zinc-parser'
-import {ZincVisitor} from './zinc/zinc-visitor'
-import {SlkGridEditorProvider} from './slk/slk-grid-editor-provider'
+import ZincVisitor from './zinc/zinc-visitor'
+import WtsTokensList from './wts/wts-tokens-list'
+import WtsParser from './wts/wts-parser'
+import WtsVisitor from './wts/wts-visitor'
+import {PawDrawEditorProvider} from './binary/paw-draw/editor-provider'
+import SlkTableEditorProvider from './slk/slk-table-editor-provider'
+import {BinaryEditorProvider} from './binary/binary-editor-provider'
 
 // noinspection JSUnusedGlobalSymbols
 export function activate(context: ExtensionContext) {
@@ -29,6 +31,26 @@ export function activate(context: ExtensionContext) {
         languages.registerDocumentSymbolProvider({language: wts.languageName}, wts),
         languages.registerFoldingRangeProvider({language: wts.languageName}, wts),
 
-        SlkGridEditorProvider.register(context),
+        window.registerCustomEditorProvider('SlkTable', new SlkTableEditorProvider(context)),
+        window.registerCustomEditorProvider(
+            'catCustoms.pawDraw',
+            new PawDrawEditorProvider(context),
+            {
+                webviewOptions: {
+                    retainContextWhenHidden: true,
+                },
+                supportsMultipleEditorsPerDocument: false,
+            },
+        ),
+        window.registerCustomEditorProvider(
+            'BinaryEdit',
+            new BinaryEditorProvider(context),
+            {
+                webviewOptions: {
+                    retainContextWhenHidden: true,
+                },
+                supportsMultipleEditorsPerDocument: false,
+            },
+        )
     )
 }

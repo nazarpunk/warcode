@@ -10,7 +10,7 @@ import {
     SymbolKind,
     TextDocument
 } from 'vscode'
-import {WtsParser} from './wts-parser'
+import WtsParser from './wts-parser'
 import TokenLegend from '../semantic/token-legend'
 import {IToken} from '@chevrotain/types'
 import WtsRule from './wts-rule'
@@ -22,14 +22,13 @@ import {SymbolIToken, VisitNodes, VisitToken, VisitTokens} from '../utils/ext-vi
 import {CstNode} from 'chevrotain'
 
 const parser = new WtsParser()
-
-const BaseCstVisitor = parser.getBaseCstVisitorConstructor()
+const visitor = parser.getBaseCstVisitorConstructor()
 
 interface Block {
     index: IToken | null
 }
 
-export class WtsVisitor extends BaseCstVisitor implements IVisitor {
+export default class WtsVisitor extends visitor implements IVisitor {
     constructor() {
         super()
         this.validateVisitor()

@@ -4,7 +4,7 @@ import {createSyntaxDiagramsCode, Lexer} from 'chevrotain'
 import ZincParser from '../../src/zinc/zinc-parser'
 import ZincTokensList from '../../src/zinc/zinc-tokens-list'
 import ZincRule from '../../src/zinc/zinc-rule'
-import {ZincVisitorDocs} from '../../src/zinc/zinc-visitor-docs'
+import ZincVisitorDocs from '../../src/zinc/zinc-visitor-docs'
 
 const parser = new ZincParser()
 

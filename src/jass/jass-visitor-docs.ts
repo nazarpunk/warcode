@@ -7,7 +7,7 @@ import {CstNode} from 'chevrotain'
 const parser = new JassParser()
 const ParserVisitor = parser.getBaseCstVisitorConstructor()
 
-export class JassVisitorDocs extends ParserVisitor {
+export default class JassVisitorDocs extends ParserVisitor {
     constructor() {
         super()
         this.validateVisitor()

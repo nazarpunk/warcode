@@ -1,23 +1,14 @@
 // https://code.visualstudio.com/api/extension-guides/custom-editors
 import {
     CustomTextEditorProvider,
-    Disposable,
     ExtensionContext, TextDocument, Uri, Webview,
     WebviewPanel,
-    window,
     workspace
 } from 'vscode'
 import nonceGen from '../utils/nonce-gen'
 import SlkPostMessage from './model/slk-post-message'
 
-export class SlkGridEditorProvider implements CustomTextEditorProvider {
-
-    public static register(context: ExtensionContext): Disposable {
-        const provider = new SlkGridEditorProvider(context)
-        return window.registerCustomEditorProvider(SlkGridEditorProvider.viewType, provider)
-    }
-
-    private static readonly viewType = 'slkGrid.slk'
+export default class SlkTableEditorProvider implements CustomTextEditorProvider {
 
     constructor(
         private readonly context: ExtensionContext

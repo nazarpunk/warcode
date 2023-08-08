@@ -4,7 +4,7 @@ import WtsTokens from './wts-tokens'
 import WtsTokensList from './wts-tokens-list'
 import {IParserConfig} from '@chevrotain/types'
 
-export class WtsParser extends CstParser {
+export default class WtsParser extends CstParser {
 
     declare [WtsRule.wts]: ParserMethod<any, any>
     declare [WtsRule.block]: ParserMethod<any, any>

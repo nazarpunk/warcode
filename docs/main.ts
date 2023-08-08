@@ -1,8 +1,8 @@
 import {createSyntaxDiagramsCode, Lexer} from 'chevrotain'
-import JassParser from '../src/jass/jass-parser'
 import JassRule from '../src/jass/jass-rule'
 import JassTokensList from '../src/jass/jass-tokens-list'
-import {JassVisitorDocs} from '../src/jass/jass-visitor-docs'
+import JassParser from '../src/jass/jass-parser'
+import JassVisitorDocs from '../src/jass/jass-visitor-docs'
 
 const parser = new JassParser({
     recoveryEnabled: true,

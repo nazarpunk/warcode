@@ -24,7 +24,7 @@ import ITokenToRanges from '../utils/vscode/i-token-to-ranges'
 import {CharCode, CharCodeWhitespaceList} from '../utils/char-code'
 
 const parser = new JassParser()
-const ParserVisitor = parser.getBaseCstVisitorConstructor()
+const visitor = parser.getBaseCstVisitorConstructor()
 
 interface Variable {
     type: IToken | null,
@@ -38,7 +38,7 @@ interface FuncHead {
     returns: IToken | null
 }
 
-export class JassVisitor extends ParserVisitor implements IVisitor {
+export default class JassVisitor extends visitor implements IVisitor {
     constructor() {
         super()
         this.validateVisitor()

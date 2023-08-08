@@ -10,7 +10,7 @@ import ExtSettings from '../utils/ext-settings'
 const parser = new ZincParser()
 const ParserVisitor = parser.getBaseCstVisitorConstructor()
 
-export class ZincVisitorDocs extends ParserVisitor implements IVisitor {
+export default class ZincVisitorDocs extends ParserVisitor implements IVisitor {
     constructor() {
         super()
         this.validateVisitor()
