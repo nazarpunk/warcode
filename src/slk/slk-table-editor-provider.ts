@@ -41,13 +41,14 @@ export default class SlkTableEditorProvider implements CustomTextEditorProvider 
     }
 
     #getHtmlForWebview(webview: Webview): string {
-        const jsUri = webview.asWebviewUri(Uri.joinPath(this.context.extensionUri, 'out', 'slkGrid.js'))
+        const exturi = this.context.extensionUri
 
-        const cssUri = webview.asWebviewUri(Uri.joinPath(this.context.extensionUri, 'src', 'slk', 'css', 'main.css'))
+        const jsUri = webview.asWebviewUri(Uri.joinPath(exturi, 'out', 'slkGrid.js'))
+        const cssUri = webview.asWebviewUri(Uri.joinPath(exturi, 'src', 'slk', 'css', 'main.css'))
 
         const nonce = nonceGen()
 
-        return /* html */`
+        return `
 			<!DOCTYPE html>
 			<html lang="en">
 			<head>

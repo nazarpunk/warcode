@@ -30,13 +30,14 @@
   "main": "./out/extension.js",
   "scripts": {
     "esbuild-docs": "esbuild jass=docs/main.ts zinc=docs/zinc/main.ts wts=docs/wts/main.ts calculator=docs/calculator/main.mjs gen=docs/_gen/gen.ts --outdir=docs/out --target=es2020 --bundle --external:vscode --external:fs --format=cjs --platform=browser --tree-shaking=true --sourcemap --watch",
-    "esbuild-base": "esbuild extension=src/extension.ts slkGrid=src/slk/js/main.ts --outdir=out --tsconfig=src/tsconfig.json --target=es2020 --bundle --external:vscode --external:fs --format=cjs --platform=node --tree-shaking=true --sourcemap",
+    "esbuild-base": "esbuild extension=src/extension.ts slkGrid=src/slk/js/main.ts BinaryEditor=src/binary/js/main.ts --outdir=out --tsconfig=src/tsconfig.json --target=es2020 --bundle --external:vscode --external:fs --format=cjs --platform=node --tree-shaking=true --sourcemap",
     "esbuild": "npm run esbuild-base",
     "vscode:prepublish": "npm run esbuild-base",
     "build": "vsce package",
     "publish": "vsce publish patch"
   },
   "devDependencies": {
+    "@types/web": "^0.0.112",
     "@types/node": "^20.4.8",
     "@types/vscode": "^1.81.0",
     "@typescript-eslint/eslint-plugin": "^6.3.0",
@@ -75,20 +76,11 @@
         ]
       },
       {
-        "viewType": "BinaryEdit",
+        "viewType": "BinaryEditor",
         "displayName": "Binary text editor",
         "selector": [
           {
-            "filenamePattern": "*.w3a"
-          }
-        ]
-      },
-      {
-        "viewType": "catCustoms.pawDraw",
-        "displayName": "Paw Draw",
-        "selector": [
-          {
-            "filenamePattern": "*.pawdraw"
+            "filenamePattern": "*.{w3a,w3b,w3d,w3h,w3q,w3t,w3u}"
           }
         ]
       }

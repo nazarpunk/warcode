@@ -1,15 +1,10 @@
 import SlkPostMessage from '../model/slk-post-message'
 import {Slk} from '../parser/Slk'
-
-type VSCode = {
-    postMessage(message: any): void;
-    getState(): any;
-    setState(state: any): void;
-}
+import {AcquireVscodeApi} from '../../utils/editor/model/acquire-vscode-api'
 
 {
     // @ts-ignore
-    const vscode: VSCode = acquireVsCodeApi()
+    const vscode: AcquireVscodeApi = acquireVsCodeApi()
 
     const updateContent = (text: string) => {
         document.body.textContent = ''

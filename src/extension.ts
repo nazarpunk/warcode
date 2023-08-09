@@ -10,7 +10,6 @@ import ZincVisitor from './zinc/zinc-visitor'
 import WtsTokensList from './wts/wts-tokens-list'
 import WtsParser from './wts/wts-parser'
 import WtsVisitor from './wts/wts-visitor'
-import {PawDrawEditorProvider} from './binary/paw-draw/editor-provider'
 import SlkTableEditorProvider from './slk/slk-table-editor-provider'
 import {BinaryEditorProvider} from './binary/binary-editor-provider'
 
@@ -33,17 +32,7 @@ export function activate(context: ExtensionContext) {
 
         window.registerCustomEditorProvider('SlkTable', new SlkTableEditorProvider(context)),
         window.registerCustomEditorProvider(
-            'catCustoms.pawDraw',
-            new PawDrawEditorProvider(context),
-            {
-                webviewOptions: {
-                    retainContextWhenHidden: true,
-                },
-                supportsMultipleEditorsPerDocument: false,
-            },
-        ),
-        window.registerCustomEditorProvider(
-            'BinaryEdit',
+            'BinaryEditor',
             new BinaryEditorProvider(context),
             {
                 webviewOptions: {

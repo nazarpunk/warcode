@@ -1,0 +1,39 @@
+body {
+    color: var(--vscode-editor-foreground);
+    font-size: var(--vscode-editor-font-size);
+    font-weight: var(--vscode-editor-font-weight);
+    font-family: var(--vscode-editor-font-family);
+    background-color: var(--vscode-editor-background);
+    display: flex;
+    gap: 4px;
+    padding: 4px;
+    flex-wrap: wrap;
+}
+
+.block {
+    white-space: nowrap;
+    padding: 2px 4px;
+    background-color: var(--bg, transparent);
+    color: var(--c, var(--vscode-editor-foreground));
+    border-radius: 3px;
+}
+
+.uint32le {
+    --c: #f18181;
+    --bg: #540d0d;
+}
+
+.uint32be {
+    --c: #857ee4;
+    --bg: #130c45;
+}
+
+.float32le {
+    --с: #46e127;
+    --bg: #135007;
+}
+
+.string {
+    --с: #3dd3de;
+    --bg: #0f494d;
+}

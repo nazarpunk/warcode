@@ -10,7 +10,7 @@ import {
     workspace
 } from 'vscode'
 import BinaryDocumentDelegate from './model/binary-document-delegate'
-import BinaryEdit from './model/binary-edit'
+import BinaryEditor from './model/binary-editor'
 
 
 export class BinaryDocument implements CustomDocument {
@@ -29,7 +29,7 @@ export class BinaryDocument implements CustomDocument {
         }
     }
 
-    protected _register<T extends Disposable>(value: T): T {
+    #register<T extends Disposable>(value: T): T {
         if (this._isDisposed) value.dispose()
         else this._disposables.push(value)
         return value
@@ -41,22 +41,20 @@ export class BinaryDocument implements CustomDocument {
         delegate: BinaryDocumentDelegate,
     ): Promise<BinaryDocument | PromiseLike<BinaryDocument>> {
         const dataFile = typeof backupId === 'string' ? Uri.parse(backupId) : uri
-        const fileData = await BinaryDocument.readFile(dataFile)
+        const fileData = await BinaryDocument.#readFile(dataFile)
         return new BinaryDocument(uri, fileData, delegate)
     }
 
-    private static async readFile(uri: Uri): Promise<Uint8Array> {
-        if (uri.scheme === 'untitled') {
-            return new Uint8Array()
-        }
+    static async #readFile(uri: Uri): Promise<Uint8Array> {
+        if (uri.scheme === 'untitled') return new Uint8Array()
         return new Uint8Array(await workspace.fs.readFile(uri))
     }
 
-    private readonly _uri: Uri
+    readonly uri: Uri
 
-    private _documentData: Uint8Array
-    private _edits: Array<BinaryEdit> = []
-    private _savedEdits: Array<BinaryEdit> = []
+    documentData: Uint8Array
+    private _edits: Array<BinaryEditor> = []
+    private _savedEdits: Array<BinaryEditor> = []
 
     private readonly _delegate: BinaryDocumentDelegate
 
@@ -65,52 +63,43 @@ export class BinaryDocument implements CustomDocument {
         initialContent: Uint8Array,
         delegate: BinaryDocumentDelegate
     ) {
-        this._uri = uri
-        this._documentData = initialContent
+        this.uri = uri
+        this.documentData = initialContent
         this._delegate = delegate
     }
 
-    public get uri() {
-        return this._uri
-    }
-
-    public get documentData(): Uint8Array {
-        return this._documentData
-    }
-
-    private readonly _onDidDispose = this._register(new EventEmitter<void>())
+    private readonly _onDidDispose = this.#register(new EventEmitter<void>())
     public readonly onDidDispose = this._onDidDispose.event
 
-    private readonly _onDidChangeDocument = this._register(new EventEmitter<{
+    readonly #onDidChangeDocument = this.#register(new EventEmitter<{
         readonly content?: Uint8Array;
-        readonly edits: readonly BinaryEdit[];
+        readonly edits: readonly BinaryEditor[];
     }>())
 
-    public readonly onDidChangeContent = this._onDidChangeDocument.event
+    public readonly onDidChangeContent = this.#onDidChangeDocument.event
 
-    private readonly _onDidChange = this._register(new EventEmitter<{
+    readonly #onDidChange = this.#register(new EventEmitter<{
         readonly label: string,
         undo(): void,
         redo(): void,
     }>())
 
-    public readonly onDidChange = this._onDidChange.event
+    public readonly onDidChange = this.#onDidChange.event
 
-    makeEdit(edit: BinaryEdit) {
+    makeEdit(edit: BinaryEditor) {
         this._edits.push(edit)
 
-
-        this._onDidChange.fire({
+        this.#onDidChange.fire({
             label: 'Stroke',
             undo: async () => {
                 this._edits.pop()
-                this._onDidChangeDocument.fire({
+                this.#onDidChangeDocument.fire({
                     edits: this._edits,
                 })
             },
             redo: async () => {
                 this._edits.push(edit)
-                this._onDidChangeDocument.fire({
+                this.#onDidChangeDocument.fire({
                     edits: this._edits,
                 })
             }
@@ -129,10 +118,10 @@ export class BinaryDocument implements CustomDocument {
     }
 
     async revert(): Promise<void> {
-        const diskContent = await BinaryDocument.readFile(this.uri)
-        this._documentData = diskContent
+        const diskContent = await BinaryDocument.#readFile(this.uri)
+        this.documentData = diskContent
         this._edits = this._savedEdits
-        this._onDidChangeDocument.fire({
+        this.#onDidChangeDocument.fire({
             content: diskContent,
             edits: this._edits,
         })
