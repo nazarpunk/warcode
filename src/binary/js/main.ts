@@ -2,7 +2,7 @@ import {AcquireVscodeApi} from '../../utils/editor/model/acquire-vscode-api'
 import BinaryMessage from '../model/binary-message'
 import {ParsedPath} from 'path'
 import {W3abdhqtu} from '../parser/w3abdhqtu/w3abdhqtu'
-import {DataReader} from '../utils/data-reader'
+import {DataReader} from '../utils/data-reader/data-reader'
 
 {
     // @ts-ignore

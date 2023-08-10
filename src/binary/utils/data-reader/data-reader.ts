@@ -1,5 +1,6 @@
-import {Uint8ArrayBuffer} from './uint8-array-buffer'
+import {Uint8ArrayBuffer} from '../uint8-array-buffer'
 import {DataReaderType} from './data-reader-type'
+import Number2Id from '../number-2-id'
 
 export class DataReader extends DataView {
 
@@ -14,19 +15,33 @@ export class DataReader extends DataView {
 
     cursor = 0
 
-    read<T extends number | string>(type: DataReaderType): T {
+    read<T extends number | string>(type: DataReaderType, {
+        parent
+    }: {
+        parent: HTMLElement
+    }): T {
         let value: number | string
         const div = this.document.createElement('div')
-        div.classList.add('block')
+        div.classList.add('value')
 
         switch (type) {
             case DataReaderType.uint32le:
-            case DataReaderType.uint32be:
-                const le = type == DataReaderType.uint32le
-                value = this.getUint32(this.cursor, le)
+                value = this.getUint32(this.cursor, true)
                 this.cursor += 4
-                div.classList.add(le ? 'uint32le' : 'uint32be')
+                div.classList.add('uint32le')
                 div.textContent = value.toString()
+                break
+            case DataReaderType.uint32be:
+                value = this.getUint32(this.cursor, false)
+                this.cursor += 4
+                div.classList.add('uint32be')
+                div.textContent = value.toString()
+                break
+            case DataReaderType.id:
+                value = this.getUint32(this.cursor, false)
+                this.cursor += 4
+                div.classList.add('rawcode')
+                div.textContent = Number2Id(value)
                 break
             case DataReaderType.float32le:
                 value = this.getFloat32(this.cursor, true)
@@ -47,7 +62,7 @@ export class DataReader extends DataView {
                 div.textContent = value
         }
 
-        this.document.body.appendChild(div)
+        parent.appendChild(div)
 
         return value as T
     }

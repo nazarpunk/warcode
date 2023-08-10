@@ -1,3 +1,7 @@
+:root {
+    --gap: 6px;
+}
+
 body {
     color: var(--vscode-editor-foreground);
     font-size: var(--vscode-editor-font-size);
@@ -5,17 +9,42 @@ body {
     font-family: var(--vscode-editor-font-family);
     background-color: var(--vscode-editor-background);
     display: flex;
-    gap: 4px;
-    padding: 4px;
+    gap: var(--gap);
+    padding: var(--gap);
     flex-wrap: wrap;
 }
 
 .block {
+    display: flex;
+    gap: var(--gap);
+    padding: var(--gap);
+    flex-wrap: wrap;
+
+    width: 100%;
+    box-sizing: border-box;
+    border-radius: 3px;
+
+    border: 1px solid rgb(80, 80, 80);
+}
+
+.block:empty {
+    display: none;
+}
+
+.value {
     white-space: nowrap;
     padding: 2px 4px;
     background-color: var(--bg, transparent);
     color: var(--c, var(--vscode-editor-foreground));
     border-radius: 3px;
+    max-width: 100%;
+    display: flex;
+    align-items: center;
+}
+
+.rawcode {
+    --c: #4b0082;
+    --bg: #42bbde;
 }
 
 .uint32le {
@@ -36,4 +65,5 @@ body {
 .string {
     --с: #3dd3de;
     --bg: #0f494d;
+    white-space: break-spaces;
 }
