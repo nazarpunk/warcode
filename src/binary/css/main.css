@@ -15,14 +15,20 @@ body {
     display: flex;
     gap: var(--gap);
     padding: var(--gap);
-    flex-wrap: wrap;
+    flex-direction: column;
+}
+
+.column {
+    display: flex;
+    gap: var(--gap);
+    padding: var(--gap);
 }
 
 .block {
     display: flex;
     gap: var(--gap);
     padding: var(--gap);
-    flex-wrap: wrap;
+    flex-direction: column;
 
     width: 100%;
     box-sizing: border-box;
@@ -69,6 +75,7 @@ body {
     border-bottom-right-radius: 0;
 }
 
-.ws-bs {
-    white-space: break-spaces !important;
+.value.string {
+    white-space: break-spaces;
+    word-break: break-all;
 }

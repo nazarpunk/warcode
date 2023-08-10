@@ -65,6 +65,8 @@ export default class W3abdhqtuItemDataValue implements BinaryParser {
                 break
             case DataType.unreal:
                 stype = 'unreal'
+                // @ts-ignore
+                vstring = parseFloat(this.value.toFixed(4)).toString()
                 break
             case DataType.string:
                 stype = 'string'
@@ -73,11 +75,8 @@ export default class W3abdhqtuItemDataValue implements BinaryParser {
 
         parent.insertAdjacentHTML('beforeend', `<div class="value value-all">${Number2Id(this.id)}</div><div class="value-group"><div class="value value-help">value type</div><div class="value value-all">${this.type}</div><div class="value value-help">${stype}</div></div>`)
         if (this.adq) {
-            parent.insertAdjacentHTML('beforeend', `<div class="value-group"><div class="value value-help">level</div><div class="value value-all">${this.level}</div></div>`)
-            parent.insertAdjacentHTML('beforeend', `<div class="value-group"><div class="value value-help">data</div><div class="value value-all">${this.data}</div></div>`)
+            parent.insertAdjacentHTML('beforeend', `<div class="value-group"><div class="value value-help">level</div><div class="value value-all">${this.level}</div></div><div class="value-group"><div class="value value-help">data</div><div class="value value-all">${this.data}</div></div>`)
         }
-        parent.insertAdjacentHTML('beforeend', `<div class="value-group"><div class="value value-help">value</div><div class="value value-all ws-bs">${vstring}</div></div>`)
-        parent.insertAdjacentHTML('beforeend', `<div class="value-group"><div class="value value-help">end</div><div class="value value-all">${Number2Id(this.end)}</div></div>`)
-
+        parent.insertAdjacentHTML('beforeend', `<div class="value-group"><div class="value value-help">value</div><div class="value value-all string">${vstring}</div></div><div class="value-group"><div class="value value-help">end</div><div class="value value-all">${Number2Id(this.end)}</div></div>`)
     }
 }
