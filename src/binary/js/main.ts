@@ -3,6 +3,7 @@ import BinaryMessage from '../model/binary-message'
 import {ParsedPath} from 'path'
 import {W3abdhqtu} from '../parser/w3abdhqtu/w3abdhqtu'
 import {DataReader} from '../utils/data-reader/data-reader'
+import {BinaryParser} from '../parser/binary-parser'
 
 {
     // @ts-ignore
@@ -11,33 +12,45 @@ import {DataReader} from '../utils/data-reader/data-reader'
     const read = (list: Uint8Array, p: ParsedPath) => {
         document.body.textContent = ''
 
-        const view = new DataReader(document, list)
+        const view = new DataReader(list)
 
-        let errors: Error[] = []
+        let parser: BinaryParser | undefined = undefined
 
         switch (p.ext) {
             case '.w3a':
             case '.w3d':
             case '.w3q':
-                errors = (new W3abdhqtu(view, true)).errors
+                parser = new W3abdhqtu(view, true)
                 break
             case '.w3b':
             case '.w3h':
             case '.w3t':
             case '.w3u':
-                errors = (new W3abdhqtu(view, false)).errors
+                parser = new W3abdhqtu(view, false)
                 break
             default:
                 document.body.textContent = 'Unexpected file!'
         }
 
+        if (!parser) {
+            document.body.textContent = 'Undefined parser!'
+            return
+        }
+
         // errors
-        if (errors.length > 0) for (const error of errors) {
+        if (parser.errors.length > 0) for (const error of parser.errors) {
             //console.log(error)
             const div = document.createElement('div')
             div.textContent = error.message
             document.body.appendChild(div)
+            return
         }
+
+        // render
+        const div = document.createElement('div')
+        div.classList.add('wrap')
+        parser.toHTML(document, div)
+        document.body.appendChild(div)
     }
 
     window.addEventListener('message', async e => {

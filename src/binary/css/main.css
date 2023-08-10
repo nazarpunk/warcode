@@ -8,6 +8,10 @@ body {
     font-weight: var(--vscode-editor-font-weight);
     font-family: var(--vscode-editor-font-family);
     background-color: var(--vscode-editor-background);
+    padding: 0;
+}
+
+.wrap {
     display: flex;
     gap: var(--gap);
     padding: var(--gap);
@@ -34,36 +38,37 @@ body {
 .value {
     white-space: nowrap;
     padding: 2px 4px;
-    background-color: var(--bg, transparent);
-    color: var(--c, var(--vscode-editor-foreground));
     border-radius: 3px;
     max-width: 100%;
     display: flex;
     align-items: center;
 }
 
-.rawcode {
-    --c: #4b0082;
-    --bg: #42bbde;
+.value-help {
+    background-color: #505050;
 }
 
-.uint32le {
-    --c: #f18181;
-    --bg: #540d0d;
+.value-all {
+    background-color: #114848;
 }
 
-.uint32be {
-    --c: #857ee4;
-    --bg: #130c45;
+.value-group {
+    display: flex;
+    gap: 1px;
+    align-items: stretch;
+    flex-wrap: nowrap;
 }
 
-.float32le {
-    --с: #46e127;
-    --bg: #135007;
+.value-group > .value:not(:first-child) {
+    border-top-left-radius: 0;
+    border-bottom-left-radius: 0;
 }
 
-.string {
-    --с: #3dd3de;
-    --bg: #0f494d;
-    white-space: break-spaces;
+.value-group > .value:not(:last-child) {
+    border-top-right-radius: 0;
+    border-bottom-right-radius: 0;
+}
+
+.ws-bs {
+    white-space: break-spaces !important;
 }
