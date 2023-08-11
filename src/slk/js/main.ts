@@ -1,194 +1,66 @@
-import {
-    provideVSCodeDesignSystem,
-    vsCodeDataGrid,
-    vsCodeDataGridCell,
-    vsCodeDataGridRow,
-    DataGrid,
-    DataGridCell,
-} from '@vscode/webview-ui-toolkit'
+import SlkPostMessage from '../model/slk-post-message'
+import {Slk} from '../parser/Slk'
+import {AcquireVscodeApi} from '../../utils/editor/model/acquire-vscode-api'
 
-provideVSCodeDesignSystem().register(vsCodeDataGrid(), vsCodeDataGridCell(), vsCodeDataGridRow())
+// @ts-ignore
+const vscode: AcquireVscodeApi = acquireVsCodeApi()
 
-window.addEventListener('load', main)
 
-function main() {
-    // Define default data grid
-    const basicDataGrid = document.getElementById('basic-grid') as DataGrid
-    // Random data generated using https://generatedata.com/
-    basicDataGrid.rowsData = [
-        {
-            name: 'Isadora Meyers',
-            email: 'ac.mi@icloud.couk',
-            phone: '(523) 454-7331',
-            country: 'Chile',
-        },
-        {
-            name: 'Tasha Hess',
-            email: 'tasha.hess@protonmail.couk',
-            phone: '(578) 194-4268',
-            country: 'Canada',
-        },
-        {
-            name: 'Dustin Bell',
-            email: 'pede.sagittis.augue@yahoo.com',
-            phone: '(852) 676-6719',
-            country: 'Brazil',
-        },
-        {
-            name: 'Damon Haynes',
-            email: 'nisl.arcu.iaculis@aol.org',
-            phone: '(311) 205-2738',
-            country: 'Indonesia',
-        },
-        {
-            name: 'Caleb Vazquez',
-            email: 'interdum.feugiat.sed@yahoo.edu',
-            phone: '(454) 800-7845',
-            country: 'Peru',
-        },
-        {
-            name: 'Flavia Herman',
-            email: 'magna.tellus.faucibus@aol.org',
-            phone: '(456) 891-2764',
-            country: 'Australia',
-        },
-        {
-            name: 'Stella Raymond',
-            email: 'lorem.eu.metus@hotmail.net',
-            phone: '(323) 241-3541',
-            country: 'United Kingdom',
-        },
-        {
-            name: 'Lisandra Brooks',
-            email: 'sapien.cursus.in@yahoo.ca',
-            phone: '(175) 344-7646',
-            country: 'Sweden',
-        },
-        {
-            name: 'Stone Fischer',
-            email: 'porttitor.eros@google.ca',
-            phone: '(845) 908-7645',
-            country: 'Ukraine',
-        },
-        {
-            name: 'Demetrius Strickland',
-            email: 'mi.enim@outlook.net',
-            phone: '(733) 706-8928',
-            country: 'Spain',
-        },
-    ]
-    basicDataGrid.columnDefinitions = [
-        {columnDataKey: 'name', title: 'Name'},
-        {columnDataKey: 'email', title: 'Email'},
-        {columnDataKey: 'phone', title: 'Phone Number'},
-        {columnDataKey: 'country', title: 'Country'},
-    ]
+// ----------
+const updateContent = (text: string) => {
+    document.body.textContent = ''
+    const slk = new Slk(text)
+    if (slk.errors.length > 0) {
+        for (const error of slk.errors) {
+            document.body.innerHTML += `<div>${error}</div>`
+        }
+        return
+    }
 
-    // Initialize editable data grid
-    initEditableDataGrid('basic-grid')
+    if (!slk.header) {
+        document.body.innerHTML += '<div>Missing header</div>'
+        return
+    }
+
+    const table = document.createElement('table')
+    document.body.appendChild(table)
+
+    // head
+    const thead = document.createElement('thead')
+    table.appendChild(thead)
+    const theadRow = document.createElement('tr')
+    thead.appendChild(theadRow)
+    for (const v of slk.header) {
+        const th = document.createElement('th')
+        theadRow.appendChild(th)
+        if (v) th.textContent = v.toString()
+    }
+
+    // body
+    const tbody = document.createElement('tbody')
+    table.appendChild(tbody)
+    for (const list of slk.list) {
+        const tr = document.createElement('tr')
+        tbody.appendChild(tr)
+        for (let i = 0; i < slk.header.length; i++) {
+            const td = document.createElement('td')
+            td.textContent = list?.[i]?.toString() ?? ''
+            tr.appendChild(td)
+        }
+    }
 }
 
-function initEditableDataGrid(id: string) {
-    const grid = document.getElementById(id) as DataGridCell
-    grid?.addEventListener('cell-focused', (e: Event) => {
-        const cell = e.target as DataGridCell
-        // Do not continue if `cell` is undefined/null or is not a grid cell
-        if (!cell || cell.role !== 'gridcell') {
+window.addEventListener('message', (event: MessageEvent) => {
+    const message = event.data
+    switch (message.type) {
+        case SlkPostMessage.update:
+            const text = message.text
+            updateContent(text)
+            vscode.setState({text})
             return
-        }
-        // Do not allow data grid header cells to be editable
-        if (cell.className === 'column-header') {
-            return
-        }
-
-        // Note: Need named closures in order to later use removeEventListener
-        // in the handleBlurClosure function
-        const handleKeydownClosure = (e: KeyboardEvent) => {
-            handleKeydown(e, cell)
-        }
-        const handleClickClosure = () => {
-            setCellEditable(cell)
-        }
-        const handleBlurClosure = () => {
-            syncCellChanges(cell)
-            unsetCellEditable(cell)
-            // Remove the blur, keydown, and click event listener _only after_
-            // the cell is no longer focused
-            cell.removeEventListener('blur', handleBlurClosure)
-            cell.removeEventListener('keydown', handleKeydownClosure)
-            cell.removeEventListener('click', handleClickClosure)
-        }
-
-        cell.addEventListener('keydown', handleKeydownClosure)
-        // Run the click listener once so that if a cell's text is clicked a
-        // second time the cursor will move to the given position in the string
-        // (versus reselecting the cell text again)
-        cell.addEventListener('click', handleClickClosure, {once: true})
-        cell.addEventListener('blur', handleBlurClosure)
-    })
-}
-
-// Make a given cell editable
-function setCellEditable(cell: DataGridCell) {
-    cell.setAttribute('contenteditable', 'true')
-    selectCellText(cell)
-}
-
-// Handle keyboard events on a given cell
-function handleKeydown(e: KeyboardEvent, cell: DataGridCell) {
-    if (!cell.hasAttribute('contenteditable') || cell.getAttribute('contenteditable') === 'false') {
-        if (e.key === 'Enter') {
-            e.preventDefault()
-            setCellEditable(cell)
-        }
-    } else {
-        if (e.key === 'Enter' || e.key === 'Escape') {
-            e.preventDefault()
-            syncCellChanges(cell)
-            unsetCellEditable(cell)
-        }
     }
-}
+})
 
-// Make a given cell non-editable
-function unsetCellEditable(cell: DataGridCell) {
-    cell.setAttribute('contenteditable', 'false')
-    deselectCellText()
-}
+const state = vscode.getState()
+if (state) updateContent(state.text)
 
-// Select the text of an editable cell
-function selectCellText(cell: DataGridCell) {
-    const selection = window.getSelection()
-    if (selection) {
-        const range = document.createRange()
-        range.selectNodeContents(cell)
-        selection.removeAllRanges()
-        selection.addRange(range)
-    }
-}
-
-// Deselect the text of a cell that was previously editable
-function deselectCellText() {
-    const selection = window.getSelection()
-    if (selection) {
-        selection.removeAllRanges()
-    }
-}
-
-// Syncs changes made in an editable cell with the
-// underlying data structure of a vscode-data-grid
-function syncCellChanges(cell: DataGridCell) {
-    const column = cell.columnDefinition
-    const row = cell.rowData
-
-    if (column && row) {
-        // @ts-ignore
-        const originalValue = row[column.columnDataKey]
-        const newValue = cell.innerText
-
-        if (originalValue !== newValue) {
-            // @ts-ignore
-            row[column.columnDataKey] = newValue
-        }
-    }
-}

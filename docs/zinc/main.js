@@ -1,18 +1,16 @@
-"use strict";
 // noinspection DuplicatedCode
-Object.defineProperty(exports, "__esModule", { value: true });
-const chevrotain_1 = require("chevrotain");
-const zinc_parser_1 = require("../../src/zinc/zinc-parser");
-const zinc_tokens_list_1 = require("../../src/zinc/zinc-tokens-list");
-const zinc_visitor_docs_1 = require("../../src/zinc/zinc-visitor-docs");
-const parser = new zinc_parser_1.default();
+import { createSyntaxDiagramsCode, Lexer } from 'chevrotain';
+import ZincParser from '../../src/zinc/zinc-parser';
+import ZincTokensList from '../../src/zinc/zinc-tokens-list';
+import ZincVisitorDocs from '../../src/zinc/zinc-visitor-docs';
+const parser = new ZincParser();
 const iframe = document.createElement('iframe');
-iframe.src = 'data:text/html;charset=utf-8,' + encodeURI((0, chevrotain_1.createSyntaxDiagramsCode)(parser.getSerializedGastProductions()));
+iframe.src = 'data:text/html;charset=utf-8,' + encodeURI(createSyntaxDiagramsCode(parser.getSerializedGastProductions()));
 document.body.appendChild(iframe);
 (async () => {
     const request = await fetch('test.txt');
     const text = await request.text();
-    const lexer = new chevrotain_1.Lexer(zinc_tokens_list_1.default, {
+    const lexer = new Lexer(ZincTokensList, {
         recoveryEnabled: true,
         positionTracking: 'onlyOffset',
         deferDefinitionErrorsHandling: true,
@@ -21,7 +19,7 @@ document.body.appendChild(iframe);
     const result = lexer.tokenize(text);
     parser.input = result.tokens;
     const nodes = parser["zinc" /* ZincRule.zinc */]();
-    const visitor = new zinc_visitor_docs_1.default();
+    const visitor = new ZincVisitorDocs();
     visitor.visit(nodes);
 })();
 //# sourceMappingURL=main.js.map

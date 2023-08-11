@@ -1,12 +1,10 @@
-"use strict";
-Object.defineProperty(exports, "__esModule", { value: true });
-const chevrotain_1 = require("chevrotain");
+import { createSyntaxDiagramsCode } from 'chevrotain';
 //import WtsRule from '../../src/wts/wts-rule'
-const wts_parser_1 = require("../../src/wts/wts-parser");
+import WtsParser from '../../src/wts/wts-parser';
 //import WtsVisitor from '../../src/wts/wts-visitor'
-const parser = new wts_parser_1.default();
+const parser = new WtsParser();
 const iframe = document.createElement('iframe');
-iframe.src = 'data:text/html;charset=utf-8,' + encodeURI((0, chevrotain_1.createSyntaxDiagramsCode)(parser.getSerializedGastProductions()));
+iframe.src = 'data:text/html;charset=utf-8,' + encodeURI(createSyntaxDiagramsCode(parser.getSerializedGastProductions()));
 document.body.appendChild(iframe);
 /*
 (async () => {

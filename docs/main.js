@@ -1,21 +1,19 @@
-"use strict";
-Object.defineProperty(exports, "__esModule", { value: true });
-const chevrotain_1 = require("chevrotain");
-const jass_tokens_list_1 = require("../src/jass/jass-tokens-list");
-const jass_parser_1 = require("../src/jass/jass-parser");
-const jass_visitor_docs_1 = require("../src/jass/jass-visitor-docs");
-const parser = new jass_parser_1.default({
+import { createSyntaxDiagramsCode, Lexer } from 'chevrotain';
+import JassTokensList from '../src/jass/jass-tokens-list';
+import JassParser from '../src/jass/jass-parser';
+import JassVisitorDocs from '../src/jass/jass-visitor-docs';
+const parser = new JassParser({
     recoveryEnabled: true,
     nodeLocationTracking: 'onlyOffset',
     skipValidations: false,
 });
 const iframe = document.createElement('iframe');
-iframe.src = 'data:text/html;charset=utf-8,' + encodeURI((0, chevrotain_1.createSyntaxDiagramsCode)(parser.getSerializedGastProductions()));
+iframe.src = 'data:text/html;charset=utf-8,' + encodeURI(createSyntaxDiagramsCode(parser.getSerializedGastProductions()));
 document.body.appendChild(iframe);
 (async () => {
     const request = await fetch('test.txt');
     const text = await request.text();
-    const lexer = new chevrotain_1.Lexer(jass_tokens_list_1.default, {
+    const lexer = new Lexer(JassTokensList, {
         recoveryEnabled: true,
         positionTracking: 'onlyOffset',
         deferDefinitionErrorsHandling: true,
@@ -26,7 +24,7 @@ document.body.appendChild(iframe);
     const nodes = parser["jass" /* JassRule.jass */]();
     for (const error of parser.errors)
         console.error(error);
-    const visitor = new jass_visitor_docs_1.default();
+    const visitor = new JassVisitorDocs();
     visitor.visit(nodes);
 })();
 //# sourceMappingURL=main.js.map

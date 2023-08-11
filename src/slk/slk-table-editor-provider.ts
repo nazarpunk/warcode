@@ -1,8 +1,7 @@
 // https://code.visualstudio.com/api/extension-guides/custom-editors
 import {
     CustomTextEditorProvider,
-    ExtensionContext, TextDocument, Uri, Webview,
-    WebviewPanel,
+    ExtensionContext, TextDocument, Uri, WebviewPanel,
     workspace
 } from 'vscode'
 import nonceGen from '../utils/nonce-gen'
@@ -26,6 +25,7 @@ export default class SlkTableEditorProvider implements CustomTextEditorProvider 
             enableScripts: true,
         }
 
+        const fix = 'window.module = {};'
         webviewPanel.webview.html = `<!DOCTYPE html>
 			<html lang="en">
 			<head>
@@ -40,7 +40,7 @@ export default class SlkTableEditorProvider implements CustomTextEditorProvider 
 			</head>
 			<body>
 			<vscode-data-grid id="basic-grid"></vscode-data-grid>
-			<script nonce="${nonce}">delete window.FAST</script>
+			<script nonce="${nonce}">${fix}</script>
 			<script nonce="${nonce}" src="${webviewPanel.webview.asWebviewUri(Uri.joinPath(exturi, 'out', 'SlkGrid.js'))}"></script>
 			</body>
 			</html>`

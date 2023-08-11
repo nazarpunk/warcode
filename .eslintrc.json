@@ -12,10 +12,10 @@
     "ecmaVersion": "latest",
     "sourceType": "module",
     "project": [
-      "src/tsconfig.json",
-      "docs/tsconfig.json"
+      "tsconfig.json"
     ]
   },
+  "ignorePatterns": ["webpack.config.js"],
   "rules": {
     "curly": "off",
     "semi": ["error", "never"],

@@ -1,13 +1,11 @@
-"use strict";
-Object.defineProperty(exports, "__esModule", { value: true });
-const jass_tokens_1 = require("../../src/jass/jass-tokens");
-const zinc_tokens_1 = require("../../src/zinc/zinc-tokens");
-const wts_tokens_1 = require("../../src/wts/wts-tokens");
-const fs = require("fs");
+import { JassColors } from '../../src/jass/jass-tokens';
+import { ZincColors } from '../../src/zinc/zinc-tokens';
+import { WtsColors } from '../../src/wts/wts-tokens';
+import * as fs from 'fs';
 const legendMap = {
-    ...jass_tokens_1.JassColors,
-    ...wts_tokens_1.WtsColors,
-    ...zinc_tokens_1.ZincColors
+    ...JassColors,
+    ...WtsColors,
+    ...ZincColors
 };
 const root = '../..';
 const packagePath = `${root}/package.json`;
