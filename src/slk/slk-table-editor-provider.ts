@@ -19,10 +19,31 @@ export default class SlkTableEditorProvider implements CustomTextEditorProvider 
         document: TextDocument,
         webviewPanel: WebviewPanel,
     ): Promise<void> {
+        const exturi = this.context.extensionUri
+        const nonce = nonceGen()
+
         webviewPanel.webview.options = {
             enableScripts: true,
         }
-        webviewPanel.webview.html = this.#getHtmlForWebview(webviewPanel.webview)
+
+        webviewPanel.webview.html = `<!DOCTYPE html>
+			<html lang="en">
+			<head>
+				<meta charset="UTF-8">
+				<meta http-equiv="Content-Security-Policy" content="default-src 'none';
+				 img-src ${webviewPanel.webview.cspSource};
+				 style-src ${webviewPanel.webview.cspSource} 'sha256-47DEQpj8HBSa+/TImW+5JCeuQeRkm5NMpJWZG3hSuFU=';
+				 script-src 'nonce-${nonce}';">
+				<meta name="viewport" content="width=device-width, initial-scale=1.0">
+				<link href="${webviewPanel.webview.asWebviewUri(Uri.joinPath(exturi, 'src', 'slk', 'css', 'main.css'))}" rel="stylesheet" />
+				<title>SLK Grid</title>
+			</head>
+			<body>
+			<vscode-data-grid id="basic-grid"></vscode-data-grid>
+			<script nonce="${nonce}">delete window.FAST</script>
+			<script nonce="${nonce}" src="${webviewPanel.webview.asWebviewUri(Uri.joinPath(exturi, 'out', 'SlkGrid.js'))}"></script>
+			</body>
+			</html>`
 
         const updateWebview = () => webviewPanel.webview.postMessage({
             type: SlkPostMessage.update,
@@ -38,31 +59,6 @@ export default class SlkTableEditorProvider implements CustomTextEditorProvider 
         })
 
         updateWebview()
-    }
 
-    #getHtmlForWebview(webview: Webview): string {
-        const exturi = this.context.extensionUri
-
-        const jsUri = webview.asWebviewUri(Uri.joinPath(exturi, 'out', 'slkGrid.js'))
-        const cssUri = webview.asWebviewUri(Uri.joinPath(exturi, 'src', 'slk', 'css', 'main.css'))
-
-        const nonce = nonceGen()
-
-        return `
-			<!DOCTYPE html>
-			<html lang="en">
-			<head>
-				<meta charset="UTF-8">
-				<meta http-equiv="Content-Security-Policy" content="default-src 'none'; img-src ${webview.cspSource}; style-src ${webview.cspSource}; script-src 'nonce-${nonce}';">
-				<meta name="viewport" content="width=device-width, initial-scale=1.0">
-
-				<link href="${cssUri}" rel="stylesheet" />
-				<link href="${cssUri}" rel="stylesheet" />
-
-				<title>SLK Grid</title>
-				<script nonce="${nonce}" src="${jsUri}" defer></script>
-			</head>
-			<body></body>
-			</html>`
     }
 }

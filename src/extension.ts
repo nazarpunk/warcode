@@ -1,4 +1,4 @@
-import {ExtensionContext, languages, window} from 'vscode'
+import {commands, ExtensionContext, languages, window} from 'vscode'
 import ExtProvider from './utils/ext-provider'
 import ExtSemanticTokensLegend from './semantic/ext-semantic-tokens-legend'
 import JassTokensList from './jass/jass-tokens-list'
@@ -18,6 +18,7 @@ export function activate(context: ExtensionContext) {
     const jass = new ExtProvider('jass', JassTokensList, JassParser, JassVisitor)
     const zinc = new ExtProvider('zinc', ZincTokensList, ZincParser, ZincVisitor)
     const wts = new ExtProvider('wts', WtsTokensList, WtsParser, WtsVisitor)
+
 
     context.subscriptions.push(
         languages.registerDocumentSemanticTokensProvider({language: jass.languageName}, jass, ExtSemanticTokensLegend),
@@ -40,6 +41,6 @@ export function activate(context: ExtensionContext) {
                 },
                 supportsMultipleEditorsPerDocument: false,
             },
-        )
+        ),
     )
 }

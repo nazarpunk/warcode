@@ -15,6 +15,12 @@ export class Slk {
 
     constructor(slk: string) {
         this.#text = slk
+
+        try {
+            this.#read()
+        } catch (e) {
+            if (e instanceof Error) this.errors.push(e)
+        }
     }
 
     #text: string
@@ -32,6 +38,7 @@ export class Slk {
         let def: SlkData = null
 
         const _value = (s: string): string | number => {
+            s = s.trim()
             if (s.substring(0, 1) === '"') {
                 const v = s.split('')
                 if (v.shift() !== '"') throw new Error('Wrong string begining.')
@@ -96,13 +103,5 @@ export class Slk {
             }
         }
         this.header = this.list.shift()
-    }
-
-    read() {
-        try {
-            this.#read()
-        } catch (e) {
-            if (e instanceof Error) this.errors.push(e)
-        }
     }
 }

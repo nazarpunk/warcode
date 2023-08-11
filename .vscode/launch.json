@@ -12,11 +12,11 @@
       "outFiles": [
         "${workspaceRoot}/client/out/**/*.js"
       ],
+      "autoAttachChildProcesses": true,
       "preLaunchTask": {
         "type": "npm",
-        "script": "esbuild"
-      },
-      "autoAttachChildProcesses": true
+        "script": "compile"
+      }
     }
   ]
 }
