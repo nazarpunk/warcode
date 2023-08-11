@@ -7,30 +7,9 @@ body {
     padding: 0;
 }
 
-table {
-    border-spacing: 0;
-    --cell-padding: 3px;
-}
-
-thead {
-    position: sticky;
-    top: 0;
-    background-color: var(--vscode-editor-background);
-}
-
-th {
-    padding: var(--cell-padding);
-    text-align: left;
-}
-
-tbody > tr:nth-child(odd) {
-    background-color: var(--vscode-tree-tableOddRowsBackground);
-}
-
-td {
-    padding: var(--cell-padding);
-}
-
-td {
-    white-space: nowrap;
+.wrap {
+    position: absolute;
+    inset: 0;
+    display: flex;
+    flex-direction: column;
 }

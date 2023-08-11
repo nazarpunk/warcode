@@ -31,6 +31,7 @@ const config = {
         // https://webpack.js.org/configuration/externals
         vscode: 'commonjs vscode',
         fs: 'commonjs fs',
+        path: 'commonjs path',
     },
     resolve: { // https://github.com/TypeStrong/ts-loader
         extensions: ['.ts', '.js']

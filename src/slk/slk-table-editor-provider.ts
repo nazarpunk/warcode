@@ -35,14 +35,13 @@ export default class SlkTableEditorProvider implements CustomTextEditorProvider 
 				 style-src ${webviewPanel.webview.cspSource} 'sha256-47DEQpj8HBSa+/TImW+5JCeuQeRkm5NMpJWZG3hSuFU=';
 				 script-src 'nonce-${nonce}';">
 				<meta name="viewport" content="width=device-width, initial-scale=1.0">
+				<link href="${webviewPanel.webview.asWebviewUri(Uri.joinPath(exturi, 'src', 'utils', 'css', 'tabulator.css'))}" rel="stylesheet" />
 				<link href="${webviewPanel.webview.asWebviewUri(Uri.joinPath(exturi, 'src', 'slk', 'css', 'main.css'))}" rel="stylesheet" />
+				<script nonce="${nonce}">${fix}</script>
+			    <script nonce="${nonce}" src="${webviewPanel.webview.asWebviewUri(Uri.joinPath(exturi, 'out', 'SlkGrid.js'))}" defer></script>
 				<title>SLK Grid</title>
 			</head>
-			<body>
-			<vscode-data-grid id="basic-grid"></vscode-data-grid>
-			<script nonce="${nonce}">${fix}</script>
-			<script nonce="${nonce}" src="${webviewPanel.webview.asWebviewUri(Uri.joinPath(exturi, 'out', 'SlkGrid.js'))}"></script>
-			</body>
+			<body><div class="wrap"><div id="slk-table"></div></div></body>
 			</html>`
 
         const updateWebview = () => webviewPanel.webview.postMessage({

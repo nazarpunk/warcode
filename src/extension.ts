@@ -1,4 +1,4 @@
-import {commands, ExtensionContext, languages, window} from 'vscode'
+import {ExtensionContext, languages, window} from 'vscode'
 import ExtProvider from './utils/ext-provider'
 import ExtSemanticTokensLegend from './semantic/ext-semantic-tokens-legend'
 import JassTokensList from './jass/jass-tokens-list'

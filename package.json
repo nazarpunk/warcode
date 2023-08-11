@@ -38,6 +38,7 @@
   },
   "devDependencies": {
     "@types/node": "^20.4.9",
+    "@types/tabulator-tables": "^5.4.10",
     "@types/vscode": "^1.81.0",
     "@types/web": "^0.0.112",
     "@typescript-eslint/eslint-plugin": "^6.3.0",
@@ -48,6 +49,7 @@
     "eslint": "^8.46.0",
     "i18next": "^23.4.4",
     "rollup": "^3.28.0",
+    "tabulator-tables": "^5.5.1",
     "ts-loader": "^9.4.4",
     "typescript": "^5.1.6",
     "webpack": "^5.88.2",
