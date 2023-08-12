@@ -2,7 +2,7 @@ body {
     color: var(--vscode-editor-foreground);
     font-size: var(--vscode-editor-font-size);
     font-weight: var(--vscode-editor-font-weight);
-    font-family: var(--vscode-editor-font-family);
+    font-family: var(--vscode-font-family);
     background-color: var(--vscode-editor-background);
     padding: 0;
 }

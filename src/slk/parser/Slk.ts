@@ -1,12 +1,14 @@
 // https://github.com/stijnherfst/HiveWE/wiki/SLK
 
 const enum SlkKey {
+    Id = 'ID',
     TableSize = 'B',
     Cell = 'C',
-    Width = 'X',
-    Height = 'Y',
+    X = 'X',
+    Y = 'Y',
     Default = 'D',
     Data = 'K',
+    End = 'E'
 }
 
 type SlkData = number | string | null
@@ -33,9 +35,22 @@ export class Slk {
     width = -1
     height = -1
 
+    def: SlkData = null
+
+    #push(y: number, x: number, value: SlkData) {
+        while (this.list.length <= y) {
+            this.list.push([])
+        }
+        const list = this.list[y]
+        while (list.length <= x) {
+            list.push(null)
+        }
+
+        this.list[y][x] = value
+    }
+
     #read() {
         let y = -1
-        let def: SlkData = null
 
         const _value = (s: string): string | number => {
             s = s.trim()
@@ -48,60 +63,60 @@ export class Slk {
             return Number(s)
         }
 
-        for (const string of this.#text.split('\n')) {
+        loop: for (const string of this.#text.split(/\r\n|\n/)) {
             const chunks = string.split(';')
+
             if (chunks.length === 0) continue
-            switch (chunks.shift() as SlkKey) {
+            const chunk = chunks.shift()?.trim()
+
+            switch (chunk as SlkKey | null) {
+                case SlkKey.Id:
+                    break
                 case SlkKey.TableSize:
                     for (const value of chunks) {
                         const list = value.split('')
                         const k = list.shift()
                         const v = list.join('')
                         switch (k as SlkKey) {
-                            case SlkKey.Width:
+                            case SlkKey.X:
                                 this.width = Number(v)
                                 break
-                            case SlkKey.Height:
+                            case SlkKey.Y:
                                 this.height = Number(v)
                                 break
                             case SlkKey.Default:
-                                def = _value(v)
+                                this.def = _value(v)
                         }
-                    }
-                    if (this.width < 0 || this.height < 0) throw new Error('Missing size chunk.')
-                    for (let h = 0; h < this.height; h++) {
-                        const list = []
-                        for (let w = 0; w < this.width; w++) {
-                            list.push(def)
-                        }
-                        this.list.push(list)
                     }
                     break
                 case SlkKey.Cell:
-                    if (this.width < 0 || this.height < 0) throw new Error('Missing table size.')
-
                     let x = -1
-                    let value = def
-                    for (const chunk of chunks) {
-                        const list = chunk.split('')
+                    let value = this.def
+                    for (const c of chunks) {
+                        const list = c.split('')
                         const k = list.shift()
                         const v = list.join('')
                         switch (k as SlkKey) {
-                            case SlkKey.Width:
+                            case SlkKey.X:
                                 x = Number(v) - 1
                                 break
-                            case SlkKey.Height:
+                            case SlkKey.Y:
                                 y = Number(v) - 1
                                 break
                             case SlkKey.Data:
                                 value = _value(v)
                         }
                     }
-                    if (value === undefined) throw new Error('Missing value.')
-                    this.list[y][x] = value
+                    this.#push(y, x, value)
                     break
+                case SlkKey.End:
+                    break loop
             }
         }
         this.header = this.list.shift()
+
+        for (let i = this.list.length - 1; i >= 0; i--) {
+            //console.log(this.list[i].length)
+        }
     }
 }

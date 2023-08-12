@@ -1,6 +1,6 @@
 const enum SlkPostMessage {
+    error = 'error',
     update = 'update',
-    log = 'log',
 }
 
 export default SlkPostMessage
