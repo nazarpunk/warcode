@@ -6,12 +6,11 @@ const enum SlkKey {
     Cell = 'C',
     X = 'X',
     Y = 'Y',
-    Default = 'D',
     Data = 'K',
     End = 'E'
 }
 
-type SlkData = number | string | null
+type SlkValue = number | string | null
 
 export class Slk {
 
@@ -28,16 +27,14 @@ export class Slk {
     #text: string
     errors: Error[] = []
 
-    list: SlkData[][] = []
+    list: SlkValue[][] = []
 
-    header?: SlkData[]
+    header?: SlkValue[]
 
     width = -1
     height = -1
 
-    def: SlkData = null
-
-    #push(y: number, x: number, value: SlkData) {
+    #push(y: number, x: number, value: SlkValue) {
         while (this.list.length <= y) {
             this.list.push([])
         }
@@ -84,14 +81,12 @@ export class Slk {
                             case SlkKey.Y:
                                 this.height = Number(v)
                                 break
-                            case SlkKey.Default:
-                                this.def = _value(v)
                         }
                     }
                     break
                 case SlkKey.Cell:
                     let x = -1
-                    let value = this.def
+                    let value: SlkValue = null
                     for (const c of chunks) {
                         const list = c.split('')
                         const k = list.shift()
@@ -114,9 +109,5 @@ export class Slk {
             }
         }
         this.header = this.list.shift()
-
-        for (let i = this.list.length - 1; i >= 0; i--) {
-            //console.log(this.list[i].length)
-        }
     }
 }

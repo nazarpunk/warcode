@@ -12,6 +12,7 @@ const table = new Tabulator('#slk-table', {
     maxHeight: '100%',
 })
 
+
 const update = (text: string) => {
     const slk = new Slk(text)
 
@@ -24,6 +25,7 @@ const update = (text: string) => {
         vscode.postMessage({type: SlkPostMessage.error, data: 'Missing header.'})
         return
     }
+
 
     // columns
     const columns: ColumnDefinition[] = []
@@ -38,9 +40,8 @@ const update = (text: string) => {
     for (const item of slk.list) {
         const obj: Record<string, any> = {}
         for (let i = 0; i < slk.header.length; i++) {
-            const index = slk.header[i]
-            if (index == null) continue
-            obj[index] = item[i] ?? slk.def
+            if (slk.header!.length - 1 < i) continue
+            obj[slk.header[i]!] = item[i] ?? ''
         }
         data.push(obj)
     }
@@ -62,5 +63,4 @@ window.addEventListener('message', (event: MessageEvent) => {
 /*
 const state = vscode.getState()
 if (state) update(state.text)
-
- */
+*/
