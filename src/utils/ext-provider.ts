@@ -20,6 +20,7 @@ import TokenLegend from '../semantic/token-legend'
 import ITokenToRanges from './vscode/i-token-to-ranges'
 import ExtSettings from './ext-settings'
 
+
 interface IParserConstructor {
     new(config?: IParserConfig): CstParser;
 }
@@ -53,6 +54,7 @@ class DocumentHolder {
         holder.document = document
         if (!isset) {
             holder.languageName = languageName
+            holder.collection = languages.createDiagnosticCollection()
 
             holder.lexer = new Lexer(lexerDefinition, {
                 recoveryEnabled: true,
@@ -78,8 +80,6 @@ class DocumentHolder {
             })
 
             holder.visitor = new visitorConstructor()
-
-            holder.collection = languages.createDiagnosticCollection(path)
         }
         return holder
     }
@@ -110,16 +110,14 @@ class DocumentHolder {
         //===  lexing
         const lexing = this.lexer.tokenize(text)
 
-        for (const error of lexing.errors) {
-            this.diagnostics.push({
-                message: error.message,
-                range: new Range(
-                    this.document.positionAt(error.offset),
-                    this.document.positionAt(error.offset + error.length)
-                ),
-                severity: DiagnosticSeverity.Error,
-            })
-        }
+        for (const error of lexing.errors) this.diagnostics.push({
+            message: error.message ?? 'Fuck',
+            range: new Range(
+                this.document.positionAt(error.offset),
+                this.document.positionAt(error.offset + error.length)
+            ),
+            severity: DiagnosticSeverity.Error,
+        })
 
         const comments = lexing.groups['comments']
         if (comments) for (const comment of comments) {

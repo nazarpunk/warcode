@@ -12,6 +12,7 @@ import WtsParser from './wts/wts-parser'
 import WtsVisitor from './wts/wts-visitor'
 import SlkTableEditorProvider from './slk/slk-table-editor-provider'
 import {BinaryEditorProvider} from './binary/binary-editor-provider'
+import './utils/i18n'
 
 // noinspection JSUnusedGlobalSymbols
 export function activate(context: ExtensionContext) {
@@ -31,7 +32,12 @@ export function activate(context: ExtensionContext) {
         languages.registerDocumentSymbolProvider({language: wts.languageName}, wts),
         languages.registerFoldingRangeProvider({language: wts.languageName}, wts),
 
-        window.registerCustomEditorProvider('SlkTable', new SlkTableEditorProvider(context)),
+        window.registerCustomEditorProvider('SlkTable', new SlkTableEditorProvider(context), {
+            webviewOptions: {
+                retainContextWhenHidden: true
+            },
+            supportsMultipleEditorsPerDocument: true,
+        }),
         window.registerCustomEditorProvider(
             'BinaryEditor',
             new BinaryEditorProvider(context),

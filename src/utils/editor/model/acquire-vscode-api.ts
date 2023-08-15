@@ -1,5 +1,7 @@
 export type AcquireVscodeApi = {
     postMessage(message: any): void;
-    getState(): any;
+    getState(): {
+        text: string
+    } | undefined;
     setState(state: any): void;
 }

@@ -2,18 +2,22 @@ import SlkPostMessage from '../model/slk-post-message'
 import {Slk} from '../parser/Slk'
 import {AcquireVscodeApi} from '../../utils/editor/model/acquire-vscode-api'
 import {ColumnDefinition, TabulatorFull as Tabulator} from 'tabulator-tables'
+import {AsyncDelay} from '../../utils/async-delay'
 
 // @ts-ignore
 const vscode: AcquireVscodeApi = acquireVsCodeApi()
 
 const table = new Tabulator('#slk-table', {
+    renderHorizontal: 'virtual',
+    renderVertical: 'virtual',
+    renderStarted: () => console.log('start'),
+    renderComplete: () => console.log('end'),
     height: '100%',
     layout: 'fitDataFill',
     maxHeight: '100%',
 })
 
-
-const update = (text: string) => {
+const update = async (text: string) => {
     const slk = new Slk(text)
 
     if (slk.errors.length > 0) {
@@ -25,7 +29,6 @@ const update = (text: string) => {
         vscode.postMessage({type: SlkPostMessage.error, data: 'Missing header.'})
         return
     }
-
 
     // columns
     const columns: ColumnDefinition[] = []
@@ -46,21 +49,20 @@ const update = (text: string) => {
         data.push(obj)
     }
 
-    table.setData(data).then()
+    await AsyncDelay(100)
+
+
+    await table.replaceData(data)
 }
 
 window.addEventListener('message', (event: MessageEvent) => {
     const message = event.data
     switch (message.type) {
         case SlkPostMessage.update:
-            const text = message.text
-            update(text)
-            vscode.setState({text})
+            update(message.text)
             return
     }
 })
 
-/*
 const state = vscode.getState()
 if (state) update(state.text)
-*/

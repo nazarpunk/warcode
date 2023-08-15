@@ -10,10 +10,10 @@ export default class SlkTableEditorProvider implements CustomTextEditorProvider 
     ) {
     }
 
-    public async resolveCustomTextEditor(
+    public resolveCustomTextEditor(
         document: TextDocument,
         webviewPanel: WebviewPanel,
-    ): Promise<void> {
+    ): void {
         const exturi = this.context.extensionUri
         const nonce = nonceGen()
 
@@ -40,15 +40,6 @@ export default class SlkTableEditorProvider implements CustomTextEditorProvider 
 			<body><div class="wrap"><div id="slk-table"></div></div></body>
 			</html>`
 
-        const updateWebview = () => webviewPanel.webview.postMessage({
-            type: SlkPostMessage.update,
-            text: document.getText(),
-        })
-
-        const documentDisposable = workspace.onDidChangeTextDocument(e => {
-            if (e.document.uri.toString() === document.uri.toString()) updateWebview()
-        })
-
         webviewPanel.webview.onDidReceiveMessage(e => {
             switch (e.type as SlkPostMessage) {
                 case SlkPostMessage.error:
@@ -57,11 +48,17 @@ export default class SlkTableEditorProvider implements CustomTextEditorProvider 
             }
         })
 
+        const updateWebview = () => webviewPanel.webview.postMessage({
+            type: SlkPostMessage.update,
+            text: document.getText(),
+        })
+
         webviewPanel.onDidDispose(() => {
-            documentDisposable.dispose()
+            workspace.onDidChangeTextDocument(e => {
+                if (e.document.uri.toString() === document.uri.toString()) updateWebview()
+            }).dispose()
         })
 
         updateWebview()
-
     }
 }
