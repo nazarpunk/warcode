@@ -27,13 +27,13 @@ export default class SlkTableEditorProvider implements CustomTextEditorProvider 
 			<head>
 				<meta charset="UTF-8">
 				<meta http-equiv="Content-Security-Policy" content="default-src 'none';
-				 img-src ${webviewPanel.webview.cspSource};
-				 style-src ${webviewPanel.webview.cspSource} 'sha256-47DEQpj8HBSa+/TImW+5JCeuQeRkm5NMpJWZG3hSuFU=';
-				 script-src 'nonce-${nonce}';">
+				 img-src ${webviewPanel.webview.cspSource} https://resources.datagridxl.com/dgxl-logo-icon.svg;
+				 style-src ${webviewPanel.webview.cspSource} 'unsafe-inline';
+				 script-src 'nonce-${nonce}' 'unsafe-eval';">
 				<meta name="viewport" content="width=device-width, initial-scale=1.0">
-				<link href="${webviewPanel.webview.asWebviewUri(Uri.joinPath(exturi, 'out', 'tabulator.css'))}" rel="stylesheet" />
 				<link href="${webviewPanel.webview.asWebviewUri(Uri.joinPath(exturi, 'src', 'slk', 'css', 'main.css'))}" rel="stylesheet" />
 				<script nonce="${nonce}">${fix}</script>
+			    <script nonce="${nonce}" src="${webviewPanel.webview.asWebviewUri(Uri.joinPath(exturi, 'out', 'datagridxl2.js'))}" defer></script>
 			    <script nonce="${nonce}" src="${webviewPanel.webview.asWebviewUri(Uri.joinPath(exturi, 'out', 'SlkGrid.js'))}" defer></script>
 				<title>SLK Grid</title>
 			</head>

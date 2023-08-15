@@ -13,3 +13,11 @@ body {
     display: flex;
     flex-direction: column;
 }
+
+#slk-table {
+    height: 100%;
+}
+
+.dgxl-part-fullscreenButton {
+    display: none !important;
+}

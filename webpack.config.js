@@ -3,6 +3,7 @@
 'use strict'
 
 const path = require('path')
+const CopyPlugin = require('copy-webpack-plugin')
 const MiniCssExtractPlugin = require('mini-css-extract-plugin')
 
 /** @type {import('webpack').Configuration} */
@@ -13,7 +14,6 @@ const config = {
         extension: {import: './src/extension.ts', filename: '[name].js'},
         SlkGrid: {import: './src/slk/js/main.ts', filename: '[name].js'},
         BinaryEditor: {import: './src/binary/js/main.ts', filename: '[name].js'},
-        tabulator: './src/utils/css/tabulator.scss',
     },
     output: { // https://webpack.js.org/configuration/output/
         path: path.resolve(__dirname, 'out'),
@@ -64,7 +64,12 @@ const config = {
     plugins: [
         new MiniCssExtractPlugin({
             filename: '[name].css'
-        })
+        }),
+        new CopyPlugin({
+            patterns: [
+                {from: './node_modules/@datagridxl/datagridxl2/datagridxl/datagridxl2.js', to: './[name].js'},
+            ],
+        }),
     ],
 }
 
