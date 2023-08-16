@@ -4,10 +4,12 @@
     "target": "esnext",
     "moduleResolution": "Node",
     "strict": true,
-    "isolatedModules": false
+    "isolatedModules": false,
+    "jsx": "react-jsx"
   },
   "include": [
     "src/**/*.ts",
+    "src/**/*.tsx",
     "./node_modules/vscode/vscode.d.ts",
     "./node_modules/vscode/lib/*"
   ]

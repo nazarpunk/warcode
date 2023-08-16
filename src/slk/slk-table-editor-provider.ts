@@ -33,11 +33,12 @@ export default class SlkTableEditorProvider implements CustomTextEditorProvider 
 				<meta name="viewport" content="width=device-width, initial-scale=1.0">
 				<link href="${webviewPanel.webview.asWebviewUri(Uri.joinPath(exturi, 'src', 'slk', 'css', 'main.css'))}" rel="stylesheet" />
 				<script nonce="${nonce}">${fix}</script>
-			    <script nonce="${nonce}" src="${webviewPanel.webview.asWebviewUri(Uri.joinPath(exturi, 'out', 'datagridxl2.js'))}" defer></script>
-			    <script nonce="${nonce}" src="${webviewPanel.webview.asWebviewUri(Uri.joinPath(exturi, 'out', 'SlkGrid.js'))}" defer></script>
+			    <script nonce="${nonce}" src="${webviewPanel.webview.asWebviewUri(Uri.joinPath(exturi, 'out', 'SlkTable.js'))}" defer></script>
 				<title>SLK Grid</title>
 			</head>
-			<body><div class="wrap"><div id="slk-table"></div></div></body>
+			<body>
+			<div class="wrap"><div id="slk-table"></div></div>
+			</body>
 			</html>`
 
         webviewPanel.webview.onDidReceiveMessage(e => {
