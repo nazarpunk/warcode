@@ -36,7 +36,7 @@ export function activate(context: ExtensionContext) {
             webviewOptions: {
                 retainContextWhenHidden: true
             },
-            supportsMultipleEditorsPerDocument: true,
+            supportsMultipleEditorsPerDocument: false,
         }),
         window.registerCustomEditorProvider(
             'BinaryEditor',

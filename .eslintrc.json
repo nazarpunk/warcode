@@ -15,7 +15,10 @@
       "tsconfig.json"
     ]
   },
-  "ignorePatterns": ["webpack.config.js"],
+  "ignorePatterns": [
+    "vite.config.js",
+    "esbuild.js"
+  ],
   "rules": {
     "curly": "off",
     "semi": ["error", "never"],

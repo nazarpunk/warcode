@@ -14,34 +14,34 @@ export default class SlkTableEditorProvider implements CustomTextEditorProvider 
         document: TextDocument,
         webviewPanel: WebviewPanel,
     ): void {
-        const exturi = this.context.extensionUri
-        const nonce = nonceGen()
+        const uri = Uri.joinPath(this.context.extensionUri, 'out', 'slk')
 
-        webviewPanel.webview.options = {
+        const nonce = nonceGen()
+        const wv = webviewPanel.webview
+
+
+        wv.options = {
             enableScripts: true,
         }
 
-        const fix = 'window.module = {};'
-        webviewPanel.webview.html = `<!DOCTYPE html>
+        wv.html = `<!DOCTYPE html>
 			<html lang="en">
 			<head>
 				<meta charset="UTF-8">
 				<meta http-equiv="Content-Security-Policy" content="default-src 'none';
-				 img-src ${webviewPanel.webview.cspSource} https://resources.datagridxl.com/dgxl-logo-icon.svg;
-				 style-src ${webviewPanel.webview.cspSource} 'unsafe-inline';
-				 script-src 'nonce-${nonce}' 'unsafe-eval';">
+				 style-src ${wv.cspSource} 'unsafe-inline';
+				 script-src 'nonce-${nonce}';">
 				<meta name="viewport" content="width=device-width, initial-scale=1.0">
-				<link href="${webviewPanel.webview.asWebviewUri(Uri.joinPath(exturi, 'src', 'slk', 'css', 'main.css'))}" rel="stylesheet" />
-				<script nonce="${nonce}">${fix}</script>
-			    <script nonce="${nonce}" src="${webviewPanel.webview.asWebviewUri(Uri.joinPath(exturi, 'out', 'SlkTable.js'))}" defer></script>
+				<link href="${wv.asWebviewUri(Uri.joinPath(uri, 'main.css'))}" rel="stylesheet" />
+			    <script nonce="${nonce}" src="${wv.asWebviewUri(Uri.joinPath(uri, 'main.js'))}" type="module" defer></script>
 				<title>SLK Grid</title>
 			</head>
 			<body>
-			<div class="wrap"><div id="slk-table"></div></div>
+			<div class="wrap"><div id="app"></div></div>
 			</body>
 			</html>`
 
-        webviewPanel.webview.onDidReceiveMessage(e => {
+        wv.onDidReceiveMessage(e => {
             switch (e.type as SlkPostMessage) {
                 case SlkPostMessage.error:
                     window.showErrorMessage(e.data)
@@ -49,7 +49,7 @@ export default class SlkTableEditorProvider implements CustomTextEditorProvider 
             }
         })
 
-        const updateWebview = () => webviewPanel.webview.postMessage({
+        const updateWebview = () => wv.postMessage({
             type: SlkPostMessage.update,
             text: document.getText(),
         })

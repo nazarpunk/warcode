@@ -29,40 +29,28 @@
   },
   "main": "./out/extension.js",
   "scripts": {
-    "esbuild-docs": "esbuild jass=docs/main.ts zinc=docs/zinc/main.ts wts=docs/wts/main.ts calculator=docs/calculator/main.mjs gen=docs/_gen/gen.ts --outdir=docs/out --target=es2020 --bundle --external:vscode --external:fs --format=cjs --platform=browser --tree-shaking=true --sourcemap --watch",
-    "esbuild-base": "esbuild extension=src/extension.ts slkGrid=src/slk/js/main.ts BinaryEditor=src/binary/js/main.ts --outdir=out --tsconfig=src/tsconfig.json --target=es2020 --bundle --external:vscode --external:fs --format=cjs --platform=node --tree-shaking=true --sourcemap",
-    "esbuild": "npm run esbuild-base",
     "publish": "vsce publish patch",
     "vscode:prepublish": "webpack --mode production",
-    "compile": "webpack --mode development"
+    "compile": "V=1 vite build && V=2 vite build && V=3 vite build"
   },
   "devDependencies": {
-    "@babel/preset-react": "^7.22.5",
     "@glideapps/glide-data-grid": "^5.2.1",
     "@types/node": "^20.5.0",
     "@types/react": "^18.2.20",
     "@types/react-dom": "^18.2.7",
     "@types/vscode": "^1.81.0",
-    "@types/web": "^0.0.113",
+    "@types/web": "^0.0.114",
     "@typescript-eslint/eslint-plugin": "^6.4.0",
+    "@vitejs/plugin-react": "^4.0.4",
     "@vscode/vsce": "^2.20.1",
     "@vscode/webview-ui-toolkit": "^1.2.2",
-    "babel-loader": "^9.1.3",
     "chevrotain": "^11.0.3",
-    "copy-webpack-plugin": "^11.0.0",
-    "css-loader": "^6.8.1",
     "eslint": "^8.47.0",
     "i18next": "^23.4.4",
-    "mini-css-extract-plugin": "^2.7.6",
     "react": "^18.2.0",
     "react-responsive-carousel": "^3.2.23",
-    "sass": "^1.65.1",
-    "sass-loader": "^13.3.2",
-    "style-loader": "^3.3.3",
-    "ts-loader": "^9.4.4",
     "typescript": "^5.1.6",
-    "webpack": "^5.88.2",
-    "webpack-cli": "^5.1.4"
+    "vite": "^4.4.9"
   },
   "configurationDefaults": {
     "jass": {
