@@ -30,7 +30,7 @@
   "main": "./out/extension.js",
   "scripts": {
     "publish": "vsce publish patch",
-    "vscode:prepublish": "webpack --mode production",
+    "vscode:prepublish": "npm compile",
     "compile": "V=1 vite build && V=2 vite build && V=3 vite build"
   },
   "devDependencies": {
