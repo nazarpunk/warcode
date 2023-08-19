@@ -30,12 +30,12 @@
   "main": "./out/extension.js",
   "scripts": {
     "publish": "vsce publish patch",
-    "vscode:prepublish": "npm compile",
+    "vscode:prepublish": "npm run compile",
     "compile": "V=1 vite build && V=2 vite build && V=3 vite build"
   },
   "devDependencies": {
     "@glideapps/glide-data-grid": "^5.2.1",
-    "@types/node": "^20.5.0",
+    "@types/node": "^20.5.1",
     "@types/react": "^18.2.20",
     "@types/react-dom": "^18.2.7",
     "@types/vscode": "^1.81.0",
