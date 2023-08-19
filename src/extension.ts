@@ -10,7 +10,7 @@ import ZincVisitor from './zinc/zinc-visitor'
 import WtsTokensList from './wts/wts-tokens-list'
 import WtsParser from './wts/wts-parser'
 import WtsVisitor from './wts/wts-visitor'
-import SlkTableEditorProvider from './slk/slk-table-editor-provider'
+import SlkEditorProvider from './slk/slk-editor-provider'
 import {BinaryEditorProvider} from './binary/binary-editor-provider'
 import './utils/i18n'
 
@@ -32,7 +32,7 @@ export function activate(context: ExtensionContext) {
         languages.registerDocumentSymbolProvider({language: wts.languageName}, wts),
         languages.registerFoldingRangeProvider({language: wts.languageName}, wts),
 
-        window.registerCustomEditorProvider('SlkTable', new SlkTableEditorProvider(context), {
+        window.registerCustomEditorProvider('SlkEditor', new SlkEditorProvider(context), {
             webviewOptions: {
                 retainContextWhenHidden: true
             },

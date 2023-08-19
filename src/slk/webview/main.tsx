@@ -1,4 +1,4 @@
-import {Component, FC, StrictMode, useEffect, useRef, useState} from 'react'
+import {StrictMode, useCallback, useRef, useState} from 'react'
 import {createRoot} from 'react-dom/client'
 
 import '@glideapps/glide-data-grid/dist/index.css'
@@ -8,107 +8,76 @@ import SlkPostMessage from '../model/slk-post-message'
 import {Slk} from '../parser/Slk'
 import {AcquireVscodeApi} from '../../utils/editor/model/acquire-vscode-api'
 
-import {
-    DataEditor, DataEditorRef,
-    GridCell,
-    GridCellKind,
-    GridColumn,
-    Item
-} from '@glideapps/glide-data-grid'
+import {DataEditor, DataEditorRef, GridCell, GridCellKind, GridColumn, Item} from '@glideapps/glide-data-grid'
 
 // @ts-ignore
 const vscode: AcquireVscodeApi = acquireVsCodeApi()
 
-const update = (text: string) => {
-    const slk = new Slk(text)
-
-    if (slk.errors.length > 0) {
-        for (const error of slk.errors) vscode.postMessage({type: SlkPostMessage.error, data: error.message})
-        return
-    }
-
-    if (!slk.header) {
-        vscode.postMessage({type: SlkPostMessage.error, data: 'Missing header.'})
-        return
-    }
-
-    console.log('---- update')
-
-}
-
-window.addEventListener('message', (event: MessageEvent) => {
-    const message = event.data
-    switch (message.type) {
-        case SlkPostMessage.update:
-            update(message.text)
-            return
-    }
-})
-
-const state = vscode.getState()
-if (state) update(state.text)
-
-const data = [
-    {
-        firstName: 'John',
-        lastName: 'Doe'
-    },
-    {
-        firstName: 'Maria',
-        lastName: 'Garcia'
-    },
-    {
-        firstName: 'Nancy',
-        lastName: 'Jones'
-    },
-    {
-        firstName: 'James',
-        lastName: 'Smith'
-    }
-]
-
-function getData([col, row]: Item): GridCell {
-    const person = data[row]
-
-    if (col === 0) {
-        return {
-            kind: GridCellKind.Text,
-            data: person.firstName,
-            allowOverlay: false,
-            displayData: person.firstName
-        }
-    } else if (col === 1) {
-        return {
-            kind: GridCellKind.Text,
-            data: person.lastName,
-            allowOverlay: false,
-            displayData: person.lastName
-        }
-    } else {
-        throw new Error()
-    }
-}
-
-const columns: GridColumn[] = [
-    {title: 'First Name', width: 100},
-    {title: 'Last Name', width: 100}
-]
-
-const Example: FC = () => {
+const App = ({slk}: { slk: Slk }) => {
     const ref = useRef<DataEditorRef | null>(null)
 
-    console.log('+++++++ render')
+    const dataRef = useRef<Record<any, any>[]>((() => {
+        const out: Record<any, any>[] = []
+        for (const list of slk.list) {
+            const obj: Record<any, any> = {}
+            out.push(obj)
+            for (let i = 0; i < slk.header!.length; i++) {
+                obj[i] = list[i]
+            }
+        }
+        return out
+    })())
 
-    //data[0].firstName = 'Fuck!!!!!'
-    //ref.current?.updateCells([{cell: [0, 0]}])
+    // https://github.com/quicktype/glide-data-grid/blob/main/packages/core/API.md#gridcell
+    const getCellContent = useCallback((cell: Item): GridCell => {
+        const [col, row] = cell
+        const dataRow = dataRef.current[row]
+        const d = (dataRow?.[col] ?? '').toString()
+        return {
+            kind: GridCellKind.Text,
+            allowOverlay: false,
+            readonly: true,
+            displayData: d as string,
+            data: d as string,
+        }
+    }, [])
+
+    const columns = (): GridColumn[] => {
+        const list: GridColumn[] = []
+        for (let i = 0; i < slk.header!.length; i++) {
+            list.push(
+                {
+                    title: slk.header![i]!.toString(),
+                    id: i.toString(),
+                },
+            )
+        }
+        return list
+    }
+
+    const [cols, setCols] = useState(() => columns())
+
+    const onColumnResize = useCallback((column: GridColumn, newSize: number) => {
+        const list: GridColumn[] = []
+        for (const c of cols) {
+            if (c.id === column.id) (c as { width: number }).width = newSize
+            list.push(c)
+        }
+        setCols(list)
+    }, [])
 
     return <DataEditor
         ref={ref}
-        columns={columns}
-        getCellContent={getData}
+        columns={cols}
+        getCellContent={getCellContent}
         width="100%"
         height="100%"
-        rows={data.length}
+        rows={dataRef.current.length}
+        rowMarkers="both"
+        showMinimap={true}
+        maxColumnAutoWidth={500}
+        onColumnResize={onColumnResize}
+        maxColumnWidth={2000}
         theme={{
             accentColor: '#8c96ff',
             accentLight: 'rgba(202, 206, 255, 0.253)',
@@ -145,8 +114,25 @@ const Example: FC = () => {
     />
 }
 
-createRoot(document.getElementById('app')!).render(
-    <StrictMode>
-        <Example></Example>
-    </StrictMode>
-)
+const onInit = (event: MessageEvent) => {
+    if (event.data.type !== SlkPostMessage.init) return
+    window.removeEventListener('message', onInit)
+    const slk = new Slk(event.data.text)
+
+    if (slk.errors.length > 0) {
+        for (const error of slk.errors) vscode.postMessage({type: SlkPostMessage.error, data: error.message})
+        return
+    }
+
+    if (!slk.header) {
+        vscode.postMessage({type: SlkPostMessage.error, data: 'Missing header.'})
+        return
+    }
+
+    createRoot(document.body.firstElementChild!).render(
+        <StrictMode>
+            <App slk={slk}></App>
+        </StrictMode>
+    )
+}
+window.addEventListener('message', onInit)

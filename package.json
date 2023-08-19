@@ -71,8 +71,8 @@
     },
     "customEditors": [
       {
-        "viewType": "SlkTable",
-        "displayName": "SLK table",
+        "viewType": "SlkEditor",
+        "displayName": "SLK Editor",
         "selector": [
           {
             "filenamePattern": "*.slk"

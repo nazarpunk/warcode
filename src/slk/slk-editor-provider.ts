@@ -1,9 +1,9 @@
 // https://code.visualstudio.com/api/extension-guides/custom-editors
-import {CustomTextEditorProvider, ExtensionContext, TextDocument, Uri, WebviewPanel, window, workspace} from 'vscode'
+import {CustomTextEditorProvider, ExtensionContext, TextDocument, Uri, WebviewPanel, window} from 'vscode'
 import nonceGen from '../utils/nonce-gen'
 import SlkPostMessage from './model/slk-post-message'
 
-export default class SlkTableEditorProvider implements CustomTextEditorProvider {
+export default class SlkEditorProvider implements CustomTextEditorProvider {
 
     constructor(
         private readonly context: ExtensionContext
@@ -19,7 +19,6 @@ export default class SlkTableEditorProvider implements CustomTextEditorProvider 
         const nonce = nonceGen()
         const wv = webviewPanel.webview
 
-
         wv.options = {
             enableScripts: true,
         }
@@ -34,12 +33,8 @@ export default class SlkTableEditorProvider implements CustomTextEditorProvider 
 				<meta name="viewport" content="width=device-width, initial-scale=1.0">
 				<link href="${wv.asWebviewUri(Uri.joinPath(uri, 'main.css'))}" rel="stylesheet" />
 			    <script nonce="${nonce}" src="${wv.asWebviewUri(Uri.joinPath(uri, 'main.js'))}" type="module" defer></script>
-				<title>SLK Grid</title>
-			</head>
-			<body>
-			<div class="wrap"><div id="app"></div></div>
-			</body>
-			</html>`
+				<title>SLK Editor</title>
+			</head><body><div class="app"></div></body></html>`
 
         wv.onDidReceiveMessage(e => {
             switch (e.type as SlkPostMessage) {
@@ -49,17 +44,9 @@ export default class SlkTableEditorProvider implements CustomTextEditorProvider 
             }
         })
 
-        const updateWebview = () => wv.postMessage({
-            type: SlkPostMessage.update,
+        wv.postMessage({
+            type: SlkPostMessage.init,
             text: document.getText(),
         })
-
-        webviewPanel.onDidDispose(() => {
-            workspace.onDidChangeTextDocument(e => {
-                if (e.document.uri.toString() === document.uri.toString()) updateWebview()
-            }).dispose()
-        })
-
-        updateWebview()
     }
 }
