@@ -5,10 +5,19 @@ import '@glideapps/glide-data-grid/dist/index.css'
 import './main.css'
 
 import SlkPostMessage from '../model/slk-post-message'
-import {Slk} from '../parser/Slk'
+import {Slk, SlkValue} from '../parser/Slk'
 import {AcquireVscodeApi} from '../../utils/editor/model/acquire-vscode-api'
 
-import {DataEditor, DataEditorRef, GridCell, GridCellKind, GridColumn, Item} from '@glideapps/glide-data-grid'
+import {
+    DataEditor,
+    DataEditorRef,
+    EditableGridCell,
+    GridCell,
+    GridCellKind,
+    GridColumn,
+    Item
+} from '@glideapps/glide-data-grid'
+import GetDataGridTheme from '../../utils/data-grid/data-grid-theme'
 
 // @ts-ignore
 const vscode: AcquireVscodeApi = acquireVsCodeApi()
@@ -16,27 +25,13 @@ const vscode: AcquireVscodeApi = acquireVsCodeApi()
 const App = ({slk}: { slk: Slk }) => {
     const ref = useRef<DataEditorRef | null>(null)
 
-    const dataRef = useRef<Record<any, any>[]>((() => {
-        const out: Record<any, any>[] = []
-        for (const list of slk.list) {
-            const obj: Record<any, any> = {}
-            out.push(obj)
-            for (let i = 0; i < slk.header!.length; i++) {
-                obj[i] = list[i]
-            }
-        }
-        return out
-    })())
-
     // https://github.com/quicktype/glide-data-grid/blob/main/packages/core/API.md#gridcell
     const getCellContent = useCallback((cell: Item): GridCell => {
         const [col, row] = cell
-        const dataRow = dataRef.current[row]
-        const d = (dataRow?.[col] ?? '').toString()
+        const d = (slk.list[row][col] ?? '').toString()
         return {
             kind: GridCellKind.Text,
-            allowOverlay: false,
-            readonly: true,
+            allowOverlay: true,
             displayData: d as string,
             data: d as string,
         }
@@ -66,51 +61,26 @@ const App = ({slk}: { slk: Slk }) => {
         setCols(list)
     }, [])
 
+    const onCellEdited = useCallback((cell: Item, value: EditableGridCell) => {
+        const [col, row] = cell
+        slk.list[row][col] = value.data as SlkValue
+        vscode.postMessage({type: SlkPostMessage.update, content: slk.content})
+    }, [])
+
     return <DataEditor
         ref={ref}
         columns={cols}
         getCellContent={getCellContent}
         width="100%"
         height="100%"
-        rows={dataRef.current.length}
+        rows={slk.list.length}
         rowMarkers="both"
         showMinimap={true}
         maxColumnAutoWidth={500}
         onColumnResize={onColumnResize}
+        onCellEdited={onCellEdited}
         maxColumnWidth={2000}
-        theme={{
-            accentColor: '#8c96ff',
-            accentLight: 'rgba(202, 206, 255, 0.253)',
-
-            textDark: '#ffffff',
-            textMedium: '#b8b8b8',
-            textLight: '#a0a0a0',
-            textBubble: '#ffffff',
-
-            bgIconHeader: '#b8b8b8',
-            fgIconHeader: '#000000',
-            textHeader: '#a1a1a1',
-            textHeaderSelected: '#000000',
-
-            bgCell: '#16161b',
-            bgCellMedium: '#202027',
-            bgHeader: '#212121',
-            bgHeaderHasFocus: '#474747',
-            bgHeaderHovered: '#404040',
-
-            bgBubble: '#212121',
-            bgBubbleSelected: '#000000',
-
-            bgSearchResult: '#423c24',
-
-            borderColor: 'rgba(225,225,225,0.2)',
-            drilldownBorder: 'rgba(225,225,225,0.4)',
-
-            linkColor: '#4F5DFF',
-
-            headerFontStyle: 'bold 14px',
-            baseFontStyle: '13px',
-        }}
+        theme={GetDataGridTheme()}
     />
 }
 

@@ -53,6 +53,7 @@ export default defineConfig(() => {
             return {
                 plugins: [react()],
                 build: {
+                    target: 'esnext',
                     outDir: 'out/slk',
                     rollupOptions: {
                         input: 'src/slk/webview/main.tsx',

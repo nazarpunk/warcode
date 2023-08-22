@@ -6,11 +6,12 @@ const enum SlkKey {
     Cell = 'C',
     X = 'X',
     Y = 'Y',
-    Data = 'K',
+    D = 'D',
+    Value = 'K',
     End = 'E'
 }
 
-type SlkValue = number | string | null
+export type SlkValue = number | string | null
 
 export class Slk {
 
@@ -24,6 +25,7 @@ export class Slk {
         }
     }
 
+    #id: string | undefined
     #text: string
     errors: Error[] = []
 
@@ -33,6 +35,7 @@ export class Slk {
 
     width = -1
     height = -1
+    def: SlkValue | undefined
 
     #push(y: number, x: number, value: SlkValue) {
         while (this.list.length <= y) {
@@ -68,6 +71,7 @@ export class Slk {
 
             switch (chunk as SlkKey | null) {
                 case SlkKey.Id:
+                    this.#id = string
                     break
                 case SlkKey.TableSize:
                     for (const value of chunks) {
@@ -81,6 +85,8 @@ export class Slk {
                             case SlkKey.Y:
                                 this.height = Number(v)
                                 break
+                            case SlkKey.D:
+                                this.def = _value(v)
                         }
                     }
                     break
@@ -98,7 +104,7 @@ export class Slk {
                             case SlkKey.Y:
                                 y = Number(v) - 1
                                 break
-                            case SlkKey.Data:
+                            case SlkKey.Value:
                                 value = _value(v)
                         }
                     }
@@ -109,5 +115,44 @@ export class Slk {
             }
         }
         this.header = this.list.shift()
+    }
+
+    get content(): string {
+        let s = ''
+        if (this.#id) s += this.#id + '\n'
+
+        s += `${SlkKey.TableSize};${SlkKey.X}${this.width};${SlkKey.Y}${this.list.length}`
+        if (this.def !== undefined) s += `;${SlkKey.D}${this.def}`
+        s += '\n'
+
+        const _value = (v: string | number): string => {
+            return typeof v == 'number' || /^[+-]?(\d+\.\d*|[.]?\d+)$/.test(v) ? v.toString() : `"${v}"`
+        }
+
+        if (!this.header) return ''
+
+        let y = 0
+        const count = this.header.length
+        const _list = (row: SlkValue[]) => {
+            y++
+            let hasY = false
+            for (let i = 0; i < count; i++) {
+                const v = row[i] ?? null
+                if (v === null) continue
+                s += `${SlkKey.Cell};${SlkKey.X}${i + 1}`
+                if (!hasY) {
+                    hasY = true
+                    s += `;${SlkKey.Y}${y}`
+                }
+                s += `;${SlkKey.Value}${_value(v)}\n`
+            }
+        }
+        _list(this.header)
+
+        for (const item of this.list) _list(item)
+
+        s += `${SlkKey.End}\n`
+
+        return s
     }
 }
