@@ -31,16 +31,22 @@
   "scripts": {
     "publish": "vsce publish patch",
     "vscode:prepublish": "npm run compile",
-    "compile": "V=1 vite build && V=2 vite build && V=3 vite build"
+    "compile": "echo compile",
+    "compile-doc": "v=doc vite build",
+    "compile-ext": "v=ext vite build",
+    "compile-bin": "v=bin vite build",
+    "compile-slk": "v=slk vite build"
+  },
+  "dependencies": {
   },
   "devDependencies": {
-    "@glideapps/glide-data-grid": "^5.2.1",
-    "@types/node": "^20.5.1",
+    "@glideapps/glide-data-grid": "^5.3.0",
+    "@types/node": "^20.5.2",
     "@types/react": "^18.2.20",
     "@types/react-dom": "^18.2.7",
     "@types/vscode": "^1.81.0",
     "@types/web": "^0.0.114",
-    "@typescript-eslint/eslint-plugin": "^6.4.0",
+    "@typescript-eslint/eslint-plugin": "^6.4.1",
     "@vitejs/plugin-react": "^4.0.4",
     "@vscode/vsce": "^2.20.1",
     "@vscode/webview-ui-toolkit": "^1.2.2",
@@ -99,6 +105,10 @@
         "extensions": [
           "j"
         ],
+        "icon": {
+          "light": "./icons/beetle.svg",
+          "dark": "./icons/beetle.svg"
+        },
         "configuration": "./src/jass/syntaxes/language-configuration.json"
       },
       {
@@ -110,6 +120,10 @@
         "extensions": [
           "zn"
         ],
+        "icon": {
+          "light": "./icons/bat.svg",
+          "dark": "./icons/bat.svg"
+        },
         "configuration": "./src/zinc/syntaxes/language-configuration.json"
       },
       {
@@ -118,6 +132,10 @@
         "extensions": [
           "wts"
         ],
+        "icon": {
+          "light": "./icons/book.svg",
+          "dark": "./icons/book.svg"
+        },
         "configuration": "./src/wts/syntaxes/language-configuration.json"
       },
       {
@@ -125,14 +143,22 @@
         "aliases": [],
         "extensions": [
           "slk"
-        ]
+        ],
+        "icon": {
+          "light": "./icons/axes.svg",
+          "dark": "./icons/axes.svg"
+        }
       },
       {
         "id": "binary",
         "aliases": [],
         "extensions": [
           "w3a"
-        ]
+        ],
+        "icon": {
+          "light": "./icons/eye.svg",
+          "dark": "./icons/eye.svg"
+        }
       }
     ],
     "grammars": [
@@ -805,8 +831,5 @@
         }
       }
     }
-  },
-  "dependencies": {
-    "@glideapps/glide-data-grid": "^5.2.1"
   }
 }

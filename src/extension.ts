@@ -20,7 +20,6 @@ export function activate(context: ExtensionContext) {
     const zinc = new ExtProvider('zinc', ZincTokensList, ZincParser, ZincVisitor)
     const wts = new ExtProvider('wts', WtsTokensList, WtsParser, WtsVisitor)
 
-
     context.subscriptions.push(
         languages.registerDocumentSemanticTokensProvider({language: jass.languageName}, jass, ExtSemanticTokensLegend),
         languages.registerDocumentSymbolProvider({language: jass.languageName}, jass),

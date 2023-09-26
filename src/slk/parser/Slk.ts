@@ -29,9 +29,8 @@ export class Slk {
     #text: string
     errors: Error[] = []
 
+    header: SlkValue[] = []
     list: SlkValue[][] = []
-
-    header?: SlkValue[]
 
     width = -1
     height = -1
@@ -114,7 +113,7 @@ export class Slk {
                     break loop
             }
         }
-        this.header = this.list.shift()
+        this.header = this.list.shift() ?? []
     }
 
     get content(): string {

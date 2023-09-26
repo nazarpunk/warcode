@@ -1,58 +1,56 @@
 import {defineConfig} from 'vite'
 import react from '@vitejs/plugin-react'
 
+
 /** @typedef {import('vite').UserConfig} UserConfig  */
 
-const merge = (target, source) => {
-    for (const key of Object.keys(source)) {
-        if (source[key] instanceof Object) Object.assign(source[key], merge(target[key], source[key]))
-    }
-    Object.assign(target || {}, source)
-    return target
-}
-/**
- * @param c {UserConfig}
- * @return {UserConfig}
- */
-const c = c => {
-    // noinspection JSValidateTypes
-    /** @type {UserConfig} */
-    const d = {
-        build: {
-            emptyOutDir: process.env.V === '1',
-            outDir: 'out',
-            target: 'modules',
-            rollupOptions: {
-                external: ['vscode', 'fs', 'path', 'process'],
-                preserveEntrySignatures: 'strict',
-                output: {
-                    entryFileNames: '[name].js',
-                }
-            }
-        }
-    }
-    return merge(d, c)
-}
-
-
 // noinspection JSUnusedGlobalSymbols
+/** */
 export default defineConfig(() => {
-    switch (process.env.V) {
-        case '1':
-            return c({
+    switch (process.env.v) {
+        case 'ext':
+            return {
                 build: {
+                    outDir: 'out',
+                    target: 'esnext',
+                    emptyOutDir: true,
                     rollupOptions: {
-                        input: {extension: 'src/extension.ts'},
+                        external: ['vscode', 'fs', 'path', 'process'],
+                        preserveEntrySignatures: 'strict',
+                        input: {
+                            extension: 'src/extension.ts',
+                        },
                         output: {
                             format: 'commonjs',
+                            entryFileNames: '[name].js',
                         }
                     }
                 }
-            })
-        case '2':
+            }
+        case 'bin':
+            return {
+                build: {
+                    emptyOutDir: false,
+                    outDir: 'out',
+                    target: 'esnext',
+                    rollupOptions: {
+                        external: ['vscode', 'fs', 'path', 'process'],
+                        preserveEntrySignatures: 'strict',
+                        input: {
+                            binary: 'src/binary/webview/main.ts',
+                        },
+                        output: {
+                            format: 'commonjs',
+                            entryFileNames: '[name].js',
+                        }
+                    }
+                }
+            }
+        case 'slk':
             return {
                 plugins: [react()],
                 build: {
+                    emptyOutDir: false,
                     target: 'esnext',
                     outDir: 'out/slk',
                     rollupOptions: {
@@ -65,16 +63,5 @@ export default defineConfig(() => {
                     },
                 },
             }
-        case '3':
-            return c({
-                build: {
-                    rollupOptions: {
-                        input: {BinaryEditor: 'src/binary/js/main.ts'},
-                        output: {
-                            format: 'cjs'
-                        }
-                    }
-                }
-            })
     }
 })

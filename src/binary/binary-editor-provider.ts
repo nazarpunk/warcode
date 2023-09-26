@@ -82,16 +82,19 @@ export class BinaryEditorProvider implements CustomEditorProvider<BinaryDocument
 
         const exturi = this._context.extensionUri
         const nonce = nonceGen()
-        const fix = 'window.module = {};'
+        // <link rel="stylesheet" href="${webviewPanel.webview.asWebviewUri(Uri.joinPath(exturi, 'src', 'binary', 'css', 'main.css'))}">
         webviewPanel.webview.html = `<!DOCTYPE html><html lang="en"><head>
 				<meta charset="UTF-8">
-				<meta http-equiv="Content-Security-Policy" content="default-src 'none'; img-src ${webviewPanel.webview.cspSource} blob:; style-src ${webviewPanel.webview.cspSource}; script-src 'nonce-${nonce}';">
+				<meta http-equiv="Content-Security-Policy" content="
+				default-src 'none'; 
+				img-src ${webviewPanel.webview.cspSource} blob:;
+				style-src ${webviewPanel.webview.cspSource} 'unsafe-inline';
+				script-src 'nonce-${nonce}';
+				">
 				<meta name="viewport" content="width=device-width, initial-scale=1.0">
-				<link rel="stylesheet" href="${webviewPanel.webview.asWebviewUri(Uri.joinPath(exturi, 'src', 'binary', 'css', 'main.css'))}">
-				<script nonce="${nonce}">${fix}</script>
-				<script nonce="${nonce}" defer src="${webviewPanel.webview.asWebviewUri(Uri.joinPath(exturi, 'out', 'BinaryEditor.js'))}" ></script>
+				<script nonce="${nonce}" defer src="${webviewPanel.webview.asWebviewUri(Uri.joinPath(exturi, 'out', 'binary.js'))}" ></script>
 				<title>Binary</title>
-			</head><body></body></html>`
+			</head><body>Under construction...</body></html>`
 
         webviewPanel.webview.onDidReceiveMessage(e => this.onMessage(document, e))
 
